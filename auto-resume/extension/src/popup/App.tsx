@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { useWs } from './useWs';
+import Dashboard from './Dashboard';
+import ResumeForm from './ResumeForm';
+import JobTargetsForm from './JobTargetsForm';
+import ApplicationsList from './ApplicationsList';
 
 const tabs = ['仪表盘', '简历', '目标', '记录'] as const;
 type Tab = typeof tabs[number];
@@ -30,7 +34,10 @@ const App: React.FC = () => {
         ))}
       </nav>
       <main className="flex-1 overflow-y-auto p-4">
-        <p className="text-gray-400 text-center mt-10">组件开发中...</p>
+        {activeTab === '仪表盘' && <Dashboard />}
+        {activeTab === '简历' && <ResumeForm />}
+        {activeTab === '目标' && <JobTargetsForm />}
+        {activeTab === '记录' && <ApplicationsList />}
       </main>
     </div>
   );
