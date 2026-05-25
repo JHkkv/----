@@ -1,0 +1,9 @@
+{
+  "name": "auto-resume",
+  "private": true,
+  "scripts": {
+    "server": "cd server && npm run dev",
+    "extension": "cd extension && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run extension\""
+  }
+}
