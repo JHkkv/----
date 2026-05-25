@@ -3,7 +3,7 @@ import cors from 'cors';
 import { WebSocketServer } from 'ws';
 import http from 'http';
 import { CONFIG } from './config';
-import { initDb } from './db/schema';
+import { initDb } from './db/connection';
 import { resumeRouter } from './routes/resume';
 import { jobsRouter } from './routes/jobs';
 import { applicationsRouter } from './routes/applications';
