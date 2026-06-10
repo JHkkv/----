@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+
+# Environment & secrets
+.env
+.env.*
+*.key
+*.pem
+secrets.json
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# Editor & IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build outputs
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# Database
+*.db
+*.sqlite
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Python
+__pycache__/
+*.pyc
+
+# Temp files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Claude Code
+.claude/worktrees/
+.claude/scheduled_tasks.lock
+
+# Superpowers brainstorming mockups
+.superpowers/
