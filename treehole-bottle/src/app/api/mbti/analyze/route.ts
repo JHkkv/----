@@ -45,6 +45,10 @@ function mergeScores(
 export async function POST(
   request: Request,
 ): Promise<NextResponse> {
+  // TODO: Check total user count — if > 20, skip AI analysis to manage costs.
+  // The guest route already logs a warning when this threshold is exceeded.
+  // This check should query prisma.user.count() and fall back to choice-only
+  // scoring (returning existing scores or null) when totalUsers > 20.
   try {
     const user = await getCurrentUser();
     if (!user) {

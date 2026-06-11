@@ -23,6 +23,16 @@ export async function POST(): Promise<NextResponse> {
       },
     });
 
+    // Soft gate: if total users exceed 20, AI analysis should be disabled
+    const totalUsers = await prisma.user.count();
+    if (totalUsers > 20) {
+      console.warn(
+        `[AI Gate] Total users (${totalUsers}) exceed soft limit of 20. ` +
+          `AI analysis should be disabled to manage costs.`,
+      );
+      // NOTE: This is a soft gate — guest creation is NOT blocked.
+    }
+
     const cookieConfig = setAuthCookie(cookieToken);
     const response = NextResponse.json({
       user: {
