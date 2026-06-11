@@ -18,11 +18,26 @@
 
 ## 快速开始
 
+### 方式一：一键启动（推荐）
+
+```bash
+# Windows 用户直接双击运行
+setup.bat
+
+# 或者使用 Docker 启动数据库 + 手动启动
+docker compose up -d    # 启动 PostgreSQL
+npm run setup           # 安装依赖 + 初始化数据库
+npm run dev             # http://localhost:3000
+```
+
+### 方式二：手动启动
+
 ```bash
 npm install
-cp .env.example .env  # 编辑 DATABASE_URL 和 CLAUDE_API_KEY (可选)
+cp .env.example .env    # 数据库默认匹配 docker-compose
+docker compose up -d    # 启动 PostgreSQL（或用你自己的）
 npx prisma migrate dev
-npm run dev            # http://localhost:3000
+npm run dev             # http://localhost:3000
 ```
 
 ## 部署 (Vercel)
