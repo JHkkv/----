@@ -1,0 +1,37 @@
+<!--pages/teacher/submissions/submissions.wxml-->
+<view class="container">
+  <view class="page-title">学生提交</view>
+
+  <view class="empty-state" wx:if="{{list.length === 0 && !loading}}">
+    <view class="icon">🎧</view>
+    <view>暂无学生提交</view>
+  </view>
+
+  <view wx:for="{{list}}" wx:key="_id" class="card">
+    <view class="sub-header">
+      <view class="sub-student">{{item.studentName || '未知学生'}}</view>
+      <view class="sub-time">{{item.submitTimeText}}</view>
+    </view>
+    <view class="sub-track">{{item.trackName || '未指定曲目'}}</view>
+    <view class="sub-duration">时长：{{item.audioDuration}}秒</view>
+
+    <audio-player src="{{item.audioUrl}}" label="练习录音" wx:if="{{item.audioUrl}}" />
+
+    <view class="sub-review" wx:if="{{item.selfReview}}">
+      <view class="sub-label">学生自评：</view>
+      <view>{{item.selfReview}}</view>
+    </view>
+
+    <!-- Teacher feedback -->
+    <view wx:if="{{item.teacherFeedback}}" class="existing-feedback">
+      <view class="sub-label">我的点评：</view>
+      <view class="feedback-text">{{item.teacherFeedback}}</view>
+    </view>
+
+    <view wx:if="{{!item.teacherFeedback}}" class="feedback-area">
+      <view class="sub-label">写点评</view>
+      <textarea class="textarea-field" placeholder="给学生写练习点评..." value="{{item._feedbackInput || ''}}" data-id="{{item._id}}" bindinput="onFeedbackInput" />
+      <button class="btn-primary btn-small" bindtap="submitFeedback" data-id="{{item._id}}" data-idx="{{index}}">发送点评</button>
+    </view>
+  </view>
+</view>

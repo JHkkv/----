@@ -11,7 +11,7 @@ interface ScoreResult {
  * Derive the 4-letter MBTI type from MbtiScores.
  * Positive score in a dimension → first letter, negative → second letter.
  */
-function deriveType(scores: MbtiScores): MbtiType {
+export function deriveType(scores: MbtiScores): MbtiType {
   const eOrI = scores.E >= scores.I ? "E" : "I";
   const sOrN = scores.S >= scores.N ? "S" : "N";
   const tOrF = scores.T >= scores.F ? "T" : "F";

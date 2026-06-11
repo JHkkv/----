@@ -1,0 +1,26 @@
+<!--pages/teacher/students/students.wxml-->
+<view class="container">
+  <view class="page-title">学生管理</view>
+
+  <view class="card invite-card">
+    <view class="invite-label">我的邀请码</view>
+    <view class="invite-code">{{inviteCode}}</view>
+    <view class="invite-tip">让学生在小程序中输入此邀请码即可绑定</view>
+  </view>
+
+  <view class="page-title">已绑定学生 ({{list.length}})</view>
+
+  <view class="empty-state" wx:if="{{list.length === 0}}">
+    <view class="icon">👥</view>
+    <view>暂无学生绑定</view>
+    <view style="font-size:24rpx;margin-top:8rpx">将上方邀请码分享给学生</view>
+  </view>
+
+  <view wx:for="{{list}}" wx:key="_openid" class="card student-card">
+    <view class="student-avatar">{{item.avatarText}}</view>
+    <view class="student-info">
+      <view class="student-name">{{item.nickName}}</view>
+      <view class="student-time">加入于 {{item.createTimeText}}</view>
+    </view>
+  </view>
+</view>

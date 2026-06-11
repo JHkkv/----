@@ -39,6 +39,7 @@ export async function GET(request: Request): Promise<NextResponse> {
           },
         },
       },
+      take: limit * 3,
     });
 
     // Annotate bottles with default neutral similarity
@@ -76,9 +77,12 @@ export async function GET(request: Request): Promise<NextResponse> {
       sorted = [...annotated].sort((a, b) => b.similarity - a.similarity);
     } else {
       // Shuffle with slight similarity bias:
-      // Give items a biased weight = similarity^2, then shuffle proportionally.
-      // For simplicity: shuffle the array then sort with a random+similarity composite key.
-      sorted = [...annotated].sort(() => Math.random() - 0.5);
+      // Fisher-Yates shuffle followed by similarity-weighted ordering
+      sorted = [...annotated];
+      for (let i = sorted.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [sorted[i], sorted[j]] = [sorted[j], sorted[i]];
+      }
       // Gentle re-sort: items with higher similarity are more likely to appear earlier
       sorted.sort((a, b) => {
         const biasA = a.similarity * Math.random();

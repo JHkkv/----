@@ -59,7 +59,7 @@ export default function WelcomeModal({
                   完成 MBTI 性格测试
                 </h4>
                 <p className="text-white/40 text-xs leading-relaxed">
-                  只需 2-3 道题，我们会根据你的性格，优先匹配与你共鸣的漂流瓶。
+                  只需 3 道题，我们会根据你的性格，优先匹配与你共鸣的漂流瓶。
                 </p>
               </div>
             </div>
@@ -68,7 +68,7 @@ export default function WelcomeModal({
           {/* Buttons */}
           <div className="flex flex-col gap-3">
             <button className="btn-primary w-full py-3 text-sm" onClick={onStartMbti}>
-              🧠 做几道题（2-3 题）
+              🧠 做 3 道题
             </button>
             <button className="btn-ghost w-full py-3 text-sm" onClick={onDirectMbti}>
               ⚡ 我已经知道自己的 MBTI

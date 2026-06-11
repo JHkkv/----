@@ -68,5 +68,6 @@ model MbtiAnswer {
 
   user User @relation(fields: [userId], references: [id])
 
+  @@index([userId])
   @@map("mbti_answers")
 }

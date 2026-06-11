@@ -21,6 +21,7 @@ const ResumeForm: React.FC = () => {
   const [projectsText, setProjectsText] = useState('');
   const [saved, setSaved] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [parseMsg, setParseMsg] = useState('');
 
   useEffect(() => {
     if (!connected) return;
@@ -56,6 +57,7 @@ const ResumeForm: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
+    setParseMsg('');
 
     const formData = new FormData();
     formData.append('file', file);
@@ -66,19 +68,29 @@ const ResumeForm: React.FC = () => {
         body: formData,
       });
       const json = await res.json();
-      if (json.success && json.data.extracted) {
-        const ex = json.data.extracted;
-        setForm(prev => ({
-          ...prev,
-          name: ex.name || prev.name,
-          phone: ex.phone || prev.phone,
-          email: ex.email || prev.email,
-        }));
+      if (json.success) {
+        const ex = json.data?.extracted;
+        const raw = json.data?.rawText || '';
+        if (raw.trim().length < 10) {
+          setParseMsg('PDF 中未检测到文字内容（可能是扫描件或图片PDF）');
+        } else if (ex) {
+          setForm(prev => ({
+            ...prev,
+            name: ex.name || prev.name,
+            phone: ex.phone || prev.phone,
+            email: ex.email || prev.email,
+          }));
+          setParseMsg(`解析成功，提取了 ${raw.length} 个字符。已自动填入邮箱/手机。`);
+        }
+      } else {
+        setParseMsg(`解析失败: ${json.error || '不支持的文件格式'}`);
       }
     } catch (err) {
-      console.error('Upload failed:', err);
+      setParseMsg('上传失败：无法连接到本地服务，请确认服务已启动');
     } finally {
       setUploading(false);
+      // Reset file input so the same file can be re-uploaded
+      e.target.value = '';
     }
   };
 
@@ -97,6 +109,12 @@ const ResumeForm: React.FC = () => {
           <input type="file" accept=".pdf,.docx" onChange={handleUpload} className="hidden" />
         </label>
       </div>
+
+      {parseMsg && (
+        <div className={`text-xs p-2 rounded ${parseMsg.includes('成功') ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'}`}>
+          {parseMsg}
+        </div>
+      )}
 
       <InputRow label="姓名">
         <input className={inputClass} value={form.name} onChange={e => updateField('name', e.target.value)} placeholder="张三" />

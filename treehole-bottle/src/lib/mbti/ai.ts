@@ -1,16 +1,9 @@
 import type { MbtiScores, MbtiType } from "@/types";
+import { deriveType } from "./scoring";
 
 interface AnalysisResult {
   scores: MbtiScores;
   confidence: number;
-}
-
-function deriveType(scores: MbtiScores): MbtiType {
-  const eOrI = scores.E >= scores.I ? "E" : "I";
-  const sOrN = scores.S >= scores.N ? "S" : "N";
-  const tOrF = scores.T >= scores.F ? "T" : "F";
-  const jOrP = scores.J >= scores.P ? "J" : "P";
-  return `${eOrI}${sOrN}${tOrF}${jOrP}` as MbtiType;
 }
 
 function getErrorMessage(error: unknown): string {

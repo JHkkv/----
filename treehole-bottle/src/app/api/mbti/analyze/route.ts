@@ -2,21 +2,13 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { computeScores } from "@/lib/mbti/scoring";
+import { computeScores, deriveType } from "@/lib/mbti/scoring";
 import { analyzeEmotionForMbti } from "@/lib/mbti/ai";
-import type { MbtiScores, MbtiType } from "@/types";
+import type { MbtiScores } from "@/types";
 
 const analyzeSchema = z.object({
   text: z.string().min(1).max(5000),
 });
-
-function deriveType(scores: MbtiScores): MbtiType {
-  const eOrI = scores.E >= scores.I ? "E" : "I";
-  const sOrN = scores.S >= scores.N ? "S" : "N";
-  const tOrF = scores.T >= scores.F ? "T" : "F";
-  const jOrP = scores.J >= scores.P ? "J" : "P";
-  return `${eOrI}${sOrN}${tOrF}${jOrP}` as MbtiType;
-}
 
 function mergeScores(
   choiceScores: MbtiScores | null,
@@ -45,11 +37,16 @@ function mergeScores(
 export async function POST(
   request: Request,
 ): Promise<NextResponse> {
-  // TODO: Check total user count — if > 20, skip AI analysis to manage costs.
-  // The guest route already logs a warning when this threshold is exceeded.
-  // This check should query prisma.user.count() and fall back to choice-only
-  // scoring (returning existing scores or null) when totalUsers > 20.
   try {
+    // Check user count gate: disable AI analysis if > 20 users
+    const totalUsers = await prisma.user.count();
+    if (totalUsers > 20) {
+      return NextResponse.json(
+        { skipped: true, message: "AI analysis disabled (user limit reached). Use choice-based MBTI instead." },
+        { status: 200 }
+      );
+    }
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -79,6 +79,7 @@ export default function MbtiQuizPage() {
             scores: data.scores,
           });
           setCurrentIndex(currentIndex + 1);
+          setIsSubmitting(false);
         } else {
           // Advance to next question
           setCurrentIndex(currentIndex + 1);

@@ -13,8 +13,15 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const bottle = await prisma.bottle.findUnique({
-      where: { id: params.id },
+    const bottle = await prisma.bottle.findFirst({
+      where: {
+        id: params.id,
+        isDeleted: false,
+        OR: [
+          { visibility: "public" },
+          { userId: user.id },
+        ],
+      },
       include: {
         user: {
           select: {
@@ -38,7 +45,7 @@ export async function GET(
       },
     });
 
-    if (!bottle || bottle.isDeleted) {
+    if (!bottle) {
       return NextResponse.json(
         { error: "Bottle not found" },
         { status: 404 },

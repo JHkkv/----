@@ -1,0 +1,6 @@
+{
+  "env": {
+    "DOUBAO_API_ENDPOINT": "https://ark.cn-beijing.volces.com/api/v3/responses",
+    "DOUBAO_MODEL": "doubao-seed-2-0-pro-260215"
+  }
+}

@@ -1,0 +1,39 @@
+<!--components/audio-recorder/audio-recorder.wxml-->
+<view class="recorder">
+  <view class="record-time">{{displayTime}}</view>
+
+  <view class="record-status" wx:if="{{status === 'recording'}}">
+    <view class="pulse-dot"></view>
+    <text>录制中...</text>
+  </view>
+  <view class="record-status done" wx:if="{{status === 'done'}}">
+    <text>录制完成，时长 {{recordDuration}} 秒</text>
+  </view>
+
+  <view class="record-actions">
+    <!-- Start -->
+    <button wx:if="{{status === 'idle'}}" class="btn-record" bindtap="startRecord">
+      <view class="btn-record-icon">⏺️</view>
+      <view>开始录音</view>
+    </button>
+
+    <!-- Stop -->
+    <button wx:if="{{status === 'recording'}}" class="btn-record stop" bindtap="stopRecord">
+      <view class="btn-record-icon">⏹️</view>
+      <view>停止录音</view>
+    </button>
+
+    <!-- Preview controls -->
+    <view wx:if="{{status === 'done' || status === 'playing'}}" class="preview-controls">
+      <button class="btn-small" bindtap="playRecord" wx:if="{{status === 'done'}}">▶ 试听</button>
+      <button class="btn-small stop" bindtap="stopPlay" wx:if="{{status === 'playing'}}">⏹ 停止</button>
+      <button class="btn-small" bindtap="startRecord">🔄 重录</button>
+    </view>
+  </view>
+
+  <!-- Upload progress -->
+  <view wx:if="{{uploading}}" class="upload-bar">
+    <progress percent="{{uploadProgress}}" stroke-width="6" activeColor="#4A90D9" />
+    <text>上传中...</text>
+  </view>
+</view>

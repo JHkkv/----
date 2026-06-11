@@ -1,0 +1,26 @@
+<!--pages/student/practice/practice.wxml-->
+<view class="container">
+  <view class="page-title">练习提交</view>
+
+  <!-- Recorder -->
+  <view class="card">
+    <view class="label">录制练习音频</view>
+    <audio-recorder id="recorder" bind:recordComplete="onRecordComplete" />
+  </view>
+
+  <!-- Practice Info -->
+  <view class="card">
+    <view class="label">练习曲目</view>
+    <input class="input-field" placeholder="请输入练习的曲目名称" value="{{trackName}}" bindinput="onTrackInput" />
+
+    <view class="label" style="margin-top:20rpx">自我评价</view>
+    <textarea class="textarea-field" placeholder="记录本次练习的感受、遇到的困难等..." value="{{selfReview}}" bindinput="onReviewInput" />
+  </view>
+
+  <!-- Submit -->
+  <button class="btn-primary" bindtap="submit" disabled="{{submitting}}">
+    {{submitting ? '提交中...' : '提交练习'}}
+  </button>
+
+  <view class="submit-tip">提交后老师即可听到你的练习录音</view>
+</view>

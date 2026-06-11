@@ -20,6 +20,7 @@ export class Scheduler extends EventEmitter {
   constructor(config: SchedulerConfig) {
     super();
     this.config = config;
+    this.on('error', () => { /* default noop: caller should attach their own handler */ });
   }
 
   get todaySent(): number {

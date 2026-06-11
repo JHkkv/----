@@ -141,18 +141,23 @@ export function handleWsConnection(ws: WebSocket, _req: IncomingMessage): void {
 
       case 'task:start': {
         const { platform, greeting } = msg.payload as any;
+        const resolvedGreeting = greeting || '您好，我对这个岗位很感兴趣，方便聊聊吗？';
         const scheduler = getScheduler(platform);
+
+        scheduler.on('error', (e) => {
+          ws.send(JSON.stringify({ type: 'task:error', success: false, data: e }));
+        });
 
         scheduler.enqueue(async () => {
           const db = getDb();
           db.prepare(`
             INSERT INTO applications (platform, company, position, salary, greeting, status)
             VALUES (?, ?, ?, ?, ?, 'sent')
-          `).run(platform, 'auto-sending...', 'auto-sending...', '', greeting);
+          `).run(platform, 'auto-sending...', 'auto-sending...', '', resolvedGreeting);
 
           ws.send(JSON.stringify({
             type: 'task:progress', success: true,
-            data: { platform, sent: scheduler.todaySent, action: 'send_greeting', greeting },
+            data: { platform, sent: scheduler.todaySent, action: 'send_greeting', greeting: resolvedGreeting },
           }));
         });
 

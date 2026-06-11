@@ -29,6 +29,17 @@ applicationsRouter.get('/', (req: Request, res: Response) => {
   res.json({ success: true, data, total, page, limit });
 });
 
+// POST /api/applications — record a new application
+applicationsRouter.post('/', (req: Request, res: Response) => {
+  const db = getDb();
+  const { platform, company, position, salary, greeting, status } = req.body;
+  const result = db.prepare(`
+    INSERT INTO applications (platform, company, position, salary, greeting, status)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run(platform || 'unknown', company || 'unknown', position || 'unknown', salary || '', greeting || '', status || 'sent');
+  res.json({ success: true, data: { id: result.lastInsertRowid } });
+});
+
 // GET /api/applications/stats — delivery statistics
 applicationsRouter.get('/stats', (_req: Request, res: Response) => {
   const db = getDb();

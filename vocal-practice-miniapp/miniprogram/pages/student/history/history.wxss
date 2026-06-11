@@ -1,0 +1,10 @@
+.page-title { font-size: 36rpx; font-weight: 700; margin-bottom: 24rpx; }
+.sub-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8rpx; }
+.sub-track { font-size: 30rpx; font-weight: 600; }
+.sub-time { font-size: 24rpx; color: var(--text-light); }
+.sub-duration { font-size: 24rpx; color: var(--text-light); margin-bottom: 12rpx; }
+.sub-label { font-size: 26rpx; font-weight: 600; margin-bottom: 4rpx; }
+.sub-review { margin-top: 16rpx; padding: 16rpx 0; border-top: 1rpx solid var(--border); font-size: 26rpx; }
+.sub-feedback { margin-top: 16rpx; padding: 16rpx; background: #fffbe6; border-radius: 12rpx; }
+.feedback-text { font-size: 26rpx; color: #d48806; }
+.no-feedback { margin-top: 16rpx; color: var(--text-light); font-size: 24rpx; }

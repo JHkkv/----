@@ -4,6 +4,7 @@ import type { WsMessage, WsResponse, PlatformId } from '../../../shared/types';
 let ws: WebSocket | null = null;
 let connectedPort: chrome.runtime.Port | null = null;
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingMessages: string[] = [];
 
 function connectWs() {
   if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
@@ -13,6 +14,11 @@ function connectWs() {
   ws.onopen = () => {
     console.log('[bg] WS connected');
     connectedPort?.postMessage({ type: 'ws:connected' });
+    // Flush pending messages
+    while (pendingMessages.length > 0) {
+      const msg = pendingMessages.shift()!;
+      ws?.send(msg);
+    }
   };
 
   ws.onmessage = (event) => {
@@ -36,8 +42,15 @@ function connectWs() {
 }
 
 function sendWs(msg: WsMessage): void {
+  const data = JSON.stringify(msg);
   if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify(msg));
+    ws.send(data);
+  } else {
+    // Queue message for when connection opens
+    pendingMessages.push(data);
+    if (!ws || ws.readyState === WebSocket.CLOSED) {
+      connectWs();
+    }
   }
 }
 
@@ -80,6 +93,11 @@ chrome.runtime.onConnect.addListener((port) => {
   if (port.name === 'popup') {
     connectedPort = port;
     connectWs();
+
+    // Immediately notify popup if WS is already connected
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      port.postMessage({ type: 'ws:connected' });
+    }
 
     port.onMessage.addListener((msg) => {
       switch (msg.type) {
