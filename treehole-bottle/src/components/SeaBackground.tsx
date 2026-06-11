@@ -41,7 +41,7 @@ export default function SeaBackground({ children }: SeaBackgroundProps) {
       ))}
 
       {/* Moon */}
-      <div className="absolute top-[6%] right-[10%]" aria-hidden="true">
+      <div className="absolute top-[18%] right-[10%]" aria-hidden="true">
         <div
           className="w-14 h-14 rounded-full animate-moonGlow"
           style={{
@@ -55,7 +55,7 @@ export default function SeaBackground({ children }: SeaBackgroundProps) {
       <div
         className="absolute opacity-[0.06]"
         style={{
-          top: "8%",
+          top: "20%",
           right: "14%",
           width: "120px",
           height: "2px",
@@ -69,7 +69,7 @@ export default function SeaBackground({ children }: SeaBackgroundProps) {
       <div
         className="absolute opacity-[0.04]"
         style={{
-          top: "10%",
+          top: "22%",
           right: "14%",
           width: "100px",
           height: "2px",

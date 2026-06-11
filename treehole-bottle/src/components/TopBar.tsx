@@ -7,6 +7,8 @@ interface TopBarProps {
   onModeChange: (mode: "view" | "write") => void;
   nickname: string;
   mbtiConfidence: number | null;
+  onLoginClick: () => void;
+  onMbtiClick: () => void;
 }
 
 export default function TopBar({
@@ -14,6 +16,8 @@ export default function TopBar({
   onModeChange,
   nickname,
   mbtiConfidence,
+  onLoginClick,
+  onMbtiClick,
 }: TopBarProps) {
   const showMbtiReminder = mbtiConfidence === null || mbtiConfidence < 0.6;
 
@@ -49,6 +53,7 @@ export default function TopBar({
               ease: "easeInOut",
             }}
             title="点击完成 MBTI 测试以获得更精准的漂流瓶匹配"
+            onClick={onMbtiClick}
           >
             🧠 测MBTI
           </motion.button>
@@ -82,6 +87,15 @@ export default function TopBar({
         <span className="text-sm text-gold-soft/60 truncate max-w-[120px]">
           {nickname}
         </span>
+
+        {/* Login button */}
+        <button
+          className="text-xs text-white/30 hover:text-gold-soft transition-colors border border-white/10 hover:border-gold-soft/30 rounded-full px-3 py-1"
+          onClick={onLoginClick}
+          title="登录 / 注册"
+        >
+          登录
+        </button>
       </div>
     </header>
   );

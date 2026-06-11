@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import type { BottleFeedItem, BottleDetail, BottlePayload } from "@/types";
 import SeaBackground from "@/components/SeaBackground";
@@ -10,6 +11,7 @@ import BottleModal from "@/components/BottleModal";
 import WritingPanel from "@/components/WritingPanel";
 import ConfirmModal from "@/components/ConfirmModal";
 import WelcomeModal from "@/components/WelcomeModal";
+import LoginModal from "@/components/LoginModal";
 
 interface UserState {
   nickname: string;
@@ -18,6 +20,7 @@ interface UserState {
 }
 
 export default function Home() {
+  const router = useRouter();
   const [mode, setMode] = useState<"view" | "write">("view");
   const [user, setUser] = useState<UserState>({
     nickname: "游客",
@@ -31,6 +34,7 @@ export default function Home() {
   const [showConfirm, setShowConfirm] = useState<BottlePayload | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
   const [isLoadingBottle, setIsLoadingBottle] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   // Initialize user on mount
   useEffect(() => {
@@ -126,16 +130,21 @@ export default function Home() {
   // Welcome modal handlers
   const handleStartMbti = () => {
     setShowWelcome(false);
-    // TODO: navigate to MBTI flow
+    router.push("/mbti");
   };
 
   const handleDirectMbti = () => {
     setShowWelcome(false);
-    // TODO: navigate to direct MBTI input
+    router.push("/mbti-direct");
   };
 
   const handleSkipWelcome = () => {
     setShowWelcome(false);
+  };
+
+  const handleLoginSuccess = (nickname: string) => {
+    setUser((prev) => ({ ...prev, nickname }));
+    setShowLogin(false);
   };
 
   return (
@@ -146,6 +155,8 @@ export default function Home() {
         onModeChange={setMode}
         nickname={user.nickname}
         mbtiConfidence={user.mbtiConfidence}
+        onLoginClick={() => setShowLogin(true)}
+        onMbtiClick={() => router.push("/mbti")}
       />
 
       {/* Main content area */}
@@ -234,6 +245,16 @@ export default function Home() {
             onStartMbti={handleStartMbti}
             onSkip={handleSkipWelcome}
             onDirectMbti={handleDirectMbti}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Login modal */}
+      <AnimatePresence>
+        {showLogin && (
+          <LoginModal
+            onClose={() => setShowLogin(false)}
+            onLoginSuccess={handleLoginSuccess}
           />
         )}
       </AnimatePresence>
