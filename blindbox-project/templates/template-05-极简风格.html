@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>盲盒介绍 - 极简风格</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif; color: #333; background: #fff; line-height: 1.6; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+
+        /* Header */
+        .header { padding: 30px 0; border-bottom: 1px solid #eee; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 18px; font-weight: 300; letter-spacing: 8px; text-transform: uppercase; }
+        .nav { display: flex; gap: 40px; }
+        .nav a { color: #999; text-decoration: none; font-size: 13px; letter-spacing: 2px; transition: color 0.3s; }
+        .nav a:hover { color: #333; }
+
+        /* Hero */
+        .hero { padding: 150px 0; text-align: center; }
+        .hero-title { font-size: 72px; font-weight: 100; letter-spacing: 20px; margin-bottom: 30px; }
+        .hero-subtitle { font-size: 16px; color: #999; letter-spacing: 5px; }
+        .hero-line { width: 60px; height: 1px; background: #333; margin: 40px auto; }
+
+        /* Concept */
+        .concept { padding: 100px 0; border-top: 1px solid #eee; }
+        .concept-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 80px; }
+        .concept-item { text-align: center; }
+        .concept-number { font-size: 48px; font-weight: 100; color: #ddd; margin-bottom: 20px; }
+        .concept-title { font-size: 18px; font-weight: 400; margin-bottom: 15px; letter-spacing: 3px; }
+        .concept-desc { font-size: 14px; color: #999; line-height: 1.8; }
+
+        /* Data */
+        .data { padding: 100px 0; background: #fafafa; }
+        .data-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; text-align: center; }
+        .data-item { padding: 40px; }
+        .data-value { font-size: 56px; font-weight: 100; margin-bottom: 10px; }
+        .data-unit { font-size: 18px; font-weight: 200; }
+        .data-label { font-size: 13px; color: #999; letter-spacing: 2px; margin-top: 10px; }
+
+        /* Brand Story */
+        .story { padding: 150px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; }
+        .story-image { aspect-ratio: 3/4; background: #f5f5f5; }
+        .story-content { padding: 40px 0; }
+        .story-tag { font-size: 12px; letter-spacing: 5px; color: #999; text-transform: uppercase; margin-bottom: 20px; }
+        .story-title { font-size: 36px; font-weight: 200; letter-spacing: 5px; margin-bottom: 30px; }
+        .story-text { font-size: 15px; color: #666; line-height: 2; margin-bottom: 20px; }
+        .story-link { display: inline-block; font-size: 13px; color: #333; text-decoration: none; letter-spacing: 3px; border-bottom: 1px solid #333; padding-bottom: 5px; transition: all 0.3s; }
+        .story-link:hover { color: #999; border-color: #999; }
+
+        /* Products */
+        .products { padding: 100px 0; border-top: 1px solid #eee; }
+        .section-header { text-align: center; margin-bottom: 80px; }
+        .section-tag { font-size: 12px; letter-spacing: 5px; color: #999; text-transform: uppercase; margin-bottom: 15px; }
+        .section-title { font-size: 32px; font-weight: 200; letter-spacing: 5px; }
+        .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+        .product-card { text-align: center; cursor: pointer; }
+        .product-image { aspect-ratio: 1; background: #f5f5f5; margin-bottom: 25px; transition: background 0.3s; }
+        .product-card:hover .product-image { background: #eee; }
+        .product-name { font-size: 16px; font-weight: 400; margin-bottom: 8px; letter-spacing: 2px; }
+        .product-series { font-size: 13px; color: #999; margin-bottom: 12px; }
+        .product-price { font-size: 18px; font-weight: 300; }
+
+        /* Timeline */
+        .timeline { padding: 100px 0; background: #fafafa; }
+        .timeline-list { max-width: 800px; margin: 0 auto; }
+        .timeline-item { display: flex; gap: 40px; padding: 40px 0; border-bottom: 1px solid #eee; }
+        .timeline-year { font-size: 48px; font-weight: 100; color: #ddd; width: 120px; flex-shrink: 0; }
+        .timeline-content { flex: 1; }
+        .timeline-title { font-size: 18px; font-weight: 400; margin-bottom: 10px; letter-spacing: 2px; }
+        .timeline-desc { font-size: 14px; color: #999; line-height: 1.8; }
+
+        /* CTA */
+        .cta { padding: 150px 0; text-align: center; }
+        .cta-title { font-size: 48px; font-weight: 100; letter-spacing: 10px; margin-bottom: 30px; }
+        .cta-desc { font-size: 14px; color: #999; letter-spacing: 3px; margin-bottom: 50px; }
+        .cta-btn { display: inline-block; padding: 18px 60px; border: 1px solid #333; color: #333; text-decoration: none; letter-spacing: 5px; font-size: 13px; transition: all 0.3s; }
+        .cta-btn:hover { background: #333; color: #fff; }
+
+        /* Footer */
+        .footer { padding: 60px 0; border-top: 1px solid #eee; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; }
+        .footer-logo { font-size: 14px; letter-spacing: 5px; color: #999; }
+        .footer-links { display: flex; gap: 30px; }
+        .footer-links a { color: #999; text-decoration: none; font-size: 12px; letter-spacing: 2px; transition: color 0.3s; }
+        .footer-links a:hover { color: #333; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Blind Box</div>
+                <nav class="nav">
+                    <a href="#">概念</a>
+                    <a href="#">数据</a>
+                    <a href="#">品牌</a>
+                    <a href="#">系列</a>
+                    <a href="#">关于</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1 class="hero-title">盲盒</h1>
+            <div class="hero-line"></div>
+            <p class="hero-subtitle">探索未知的惊喜</p>
+        </div>
+    </section>
+
+    <section class="concept">
+        <div class="container">
+            <div class="concept-grid">
+                <div class="concept-item">
+                    <div class="concept-number">01</div>
+                    <h3 class="concept-title">未知</h3>
+                    <p class="concept-desc">每一盒都是一次冒险<br>你永远不知道下一个会是什么</p>
+                </div>
+                <div class="concept-item">
+                    <div class="concept-number">02</div>
+                    <h3 class="concept-title">艺术</h3>
+                    <p class="concept-desc">每一个作品都是艺术家的心血<br>让艺术走进日常生活</p>
+                </div>
+                <div class="concept-item">
+                    <div class="concept-number">03</div>
+                    <h3 class="concept-title">收藏</h3>
+                    <p class="concept-desc">收集的乐趣在于过程<br>每一次开盒都是一份期待</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="data">
+        <div class="container">
+            <div class="data-grid">
+                <div class="data-item">
+                    <div class="data-value">500<span class="data-unit">亿</span></div>
+                    <div class="data-label">市场规模</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-value">35<span class="data-unit">%</span></div>
+                    <div class="data-label">年增长率</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-value">2.5<span class="data-unit">亿</span></div>
+                    <div class="data-label">活跃用户</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-value">180<span class="data-unit">元</span></div>
+                    <div class="data-label">客单价</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="story">
+        <div class="container" style="display: contents;">
+            <div class="story-image"></div>
+            <div class="story-content">
+                <div class="story-tag">Our Story</div>
+                <h2 class="story-title">品牌故事</h2>
+                <p class="story-text">泡泡玛特成立于2010年，是中国领先的潮流文化娱乐平台。我们致力于让潮流玩具成为一种生活方式。</p>
+                <p class="story-text">通过与全球优秀艺术家合作，我们持续为消费者带来高品质的潮玩产品，让艺术走进每个人的生活。</p>
+                <a href="#" class="story-link">了解更多</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="products">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Collections</div>
+                <h2 class="section-title">热门系列</h2>
+            </div>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-image"></div>
+                    <h3 class="product-name">MOLLY</h3>
+                    <p class="product-series">宇航员系列</p>
+                    <div class="product-price">¥69</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image"></div>
+                    <h3 class="product-name">DIMOO</h3>
+                    <p class="product-series">水族馆系列</p>
+                    <div class="product-price">¥69</div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image"></div>
+                    <h3 class="product-name">SKULLPANDA</h3>
+                    <p class="product-series">夜之城系列</p>
+                    <div class="product-price">¥69</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="timeline">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">History</div>
+                <h2 class="section-title">发展历程</h2>
+            </div>
+            <div class="timeline-list">
+                <div class="timeline-item">
+                    <div class="timeline-year">2010</div>
+                    <div class="timeline-content">
+                        <h3 class="timeline-title">品牌创立</h3>
+                        <p class="timeline-desc">泡泡玛特在北京成立，开设第一家门店</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2016</div>
+                    <div class="timeline-content">
+                        <h3 class="timeline-title">转型潮玩</h3>
+                        <p class="timeline-desc">签约MOLLY设计师，开启盲盒时代</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2020</div>
+                    <div class="timeline-content">
+                        <h3 class="timeline-title">成功上市</h3>
+                        <p class="timeline-desc">港交所上市，成为潮玩第一股</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2025</div>
+                    <div class="timeline-content">
+                        <h3 class="timeline-title">全球扩张</h3>
+                        <p class="timeline-desc">门店遍布全球，成为国际潮玩品牌</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <h2 class="cta-title">加入我们</h2>
+            <p class="cta-desc">探索盲盒的世界，发现未知的惊喜</p>
+            <a href="#" class="cta-btn">了解更多</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">BLIND BOX</div>
+                <div class="footer-links">
+                    <a href="#">隐私政策</a>
+                    <a href="#">使用条款</a>
+                    <a href="#">联系我们</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // 滚动动画
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.concept-item, .data-item, .product-card, .timeline-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

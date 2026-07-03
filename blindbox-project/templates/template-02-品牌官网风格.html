@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>盲盒介绍 - 品牌官网风格</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif; color: #333; }
+
+        /* Header */
+        .header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #eee; }
+        .header-content { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 20px 40px; }
+        .logo { font-size: 28px; font-weight: bold; letter-spacing: 2px; }
+        .nav { display: flex; gap: 40px; }
+        .nav a { text-decoration: none; color: #333; font-size: 14px; letter-spacing: 1px; position: relative; }
+        .nav a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: #333; transition: width 0.3s; }
+        .nav a:hover::after { width: 100%; }
+        .header-actions { display: flex; gap: 20px; }
+        .header-actions a { color: #333; text-decoration: none; font-size: 14px; }
+
+        /* Hero Section */
+        .hero { height: 100vh; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .hero-content { text-align: center; color: white; z-index: 2; }
+        .hero-badge { display: inline-block; padding: 8px 20px; border: 1px solid rgba(255,255,255,0.3); border-radius: 50px; font-size: 12px; letter-spacing: 3px; margin-bottom: 30px; }
+        .hero-title { font-size: 80px; font-weight: 200; letter-spacing: 10px; margin-bottom: 20px; }
+        .hero-subtitle { font-size: 18px; opacity: 0.8; letter-spacing: 5px; margin-bottom: 50px; }
+        .hero-btn { display: inline-block; padding: 18px 60px; border: 1px solid white; color: white; text-decoration: none; letter-spacing: 3px; font-size: 14px; transition: all 0.3s; }
+        .hero-btn:hover { background: white; color: #1a1a2e; }
+        .hero-particles { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
+        .particle { position: absolute; width: 4px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 50%; }
+
+        /* Concept Section */
+        .concept { padding: 150px 40px; max-width: 1400px; margin: 0 auto; }
+        .section-header { text-align: center; margin-bottom: 80px; }
+        .section-tag { font-size: 12px; letter-spacing: 5px; color: #999; text-transform: uppercase; margin-bottom: 20px; }
+        .section-title { font-size: 48px; font-weight: 200; letter-spacing: 5px; }
+        .concept-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; }
+        .concept-card { text-align: center; padding: 40px; }
+        .concept-icon { font-size: 60px; margin-bottom: 30px; }
+        .concept-title { font-size: 20px; font-weight: 500; margin-bottom: 15px; letter-spacing: 2px; }
+        .concept-desc { color: #666; line-height: 1.8; font-size: 14px; }
+
+        /* Data Section */
+        .data-section { background: #f8f8f8; padding: 150px 40px; }
+        .data-content { max-width: 1400px; margin: 0 auto; }
+        .data-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; margin-top: 80px; }
+        .data-item { text-align: center; }
+        .data-number { font-size: 72px; font-weight: 100; color: #333; line-height: 1; }
+        .data-unit { font-size: 24px; font-weight: 200; }
+        .data-label { margin-top: 15px; font-size: 14px; color: #999; letter-spacing: 2px; }
+
+        /* Brand Story */
+        .brand-story { padding: 150px 40px; max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; }
+        .story-image { aspect-ratio: 4/5; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; position: relative; overflow: hidden; }
+        .story-content { padding: 40px; }
+        .story-content .section-tag { text-align: left; }
+        .story-content .section-title { text-align: left; font-size: 36px; margin-bottom: 30px; }
+        .story-text { color: #666; line-height: 2; font-size: 15px; margin-bottom: 20px; }
+        .story-link { display: inline-block; margin-top: 20px; color: #333; text-decoration: none; font-size: 14px; letter-spacing: 2px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+
+        /* Products */
+        .products { padding: 150px 40px; background: #f8f8f8; }
+        .products-content { max-width: 1400px; margin: 0 auto; }
+        .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 80px; }
+        .product-card { background: white; border-radius: 20px; overflow: hidden; transition: transform 0.3s; }
+        .product-card:hover { transform: translateY(-10px); }
+        .product-image { aspect-ratio: 1; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .product-info { padding: 30px; }
+        .product-name { font-size: 18px; font-weight: 500; margin-bottom: 10px; }
+        .product-series { color: #999; font-size: 14px; margin-bottom: 15px; }
+        .product-price { font-size: 24px; font-weight: 500; }
+        .product-status { display: inline-block; padding: 5px 15px; background: #f0f0f0; border-radius: 50px; font-size: 12px; color: #666; margin-top: 15px; }
+
+        /* CTA Section */
+        .cta { padding: 200px 40px; text-align: center; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; }
+        .cta-title { font-size: 48px; font-weight: 200; letter-spacing: 5px; margin-bottom: 30px; }
+        .cta-desc { font-size: 16px; opacity: 0.8; margin-bottom: 50px; letter-spacing: 2px; }
+        .cta-buttons { display: flex; gap: 20px; justify-content: center; }
+        .cta-btn { padding: 18px 50px; border: 1px solid white; color: white; text-decoration: none; letter-spacing: 3px; font-size: 14px; transition: all 0.3s; }
+        .cta-btn.primary { background: white; color: #1a1a2e; }
+        .cta-btn:hover { opacity: 0.8; }
+
+        /* Footer */
+        .footer { padding: 80px 40px; background: #111; color: #666; }
+        .footer-content { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 60px; }
+        .footer-brand { font-size: 24px; color: white; margin-bottom: 20px; }
+        .footer-desc { font-size: 14px; line-height: 1.8; }
+        .footer-title { color: white; font-size: 14px; letter-spacing: 2px; margin-bottom: 20px; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links a { color: #666; text-decoration: none; font-size: 14px; transition: color 0.3s; }
+        .footer-links a:hover { color: white; }
+        .footer-bottom { max-width: 1400px; margin: 40px auto 0; padding-top: 30px; border-top: 1px solid #222; display: flex; justify-content: space-between; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">POP MART</div>
+            <nav class="nav">
+                <a href="#">品牌故事</a>
+                <a href="#">产品系列</a>
+                <a href="#">艺术家</a>
+                <a href="#">门店</a>
+                <a href="#">社区</a>
+            </nav>
+            <div class="header-actions">
+                <a href="#">登录</a>
+                <a href="#">购物车(0)</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-particles" id="particles"></div>
+        <div class="hero-content">
+            <div class="hero-badge">2026 NEW COLLECTION</div>
+            <h1 class="hero-title">盲盒的世界</h1>
+            <p class="hero-subtitle">探索未知的惊喜</p>
+            <a href="#" class="hero-btn">探索系列</a>
+        </div>
+    </section>
+
+    <section class="concept">
+        <div class="section-header">
+            <div class="section-tag">CONCEPT</div>
+            <h2 class="section-title">什么是盲盒</h2>
+        </div>
+        <div class="concept-grid">
+            <div class="concept-card">
+                <div class="concept-icon">🎁</div>
+                <h3 class="concept-title">未知的惊喜</h3>
+                <p class="concept-desc">每一盒都是一次冒险，你永远不知道下一个会是什么。这种不确定性带来的期待感，正是盲盒的魅力所在。</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">🎨</div>
+                <h3 class="concept-title">艺术的表达</h3>
+                <p class="concept-desc">每一个盲盒都是艺术家的心血结晶。从设计到制作，倾注了无数创意与匠心，让艺术走进日常生活。</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">💝</div>
+                <h3 class="concept-title">社交的纽带</h3>
+                <p class="concept-desc">盲盒已经成为年轻人社交的新方式。分享开盒喜悦、交换重复款式，在盲盒的世界里结识志同道合的朋友。</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="data-section">
+        <div class="data-content">
+            <div class="section-header">
+                <div class="section-tag">MARKET DATA</div>
+                <h2 class="section-title">市场洞察</h2>
+            </div>
+            <div class="data-grid">
+                <div class="data-item">
+                    <div class="data-number">500<span class="data-unit">亿</span></div>
+                    <div class="data-label">2025年市场规模</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-number">35<span class="data-unit">%</span></div>
+                    <div class="data-label">年复合增长率</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-number">2.5<span class="data-unit">亿</span></div>
+                    <div class="data-label">活跃消费者</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-number">180<span class="data-unit">元</span></div>
+                    <div class="data-label">平均客单价</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="brand-story">
+        <div class="story-image"></div>
+        <div class="story-content">
+            <div class="section-tag">OUR STORY</div>
+            <h2 class="section-title">品牌故事</h2>
+            <p class="story-text">泡泡玛特成立于2010年，是中国领先的潮流文化娱乐平台。我们致力于让潮流玩具成为一种生活方式，让艺术走进每个人的生活。</p>
+            <p class="story-text">通过与全球优秀艺术家合作，我们持续为消费者带来高品质的潮玩产品。从北京的第一家门店，到如今遍布全球的零售网络，泡泡玛特已经成为全球潮玩行业的领军品牌。</p>
+            <a href="#" class="story-link">了解更多 →</a>
+        </div>
+    </section>
+
+    <section class="products">
+        <div class="products-content">
+            <div class="section-header">
+                <div class="section-tag">COLLECTIONS</div>
+                <h2 class="section-title">热门系列</h2>
+            </div>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-image"></div>
+                    <div class="product-info">
+                        <h3 class="product-name">MOLLY 宇航员系列</h3>
+                        <p class="product-series">12款 + 1隐藏款</p>
+                        <div class="product-price">¥69</div>
+                        <div class="product-status">热销中</div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
+                    <div class="product-info">
+                        <h3 class="product-name">DIMOO 水族馆系列</h3>
+                        <p class="product-series">12款 + 1隐藏款</p>
+                        <div class="product-price">¥69</div>
+                        <div class="product-status">新品上市</div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"></div>
+                    <div class="product-info">
+                        <h3 class="product-name">SKULLPANDA 夜之城系列</h3>
+                        <p class="product-series">12款 + 1隐藏款</p>
+                        <div class="product-price">¥69</div>
+                        <div class="product-status">限量发售</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <h2 class="cta-title">加入盲盒的世界</h2>
+        <p class="cta-desc">探索无限可能，发现未知惊喜</p>
+        <div class="cta-buttons">
+            <a href="#" class="cta-btn primary">立即选购</a>
+            <a href="#" class="cta-btn">了解更多</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <div class="footer-brand">POP MART</div>
+                <p class="footer-desc">泡泡玛特是中国领先的潮流文化娱乐平台，致力于让艺术走进每个人的生活。</p>
+            </div>
+            <div>
+                <div class="footer-title">产品</div>
+                <ul class="footer-links">
+                    <li><a href="#">盲盒</a></li>
+                    <li><a href="#">手办</a></li>
+                    <li><a href="#">周边</a></li>
+                    <li><a href="#">联名款</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-title">关于</div>
+                <ul class="footer-links">
+                    <li><a href="#">品牌故事</a></li>
+                    <li><a href="#">艺术家</a></li>
+                    <li><a href="#">新闻</a></li>
+                    <li><a href="#">加入我们</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-title">支持</div>
+                <ul class="footer-links">
+                    <li><a href="#">帮助中心</a></li>
+                    <li><a href="#">联系客服</a></li>
+                    <li><a href="#">配送政策</a></li>
+                    <li><a href="#">退换货</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 POP MART. All rights reserved.</span>
+            <span>隐私政策 | 使用条款</span>
+        </div>
+    </footer>
+
+    <script>
+        // 创建粒子效果
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            particle.style.animationDelay = Math.random() * 2 + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // 滚动动画
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.concept-card, .data-item, .product-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

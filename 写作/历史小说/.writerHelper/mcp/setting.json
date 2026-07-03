@@ -1,0 +1,12 @@
+{
+  "text": {
+    "key": "enc:eNCiFgqfAWsF94lDmd1HLMQZaLVaZ4FdNT3J/l/NBnA9LOh+G3SbNdFWNbQ50wB6aBfHomiaOeh5rbxgtefb5OQ=",
+    "url": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+    "model": "qwen-long",
+    "provider": "tongyi",
+    "extraParams": {
+      "top_p": 0.8
+    }
+  },
+  "updatedAt": 1781283853305
+}

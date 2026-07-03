@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>盲盒介绍 - 杂志排版风格</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Georgia", "Times New Roman", "SimSun", serif; color: #333; background: #fff; line-height: 1.8; }
+
+        /* Header */
+        .header { padding: 30px 0; border-bottom: 2px solid #000; }
+        .header-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; }
+        .logo { font-size: 14px; letter-spacing: 8px; text-transform: uppercase; }
+        .nav { display: flex; gap: 30px; }
+        .nav a { color: #333; text-decoration: none; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; }
+
+        /* Cover */
+        .cover { height: 100vh; display: flex; position: relative; overflow: hidden; }
+        .cover-left { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 80px; background: #f8f8f8; }
+        .cover-tag { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; color: #999; margin-bottom: 30px; }
+        .cover-title { font-size: 72px; font-weight: 400; line-height: 1.1; margin-bottom: 30px; }
+        .cover-subtitle { font-size: 18px; color: #666; margin-bottom: 40px; font-style: italic; }
+        .cover-author { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: #999; }
+        .cover-right { flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; }
+        .cover-image { width: 300px; height: 400px; background: rgba(255,255,255,0.2); border-radius: 10px; }
+        .cover-issue { position: absolute; top: 30px; right: 40px; font-size: 12px; letter-spacing: 3px; }
+
+        /* TOC */
+        .toc { padding: 80px 40px; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 2fr; gap: 80px; border-bottom: 1px solid #eee; }
+        .toc-title { font-size: 14px; letter-spacing: 5px; text-transform: uppercase; color: #999; }
+        .toc-list { list-style: none; }
+        .toc-item { display: flex; justify-content: space-between; align-items: baseline; padding: 20px 0; border-bottom: 1px solid #eee; }
+        .toc-item-title { font-size: 18px; }
+        .toc-item-page { font-size: 14px; color: #999; }
+
+        /* Concept */
+        .concept { padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
+        .concept-header { display: flex; gap: 60px; margin-bottom: 60px; }
+        .concept-number { font-size: 120px; font-weight: 400; color: #eee; line-height: 1; }
+        .concept-title { font-size: 36px; font-weight: 400; align-self: center; }
+        .concept-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 60px; }
+        .concept-item { padding: 40px; border-left: 3px solid #000; }
+        .concept-item-title { font-size: 20px; font-weight: 400; margin-bottom: 15px; }
+        .concept-item-desc { font-size: 15px; color: #666; line-height: 1.8; }
+
+        /* Data */
+        .data { padding: 100px 40px; background: #f8f8f8; }
+        .data-content { max-width: 1200px; margin: 0 auto; }
+        .data-header { text-align: center; margin-bottom: 60px; }
+        .data-tag { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; color: #999; margin-bottom: 15px; }
+        .data-title { font-size: 36px; font-weight: 400; }
+        .data-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; }
+        .data-item { text-align: center; padding: 40px; background: white; }
+        .data-value { font-size: 48px; font-weight: 400; margin-bottom: 10px; }
+        .data-unit { font-size: 18px; }
+        .data-label { font-size: 13px; color: #999; letter-spacing: 2px; margin-top: 10px; }
+
+        /* Brand Story */
+        .story { padding: 100px 40px; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+        .story-image { aspect-ratio: 3/4; background: #f5f5f5; }
+        .story-content { padding: 40px 0; }
+        .story-tag { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; color: #999; margin-bottom: 20px; }
+        .story-title { font-size: 32px; font-weight: 400; margin-bottom: 30px; line-height: 1.3; }
+        .story-text { font-size: 15px; color: #666; line-height: 2; margin-bottom: 20px; }
+        .story-quote { font-size: 20px; font-style: italic; color: #333; padding: 20px; border-left: 3px solid #000; margin: 30px 0; }
+
+        /* Products */
+        .products { padding: 100px 40px; background: #f8f8f8; }
+        .products-content { max-width: 1200px; margin: 0 auto; }
+        .products-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 60px; }
+        .products-title { font-size: 36px; font-weight: 400; }
+        .products-count { font-size: 14px; color: #999; }
+        .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+        .product-card { background: white; cursor: pointer; }
+        .product-image { aspect-ratio: 3/4; background: #eee; margin-bottom: 20px; }
+        .product-info { padding: 0 5px 20px; }
+        .product-name { font-size: 18px; font-weight: 400; margin-bottom: 8px; }
+        .product-series { font-size: 13px; color: #999; margin-bottom: 12px; }
+        .product-price { font-size: 20px; }
+        .product-desc { font-size: 14px; color: #666; margin-top: 10px; line-height: 1.6; }
+
+        /* Interview */
+        .interview { padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
+        .interview-header { text-align: center; margin-bottom: 60px; }
+        .interview-tag { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; color: #999; margin-bottom: 15px; }
+        .interview-title { font-size: 36px; font-weight: 400; }
+        .interview-content { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; }
+        .interview-avatar { aspect-ratio: 1; background: #f5f5f5; border-radius: 50%; }
+        .interview-text { font-size: 16px; line-height: 2; }
+        .interview-question { font-weight: bold; margin-bottom: 10px; }
+        .interview-answer { color: #666; margin-bottom: 30px; }
+
+        /* Gallery */
+        .gallery { padding: 100px 40px; background: #f8f8f8; }
+        .gallery-content { max-width: 1200px; margin: 0 auto; }
+        .gallery-header { text-align: center; margin-bottom: 60px; }
+        .gallery-tag { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; color: #999; margin-bottom: 15px; }
+        .gallery-title { font-size: 36px; font-weight: 400; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .gallery-item { aspect-ratio: 1; background: #eee; cursor: pointer; transition: transform 0.3s; }
+        .gallery-item:hover { transform: scale(1.05); }
+        .gallery-item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+        .gallery-caption { text-align: center; margin-top: 40px; font-size: 14px; color: #999; font-style: italic; }
+
+        /* CTA */
+        .cta { padding: 100px 40px; text-align: center; border-top: 2px solid #000; }
+        .cta-title { font-size: 48px; font-weight: 400; margin-bottom: 20px; }
+        .cta-desc { font-size: 16px; color: #666; margin-bottom: 40px; font-style: italic; }
+        .cta-btn { display: inline-block; padding: 15px 50px; border: 2px solid #000; color: #000; text-decoration: none; font-size: 13px; letter-spacing: 5px; text-transform: uppercase; transition: all 0.3s; }
+        .cta-btn:hover { background: #000; color: #fff; }
+
+        /* Footer */
+        .footer { padding: 60px 40px; background: #000; color: #999; }
+        .footer-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 60px; }
+        .footer-brand { font-size: 18px; letter-spacing: 5px; color: #fff; margin-bottom: 15px; }
+        .footer-desc { font-size: 13px; line-height: 1.8; }
+        .footer-title { font-size: 12px; letter-spacing: 3px; color: #fff; text-transform: uppercase; margin-bottom: 15px; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 10px; }
+        .footer-links a { color: #999; text-decoration: none; font-size: 13px; transition: color 0.3s; }
+        .footer-links a:hover { color: #fff; }
+        .footer-bottom { max-width: 1200px; margin: 40px auto 0; padding-top: 20px; border-top: 1px solid #222; display: flex; justify-content: space-between; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">Blind Box Magazine</div>
+            <nav class="nav">
+                <a href="#">概念</a>
+                <a href="#">数据</a>
+                <a href="#">品牌</a>
+                <a href="#">系列</a>
+                <a href="#">订阅</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="cover">
+        <div class="cover-left">
+            <div class="cover-tag">Volume 01 · 2026</div>
+            <h1 class="cover-title">盲盒的世界</h1>
+            <p class="cover-subtitle">探索未知的惊喜，发现艺术的魅力</p>
+            <div class="cover-author">Written by Blind Box Editorial</div>
+        </div>
+        <div class="cover-right">
+            <div class="cover-image"></div>
+        </div>
+        <div class="cover-issue">Issue No. 01</div>
+    </section>
+
+    <section class="toc">
+        <div>
+            <div class="toc-title">Table of Contents</div>
+        </div>
+        <div>
+            <ul class="toc-list">
+                <li class="toc-item">
+                    <span class="toc-item-title">什么是盲盒</span>
+                    <span class="toc-item-page">01</span>
+                </li>
+                <li class="toc-item">
+                    <span class="toc-item-title">市场数据洞察</span>
+                    <span class="toc-item-page">02</span>
+                </li>
+                <li class="toc-item">
+                    <span class="toc-item-title">品牌故事</span>
+                    <span class="toc-item-page">03</span>
+                </li>
+                <li class="toc-item">
+                    <span class="toc-item-title">热门系列</span>
+                    <span class="toc-item-page">04</span>
+                </li>
+                <li class="toc-item">
+                    <span class="toc-item-title">设计师专访</span>
+                    <span class="toc-item-page">05</span>
+                </li>
+                <li class="toc-item">
+                    <span class="toc-item-title">收藏图鉴</span>
+                    <span class="toc-item-page">06</span>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="concept">
+        <div class="concept-header">
+            <div class="concept-number">01</div>
+            <h2 class="concept-title">什么是盲盒</h2>
+        </div>
+        <div class="concept-grid">
+            <div class="concept-item">
+                <h3 class="concept-item-title">未知的惊喜</h3>
+                <p class="concept-item-desc">每一盒都是一次冒险，你永远不知道下一个会是什么。这种不确定性带来的期待感，正是盲盒的魅力所在。从打开包装的那一刻起，心跳加速的感觉让人欲罢不能。</p>
+            </div>
+            <div class="concept-item">
+                <h3 class="concept-item-title">艺术的表达</h3>
+                <p class="concept-item-desc">每一个盲盒都是艺术家的心血结晶。从设计到制作，倾注了无数创意与匠心。这些小小的艺术品，让艺术走进了每个人的日常生活，让收藏变得触手可及。</p>
+            </div>
+            <div class="concept-item">
+                <h3 class="concept-item-title">社交的纽带</h3>
+                <p class="concept-item-desc">盲盒已经成为年轻人社交的新方式。分享开盒喜悦、交换重复款式，在盲盒的世界里结识志同道合的朋友。它不仅仅是一种玩具，更是一种生活方式。</p>
+            </div>
+            <div class="concept-item">
+                <h3 class="concept-item-title">收藏的乐趣</h3>
+                <p class="concept-item-desc">集齐一整套的成就感，发现隐藏款的惊喜感，这些都是盲盒带来的独特体验。每一次开盒都是一次期待，每一次收藏都是一次满足。</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="data">
+        <div class="data-content">
+            <div class="data-header">
+                <div class="data-tag">Market Data</div>
+                <h2 class="data-title">市场数据洞察</h2>
+            </div>
+            <div class="data-grid">
+                <div class="data-item">
+                    <div class="data-value">500<span class="data-unit">亿</span></div>
+                    <div class="data-label">2025年市场规模</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-value">35<span class="data-unit">%</span></div>
+                    <div class="data-label">年复合增长率</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-value">2.5<span class="data-unit">亿</span></div>
+                    <div class="data-label">活跃消费者</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-value">180<span class="data-unit">元</span></div>
+                    <div class="data-label">平均客单价</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="story">
+        <div class="story-image"></div>
+        <div class="story-content">
+            <div class="story-tag">Brand Story</div>
+            <h2 class="story-title">泡泡玛特：从北京到全球的潮玩传奇</h2>
+            <p class="story-text">泡泡玛特成立于2010年，是中国领先的潮流文化娱乐平台。从北京的第一家门店，到如今遍布全球的零售网络，泡泡玛特已经成为全球潮玩行业的领军品牌。</p>
+            <div class="story-quote">"我们致力于让潮流玩具成为一种生活方式，让艺术走进每个人的生活。"</div>
+            <p class="story-text">通过与全球优秀艺术家合作，泡泡玛特持续为消费者带来高品质的潮玩产品。MOLLY、DIMOO、SKULLPANDA等IP已经成为年轻人心中的潮流符号。</p>
+        </div>
+    </section>
+
+    <section class="products">
+        <div class="products-content">
+            <div class="products-header">
+                <h2 class="products-title">热门系列</h2>
+                <div class="products-count">6 Collections</div>
+            </div>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-image" style="background: linear-gradient(135deg, #667eea, #764ba2);"></div>
+                    <div class="product-info">
+                        <h3 class="product-name">MOLLY 宇航员系列</h3>
+                        <p class="product-series">12款 + 1隐藏款</p>
+                        <div class="product-price">¥69</div>
+                        <p class="product-desc">MOLLY化身宇航员，探索浩瀚宇宙。每个角色都有独特的太空装备和表情，可爱又充满未来感。</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image" style="background: linear-gradient(135deg, #f093fb, #f5576c);"></div>
+                    <div class="product-info">
+                        <h3 class="product-name">DIMOO 水族馆系列</h3>
+                        <p class="product-series">12款 + 1隐藏款</p>
+                        <div class="product-price">¥69</div>
+                        <p class="product-desc">DIMOO带你潜入神秘的海底世界，与可爱的海洋生物一起遨游。治愈系设计，萌化你的小心脏。</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image" style="background: linear-gradient(135deg, #4facfe, #00f2fe);"></div>
+                    <div class="product-info">
+                        <h3 class="product-name">SKULLPANDA 夜之城系列</h3>
+                        <p class="product-series">12款 + 1隐藏款</p>
+                        <div class="product-price">¥69</div>
+                        <p class="product-desc">暗黑风格的SKULLPANDA，带你探索神秘的夜之城。独特的哥特美学，酷感十足。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="interview">
+        <div class="interview-header">
+            <div class="interview-tag">Interview</div>
+            <h2 class="interview-title">设计师专访</h2>
+        </div>
+        <div class="interview-content">
+            <div class="interview-avatar"></div>
+            <div class="interview-text">
+                <div class="interview-question">Q: 您是如何设计出MOLLY这个角色的？</div>
+                <div class="interview-answer">A: MOLLY的灵感来源于我对童年的回忆。我想创造一个能代表纯真和梦想的角色，她的大眼睛里装着对世界的好奇。</div>
+                <div class="interview-question">Q: 盲盒对您来说意味着什么？</div>
+                <div class="interview-answer">A: 盲盒是一种连接艺术家和消费者的桥梁。它让艺术变得更加亲民，让每个人都能拥有属于自己的小确幸。</div>
+                <div class="interview-question">Q: 未来有什么新的创作计划？</div>
+                <div class="interview-answer">A: 我正在探索将传统文化元素融入潮玩设计，希望能创造出既有国际视野又有中国特色的作品。</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="gallery">
+        <div class="gallery-content">
+            <div class="gallery-header">
+                <div class="gallery-tag">Gallery</div>
+                <h2 class="gallery-title">收藏图鉴</h2>
+            </div>
+            <div class="gallery-grid">
+                <div class="gallery-item" style="background: linear-gradient(135deg, #667eea, #764ba2);"></div>
+                <div class="gallery-item" style="background: linear-gradient(135deg, #f093fb, #f5576c);"></div>
+                <div class="gallery-item" style="background: linear-gradient(135deg, #4facfe, #00f2fe);"></div>
+                <div class="gallery-item" style="background: linear-gradient(135deg, #43e97b, #38f9d7);"></div>
+                <div class="gallery-item" style="background: linear-gradient(135deg, #fa709a, #fee140);"></div>
+            </div>
+            <div class="gallery-caption">MOLLY × 迪士尼联名系列 · 2026限定版</div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <h2 class="cta-title">订阅我们的杂志</h2>
+        <p class="cta-desc">获取最新的盲盒资讯、设计师专访和收藏指南</p>
+        <a href="#" class="cta-btn">立即订阅</a>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <div class="footer-brand">Blind Box Magazine</div>
+                <p class="footer-desc">一本关于盲盒文化的独立杂志，探索潮玩世界的无限可能。</p>
+            </div>
+            <div>
+                <div class="footer-title">杂志</div>
+                <ul class="footer-links">
+                    <li><a href="#">往期回顾</a></li>
+                    <li><a href="#">订阅</a></li>
+                    <li><a href="#">投稿</a></li>
+                    <li><a href="#">广告合作</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-title">内容</div>
+                <ul class="footer-links">
+                    <li><a href="#">品牌故事</a></li>
+                    <li><a href="#">设计师专访</a></li>
+                    <li><a href="#">收藏指南</a></li>
+                    <li><a href="#">市场分析</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-title">关于</div>
+                <ul class="footer-links">
+                    <li><a href="#">关于我们</a></li>
+                    <li><a href="#">联系方式</a></li>
+                    <li><a href="#">隐私政策</a></li>
+                    <li><a href="#">使用条款</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Blind Box Magazine. All rights reserved.</span>
+            <span>Designed with ❤️</span>
+        </div>
+    </footer>
+
+    <script>
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // 滚动动画
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.concept-item, .data-item, .product-card, .interview-question, .interview-answer').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+
+        // 图片悬停效果
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+            });
+            item.addEventListener('mouseleave', function() {
+                this.style.boxShadow = '';
+            });
+        });
+    </script>
+</body>
+</html>
