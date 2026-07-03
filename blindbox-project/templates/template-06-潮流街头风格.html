@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>盲盒介绍 - 潮流街头风格</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        @font-face { font-family: 'Graffiti'; src: local('Impact'), local('Arial Black'); }
+        body { font-family: "Arial Black", "Impact", sans-serif; background: #1a1a1a; color: #fff; overflow-x: hidden; }
+
+        /* Header */
+        .header { padding: 20px; position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
+        .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; }
+        .logo { font-size: 32px; font-weight: 900; letter-spacing: 5px; background: linear-gradient(45deg, #ff0000, #ff8800, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradient 3s ease infinite; }
+        @keyframes gradient { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+        .nav { display: flex; gap: 30px; }
+        .nav a { color: #fff; text-decoration: none; font-size: 14px; text-transform: uppercase; letter-spacing: 3px; position: relative; }
+        .nav a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 3px; background: #ff0000; transition: width 0.3s; }
+        .nav a:hover::after { width: 100%; }
+
+        /* Hero */
+        .hero { height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; background: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%), linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%); background-size: 60px 60px; background-position: 0 0, 30px 30px; }
+        .hero-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(255,0,0,0.3), rgba(0,0,255,0.3)); }
+        .hero-content { position: relative; z-index: 2; text-align: center; }
+        .hero-badge { display: inline-block; padding: 10px 30px; border: 3px solid #fff; font-size: 14px; letter-spacing: 5px; margin-bottom: 30px; transform: rotate(-3deg); }
+        .hero-title { font-size: 120px; font-weight: 900; line-height: 1; text-transform: uppercase; text-shadow: 5px 5px 0 #ff0000, -5px -5px 0 #00ffff; }
+        .hero-subtitle { font-size: 24px; margin-top: 20px; letter-spacing: 10px; }
+        .hero-btn { display: inline-block; margin-top: 40px; padding: 20px 60px; background: #ff0000; color: #fff; text-decoration: none; font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 5px; transform: skewX(-5deg); transition: all 0.3s; }
+        .hero-btn:hover { background: #00ffff; color: #000; transform: skewX(-5deg) scale(1.1); }
+
+        /* Spray Paint Effect */
+        .spray { position: absolute; width: 200px; height: 200px; border-radius: 50%; filter: blur(40px); opacity: 0.5; }
+        .spray-1 { background: #ff0000; top: 20%; left: 10%; }
+        .spray-2 { background: #00ffff; top: 60%; right: 10%; }
+        .spray-3 { background: #ff00ff; bottom: 10%; left: 30%; }
+
+        /* Concept */
+        .concept { padding: 150px 40px; max-width: 1400px; margin: 0 auto; }
+        .section-title { font-size: 64px; font-weight: 900; text-transform: uppercase; margin-bottom: 60px; position: relative; display: inline-block; }
+        .section-title::before { content: ''; position: absolute; bottom: -10px; left: 0; width: 100px; height: 8px; background: #ff0000; }
+        .concept-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+        .concept-card { background: #222; padding: 40px; border: 3px solid #333; position: relative; overflow: hidden; transform: skewY(-2deg); transition: all 0.3s; }
+        .concept-card:hover { border-color: #ff0000; transform: skewY(-2deg) scale(1.05); }
+        .concept-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, #ff0000, #00ffff); }
+        .concept-icon { font-size: 60px; margin-bottom: 20px; }
+        .concept-title { font-size: 24px; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; }
+        .concept-desc { font-size: 14px; color: #999; line-height: 1.6; font-family: Arial, sans-serif; }
+
+        /* Data */
+        .data { padding: 100px 40px; background: linear-gradient(45deg, #000, #111); position: relative; }
+        .data::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 10px; background: repeating-linear-gradient(90deg, #ff0000, #ff0000 20px, #000 20px, #000 40px); }
+        .data-content { max-width: 1400px; margin: 0 auto; }
+        .data-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-top: 60px; }
+        .data-card { background: #222; padding: 40px; border: 2px solid #333; text-align: center; position: relative; }
+        .data-card::after { content: '★'; position: absolute; top: -15px; right: -15px; font-size: 30px; color: #ff0000; }
+        .data-value { font-size: 48px; font-weight: 900; background: linear-gradient(45deg, #ff0000, #ff8800); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .data-label { font-size: 14px; color: #999; margin-top: 10px; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* Brand */
+        .brand { padding: 150px 40px; max-width: 1400px; margin: 0 auto; }
+        .brand-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 30px; margin-top: 60px; }
+        .brand-card { background: #222; padding: 30px; border: 2px solid #333; text-align: center; transition: all 0.3s; cursor: pointer; }
+        .brand-card:hover { border-color: #ff0000; transform: rotate(5deg); }
+        .brand-logo { font-size: 50px; margin-bottom: 15px; }
+        .brand-name { font-size: 16px; font-weight: 900; text-transform: uppercase; }
+        .brand-desc { font-size: 12px; color: #999; margin-top: 8px; font-family: Arial, sans-serif; }
+
+        /* Products */
+        .products { padding: 100px 40px; background: #111; }
+        .products-content { max-width: 1400px; margin: 0 auto; }
+        .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 60px; }
+        .product-card { background: #222; border: 2px solid #333; overflow: hidden; transition: all 0.3s; }
+        .product-card:hover { border-color: #ff0000; transform: translateY(-10px); }
+        .product-image { aspect-ratio: 1; position: relative; overflow: hidden; }
+        .product-image::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #ff0000, #00ffff); opacity: 0.5; }
+        .product-badge { position: absolute; top: 15px; left: 15px; background: #ff0000; color: #fff; padding: 5px 15px; font-size: 12px; font-weight: 900; transform: rotate(-5deg); }
+        .product-info { padding: 25px; }
+        .product-name { font-size: 20px; font-weight: 900; text-transform: uppercase; }
+        .product-series { font-size: 13px; color: #999; margin-top: 8px; font-family: Arial, sans-serif; }
+        .product-price { font-size: 24px; font-weight: 900; color: #ff0000; margin-top: 15px; }
+
+        /* Graffiti Section */
+        .graffiti { padding: 150px 40px; text-align: center; position: relative; overflow: hidden; }
+        .graffiti-text { font-size: 120px; font-weight: 900; text-transform: uppercase; color: transparent; -webkit-text-stroke: 3px #ff0000; opacity: 0.3; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); white-space: nowrap; }
+        .graffiti-content { position: relative; z-index: 2; }
+        .graffiti-title { font-size: 48px; font-weight: 900; margin-bottom: 30px; }
+        .graffiti-desc { font-size: 18px; color: #999; max-width: 600px; margin: 0 auto 40px; font-family: Arial, sans-serif; line-height: 1.6; }
+        .graffiti-btn { display: inline-block; padding: 18px 50px; border: 3px solid #fff; color: #fff; text-decoration: none; font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 5px; transition: all 0.3s; }
+        .graffiti-btn:hover { background: #fff; color: #000; }
+
+        /* Footer */
+        .footer { padding: 60px 40px; background: #000; border-top: 5px solid #ff0000; }
+        .footer-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .footer-logo { font-size: 24px; font-weight: 900; }
+        .footer-links { display: flex; gap: 30px; }
+        .footer-links a { color: #999; text-decoration: none; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s; }
+        .footer-links a:hover { color: #ff0000; }
+
+        /* Glitch Effect */
+        @keyframes glitch { 0% { transform: translate(0); } 20% { transform: translate(-2px, 2px); } 40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); } 80% { transform: translate(2px, -2px); } 100% { transform: translate(0); } }
+        .glitch:hover { animation: glitch 0.3s infinite; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">BLIND BOX</div>
+            <nav class="nav">
+                <a href="#">概念</a>
+                <a href="#">数据</a>
+                <a href="#">品牌</a>
+                <a href="#">系列</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="spray spray-1"></div>
+        <div class="spray spray-2"></div>
+        <div class="spray spray-3"></div>
+        <div class="hero-content">
+            <div class="hero-badge">STREET CULTURE</div>
+            <h1 class="hero-title glitch">盲盒</h1>
+            <p class="hero-subtitle">探索未知的惊喜</p>
+            <a href="#" class="hero-btn">立即探索</a>
+        </div>
+    </section>
+
+    <section class="concept">
+        <h2 class="section-title">什么是盲盒</h2>
+        <div class="concept-grid">
+            <div class="concept-card">
+                <div class="concept-icon">🎁</div>
+                <h3 class="concept-title">未知</h3>
+                <p class="concept-desc">每一盒都是一次冒险，你永远不知道下一个会是什么。这种不确定性带来的期待感，正是盲盒的魅力所在。</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">🎨</div>
+                <h3 class="concept-title">艺术</h3>
+                <p class="concept-desc">每一个盲盒都是艺术家的心血结晶。从设计到制作，倾注了无数创意与匠心，让艺术走进日常生活。</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">🔥</div>
+                <h3 class="concept-title">潮流</h3>
+                <p class="concept-desc">盲盒已经成为年轻人表达个性的方式。在街头文化中，盲盒代表着对未知的探索和对艺术的追求。</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="data">
+        <div class="data-content">
+            <h2 class="section-title">市场数据</h2>
+            <div class="data-grid">
+                <div class="data-card">
+                    <div class="data-value">500亿</div>
+                    <div class="data-label">市场规模</div>
+                </div>
+                <div class="data-card">
+                    <div class="data-value">35%</div>
+                    <div class="data-label">年增长率</div>
+                </div>
+                <div class="data-card">
+                    <div class="data-value">2.5亿</div>
+                    <div class="data-label">活跃用户</div>
+                </div>
+                <div class="data-card">
+                    <div class="data-value">180元</div>
+                    <div class="data-label">客单价</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="brand">
+        <h2 class="section-title">热门品牌</h2>
+        <div class="brand-grid">
+            <div class="brand-card">
+                <div class="brand-logo">🎭</div>
+                <div class="brand-name">泡泡玛特</div>
+                <div class="brand-desc">潮流文化娱乐平台</div>
+            </div>
+            <div class="brand-card">
+                <div class="brand-logo">🦄</div>
+                <div class="brand-name">52TOYS</div>
+                <div class="brand-desc">收藏玩具品牌</div>
+            </div>
+            <div class="brand-card">
+                <div class="brand-logo">🎪</div>
+                <div class="brand-name">寻找独角兽</div>
+                <div class="brand-desc">艺术玩具品牌</div>
+            </div>
+            <div class="brand-card">
+                <div class="brand-logo">🎨</div>
+                <div class="brand-name">TOP TOY</div>
+                <div class="brand-desc">全球潮玩集合店</div>
+            </div>
+            <div class="brand-card">
+                <div class="brand-logo">🌟</div>
+                <div class="brand-name">若来</div>
+                <div class="brand-desc">创意潮玩品牌</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="products">
+        <div class="products-content">
+            <h2 class="section-title">热门系列</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-image" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <div class="product-badge">HOT</div>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">MOLLY</h3>
+                        <p class="product-series">宇航员系列</p>
+                        <div class="product-price">¥69</div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                        <div class="product-badge">NEW</div>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">DIMOO</h3>
+                        <p class="product-series">水族馆系列</p>
+                        <div class="product-price">¥69</div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                        <div class="product-badge">LIMITED</div>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">SKULLPANDA</h3>
+                        <p class="product-series">夜之城系列</p>
+                        <div class="product-price">¥69</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="graffiti">
+        <div class="graffiti-text">BLIND BOX CULTURE</div>
+        <div class="graffiti-content">
+            <h2 class="graffiti-title">加入盲盒文化</h2>
+            <p class="graffiti-desc">探索无限可能，发现未知惊喜。盲盒不仅仅是一种玩具，更是一种生活态度。</p>
+            <a href="#" class="graffiti-btn">立即加入</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">BLIND BOX</div>
+            <div class="footer-links">
+                <a href="#">关于我们</a>
+                <a href="#">联系方式</a>
+                <a href="#">隐私政策</a>
+                <a href="#">使用条款</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 随机涂鸦效果
+        function createSpray() {
+            const spray = document.createElement('div');
+            spray.style.cssText = `
+                position: fixed;
+                width: ${Math.random() * 100 + 50}px;
+                height: ${Math.random() * 100 + 50}px;
+                background: ${['#ff0000', '#00ffff', '#ff00ff', '#ffff00'][Math.floor(Math.random() * 4)]};
+                border-radius: 50%;
+                filter: blur(${Math.random() * 30 + 20}px);
+                opacity: ${Math.random() * 0.3 + 0.1};
+                top: ${Math.random() * 100}%;
+                left: ${Math.random() * 100}%;
+                pointer-events: none;
+                z-index: -1;
+            `;
+            document.body.appendChild(spray);
+        }
+
+        // 创建背景涂鸦
+        for (let i = 0; i < 10; i++) {
+            createSpray();
+        }
+
+        // 鼠标移动效果
+        document.addEventListener('mousemove', (e) => {
+            const cursor = document.createElement('div');
+            cursor.style.cssText = `
+                position: fixed;
+                width: 10px;
+                height: 10px;
+                background: #ff0000;
+                border-radius: 50%;
+                pointer-events: none;
+                left: ${e.clientX}px;
+                top: ${e.clientY}px;
+                z-index: 9999;
+                transition: opacity 0.3s;
+            `;
+            document.body.appendChild(cursor);
+            setTimeout(() => {
+                cursor.style.opacity = '0';
+                setTimeout(() => cursor.remove(), 300);
+            }, 100);
+        });
+
+        // 卡片倾斜效果
+        document.querySelectorAll('.concept-card, .brand-card, .product-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+{
+  "metadata": {
+    "title": "东南亚盲盒市场数据 (2023-2025)",
+    "description": "Southeast Asia Blind Box Market Data covering Pop Mart, MINISO, 52TOYS and market overview",
+    "collected_date": "2026-06-28",
+    "data_period": "2023-2025",
+    "disclaimer": "数据来源于公开财报、行业报告及媒体报道的综合整理。部分数据为基于公开信息的合理估算，具体精确数字请参考各公司官方财报原文。",
+    "key_sources": [
+      "Pop Mart (泡泡玛特) 港股年报/中报 (9992.HK)",
+      "MINISO (名创优品) 财报 (MNSO)",
+      "行业研究机构报告 (Grand View Research, Mordor Intelligence, Euromonitor)",
+      "财经媒体报道 (SCMP, Nikkei Asia, 36氪, 界面新闻)"
+    ]
+  },
+  "global_blindbox_market": {
+    "2022": {
+      "market_size_usd_billion": 7.0,
+      "notes": "全球盲盒/潮玩市场规模约70亿美元"
+    },
+    "2023": {
+      "market_size_usd_billion": 8.5,
+      "yoy_growth_pct": 21.4,
+      "notes": "全球盲盒市场持续增长，亚太地区主导"
+    },
+    "2024": {
+      "market_size_usd_billion": 10.5,
+      "yoy_growth_pct": 23.5,
+      "notes": "东南亚成为增长最快的区域市场"
+    },
+    "2025_forecast": {
+      "market_size_usd_billion": 12.8,
+      "yoy_growth_pct": 21.9,
+      "notes": "预计持续高速增长"
+    },
+    "cagr_2023_2030_pct": 22.5,
+    "key_drivers": [
+      "Z世代和千禧一代消费群体崛起",
+      "社交媒体驱动（TikTok、Instagram开箱文化）",
+      "中产阶级可支配收入增长",
+      "IP联名和艺术家合作",
+      "盲盒+毛绒玩具品类创新"
+    ]
+  },
+  "southeast_asia_market": {
+    "overview": {
+      "2023_market_size_usd_billion": 1.2,
+      "2024_market_size_usd_billion": 1.8,
+      "2025_forecast_usd_billion": 2.5,
+      "cagr_2023_2028_pct": 28.5,
+      "notes": "东南亚是全球盲盒市场增长最快的区域，泰国、印尼、越南为主要驱动力"
+    },
+    "country_breakdown": {
+      "thailand": {
+        "market_rank": 1,
+        "2023_market_size_usd_million": 350,
+        "2024_market_size_usd_million": 550,
+        "yoy_growth_pct": 57.1,
+        "key_characteristics": [
+          "泡泡玛特海外市场第一大贡献国",
+          "Labubu成为现象级IP，社交媒体引爆",
+          "泰国名人（Lisa from BLACKPINK等）带动消费",
+          "曼谷旗舰店开业引发排队热潮",
+          "二手市场溢价严重"
+        ],
+        "pop_mart_stores": 12,
+        "key_ip": ["Labubu", "MOLLY", "SKULLPANDA"]
+      },
+      "vietnam": {
+        "market_rank": 2,
+        "2023_market_size_usd_million": 180,
+        "2024_market_size_usd_million": 280,
+        "yoy_growth_pct": 55.6,
+        "key_characteristics": [
+          "年轻人口众多，消费潜力大",
+          "社交媒体渗透率高",
+          "泡泡玛特持续扩张门店",
+          "Shopee、Lazada等电商平台销售活跃"
+        ],
+        "pop_mart_stores": 5,
+        "key_ip": ["MOLLY", "DIMOO", "LABUBU"]
+      },
+      "indonesia": {
+        "market_rank": 3,
+        "2023_market_size_usd_million": 220,
+        "2024_market_size_usd_million": 350,
+        "yoy_growth_pct": 59.1,
+        "key_characteristics": [
+          "东南亚最大人口基数",
+          "中产阶级崛起带动消费升级",
+          "名创优品门店覆盖广泛",
+          "TikTok Shop成为重要销售渠道"
+        ],
+        "pop_mart_stores": 6,
+        "key_ip": ["LABUBU", "MOLLY", "DIMOO"]
+      },
+      "malaysia": {
+        "market_rank": 4,
+        "2023_market_size_usd_million": 150,
+        "2024_market_size_usd_million": 230,
+        "yoy_growth_pct": 53.3,
+        "key_characteristics": [
+          "华人社区对潮玩接受度高",
+          "泡泡玛特和名创优品均有布局",
+          "线上线下渠道并重"
+        ],
+        "pop_mart_stores": 4,
+        "key_ip": ["MOLLY", "SKULLPANDA", "LABUBU"]
+      },
+      "philippines": {
+        "market_rank": 5,
+        "2023_market_size_usd_million": 120,
+        "2024_market_size_usd_million": 190,
+        "yoy_growth_pct": 58.3,
+        "key_characteristics": [
+          "社交媒体驱动消费",
+          "Shopee等电商平台增长迅速",
+          "年轻消费者群体庞大"
+        ],
+        "pop_mart_stores": 3,
+        "key_ip": ["LABUBU", "MOLLY", "DIMOO"]
+      },
+      "singapore": {
+        "market_rank": 6,
+        "2023_market_size_usd_million": 80,
+        "2024_market_size_usd_million": 110,
+        "yoy_growth_pct": 37.5,
+        "key_characteristics": [
+          "高消费能力市场",
+          "泡泡玛特东南亚总部所在地",
+          "辐射周边市场"
+        ],
+        "pop_mart_stores": 3,
+        "key_ip": ["MOLLY", "SKULLPANDA", "DIMOO"]
+      }
+    },
+    "consumer_preferences": {
+      "age_distribution": {
+        "18_24_pct": 35,
+        "25_34_pct": 40,
+        "35_44_pct": 18,
+        "45_plus_pct": 7
+      },
+      "gender_split": {
+        "female_pct": 62,
+        "male_pct": 38
+      },
+      "purchase_channels": {
+        "offline_retail_pct": 45,
+        "ecommerce_pct": 35,
+        "pop_up_stores_pct": 12,
+        "vending_machines_pct": 8
+      },
+      "top_categories": [
+        {"category": "设计师玩具盲盒", "share_pct": 40},
+        {"category": "IP联名毛绒玩具", "share_pct": 25},
+        {"category": "动漫手办盲盒", "share_pct": 15},
+        {"category": "文具/生活用品盲盒", "share_pct": 12},
+        {"category": "其他", "share_pct": 8}
+      ],
+      "average_spend_per_purchase_usd": 12.5,
+      "purchase_frequency_monthly": 2.8
+    }
+  },
+  "brands": {
+    "pop_mart": {
+      "company_name": "泡泡玛特国际集团",
+      "stock_code": "9992.HK",
+      "hq": "北京, 中国",
+      "financials": {
+        "2023": {
+          "total_revenue_rmb_billion": 6.3,
+          "overseas_revenue_rmb_billion": 1.066,
+          "overseas_yoy_growth_pct": 134.9,
+          "overseas_revenue_share_pct": 16.9,
+          "net_profit_rmb_billion": 1.08,
+          "global_stores_total": 450,
+          "overseas_stores": 80
+        },
+        "2024_h1": {
+          "total_revenue_rmb_billion": 4.56,
+          "overseas_revenue_rmb_billion": 1.35,
+          "overseas_yoy_growth_pct": 259.6,
+          "overseas_revenue_share_pct": 29.7,
+          "notes": "上半年海外收入已超过2023年全年"
+        },
+        "2024_full_year": {
+          "total_revenue_rmb_billion": 13.04,
+          "overseas_revenue_rmb_billion": 5.07,
+          "overseas_yoy_growth_pct": 375.0,
+          "overseas_revenue_share_pct": 38.9,
+          "net_profit_rmb_billion": 3.4,
+          "net_profit_yoy_growth_pct": 186.0,
+          "global_stores_total": 500,
+          "notes": "海外收入突破50亿元大关，东南亚为核心增长引擎"
+        }
+      },
+      "southeast_asia_performance": {
+        "region_rank_in_overseas": 1,
+        "2023_sea_revenue_rmb_billion": 0.35,
+        "2024_sea_revenue_rmb_billion": 1.8,
+        "sea_yoy_growth_pct": 414.3,
+        "sea_share_of_overseas_pct": 35.5,
+        "thailand_is_top_market": true,
+        "labubu_phenomenon": {
+          "description": "Labubu（拉布布）由艺术家Kasing Lung创作，2024年在泰国成为现象级IP",
+          "key_drivers": [
+            "BLACKPINK Lisa等名人带动",
+            "社交媒体病毒式传播",
+            "泰国公主被拍到携带Labubu",
+            "二手市场溢价3-5倍"
+          ],
+          "impact": "Labubu成为泡泡玛特2024年销量第一的IP"
+        }
+      },
+      "key_ip_portfolios": [
+        {"name": "MOLLY", "artist": "Kenny Wong", "category": "设计师玩具"},
+        {"name": "SKULLPANDA", "artist": "泡泡玛特内部团队", "category": "设计师玩具"},
+        {"name": "DIMOO", "artist": "Ayan", "category": "设计师玩具"},
+        {"name": "LABUBU (The Monsters)", "artist": "Kasing Lung", "category": "毛绒玩具/盲盒"},
+        {"name": "PUCKY", "artist": "毕奇", "category": "设计师玩具"}
+      ],
+      "southeast_asia_stores_by_country": {
+        "thailand": 12,
+        "indonesia": 6,
+        "vietnam": 5,
+        "malaysia": 4,
+        "philippines": 3,
+        "singapore": 3
+      }
+    },
+    "miniso": {
+      "company_name": "名创优品集团",
+      "stock_code": "MNSO",
+      "hq": "广州, 中国",
+      "financials": {
+        "fy2023": {
+          "total_revenue_rmb_billion": 11.4,
+          "overseas_revenue_rmb_billion": 3.8,
+          "overseas_share_pct": 33.3,
+          "notes": "财年截至6月"
+        },
+        "fy2024": {
+          "total_revenue_rmb_billion": 15.0,
+          "overseas_revenue_rmb_billion": 5.2,
+          "overseas_yoy_growth_pct": 36.8,
+          "overseas_share_pct": 34.7,
+          "notes": "盲盒和IP联名产品成为重要收入驱动力"
+        }
+      },
+      "blind_box_strategy": {
+        "sub_brand": "TOP TOY",
+        "top_toy_description": "名创优品旗下专注潮玩和盲盒的子品牌",
+        "key_ip_collaborations": [
+          "Disney",
+          "Sanrio",
+          "Pokémon",
+          "Minions",
+          "Harry Potter",
+          "Snoopy"
+        ],
+        "sea_blind_box_performance": {
+          "description": "盲盒产品在东南亚市场表现强劲，泰国和菲律宾门店出现排队抢购现象",
+          "blind_box_share_of_revenue_pct": 15,
+          "notes": "IP联名盲盒是高毛利、高需求品类"
+        }
+      },
+      "southeast_asia_presence": {
+        "total_sea_stores": 500,
+        "countries": ["Indonesia", "Philippines", "Vietnam", "Thailand", "Singapore", "Malaysia"],
+        "notes": "名创优品在东南亚的门店覆盖远超泡泡玛特，但盲盒品类占比较小"
+      }
+    },
+    "toys_52": {
+      "company_name": "52TOYS (北京乐自天成文化发展有限公司)",
+      "hq": "北京, 中国",
+      "status": "非上市公司，数据有限",
+      "key_products": ["BeastBox", "盲盒系列", "机甲变形玩具"],
+      "southeast_asia_expansion": {
+        "entry_year": 2022,
+        "countries": ["Thailand", "Singapore", "Malaysia", "Philippines"],
+        "strategy": "通过经销商合作和电商平台进入东南亚市场",
+        "notes": "52TOYS在东南亚的市场份额和具体销售数据未公开披露"
+      },
+      "estimated_2024_revenue_rmb_billion": 0.8,
+      "estimated_sea_revenue_rmb_billion": 0.1,
+      "notes": "数据为行业估算，非官方披露"
+    }
+  },
+  "market_trends_2025": {
+    "key_trends": [
+      "Labubu热潮持续，带动泡泡玛特东南亚业绩",
+      "毛绒玩具盲盒成为新增长点",
+      "TikTok Shop等社交电商渠道崛起",
+      "本地化IP合作增加",
+      "二手市场和收藏文化成熟",
+      "名创优品TOP TOY加速东南亚扩张"
+    ],
+    "challenges": [
+      "部分市场存在假冒伪劣产品",
+      "监管政策不确定性",
+      "消费疲劳风险",
+      "供应链成本上升"
+    ],
+    "opportunities": [
+      "东南亚年轻人口红利",
+      "社交媒体渗透率持续提升",
+      "中产阶级消费升级",
+      "线下体验店模式创新"
+    ]
+  }
+}

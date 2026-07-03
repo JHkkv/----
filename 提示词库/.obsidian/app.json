@@ -1,0 +1,11 @@
+{
+  "interfaceFontSize": 14,
+  "showLineNumber": true,
+  "strictLineBreaks": false,
+  "readableLineLength": true,
+  "defaultViewMode": "preview",
+  "livePreview": true,
+  "attachmentFolderPath": "附件",
+  "newFileLocation": "folder",
+  "newFileFolderPath": "新提示词/通用"
+}

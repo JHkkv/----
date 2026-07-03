@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>盲盒介绍 - 社交媒体风格</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #fafafa; color: #333; }
+
+        /* Header */
+        .header { background: white; padding: 15px 20px; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
+        .header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+        .logo { font-size: 20px; font-weight: bold; color: #ff2442; }
+        .search { flex: 1; max-width: 400px; margin: 0 30px; position: relative; }
+        .search input { width: 100%; padding: 10px 15px 10px 35px; background: #f5f5f5; border: none; border-radius: 20px; font-size: 14px; }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #999; }
+        .nav { display: flex; gap: 25px; }
+        .nav a { color: #333; text-decoration: none; font-size: 14px; }
+
+        /* Stories */
+        .stories { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .stories-scroll { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px; }
+        .story { text-align: center; flex-shrink: 0; }
+        .story-avatar { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(45deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff); padding: 3px; margin-bottom: 8px; }
+        .story-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid white; }
+        .story-name { font-size: 12px; color: #666; }
+
+        /* Feed */
+        .feed { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .post { background: white; border-radius: 12px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .post-header { display: flex; align-items: center; padding: 15px; }
+        .post-avatar { width: 40px; height: 40px; border-radius: 50%; background: #f0f0f0; margin-right: 12px; }
+        .post-user { font-weight: 600; font-size: 14px; }
+        .post-location { font-size: 12px; color: #999; }
+        .post-more { margin-left: auto; cursor: pointer; }
+        .post-image { width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative; }
+        .post-badge { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.7); color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; }
+        .post-actions { padding: 15px; display: flex; gap: 20px; }
+        .post-action { font-size: 24px; cursor: pointer; }
+        .post-likes { padding: 0 15px; font-weight: 600; font-size: 14px; }
+        .post-caption { padding: 10px 15px; font-size: 14px; line-height: 1.5; }
+        .post-tags { padding: 0 15px 15px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .tag { background: #f0f0f0; padding: 5px 12px; border-radius: 20px; font-size: 12px; color: #666; }
+        .post-time { padding: 0 15px 15px; font-size: 11px; color: #999; }
+
+        /* Trending */
+        .trending { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .trending-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+        .trending-list { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; }
+        .trending-item { flex-shrink: 0; width: 150px; }
+        .trending-image { width: 150px; height: 150px; border-radius: 12px; margin-bottom: 10px; }
+        .trending-name { font-size: 14px; font-weight: 500; }
+        .trending-likes { font-size: 12px; color: #999; margin-top: 5px; }
+
+        /* Data Card */
+        .data-card { max-width: 600px; margin: 0 auto 20px; background: white; border-radius: 12px; padding: 20px; }
+        .data-card-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+        .data-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .data-item { background: #f8f8f8; padding: 20px; border-radius: 12px; text-align: center; }
+        .data-value { font-size: 28px; font-weight: bold; color: #ff2442; }
+        .data-label { font-size: 12px; color: #999; margin-top: 5px; }
+
+        /* Brand Cards */
+        .brands { max-width: 600px; margin: 0 auto 20px; }
+        .brands-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; padding: 0 20px; }
+        .brand-scroll { display: flex; gap: 15px; overflow-x: auto; padding: 0 20px 20px; }
+        .brand-card { flex-shrink: 0; width: 120px; text-align: center; }
+        .brand-logo { width: 80px; height: 80px; border-radius: 50%; background: white; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .brand-name { font-size: 13px; font-weight: 500; }
+        .brand-followers { font-size: 11px; color: #999; margin-top: 5px; }
+
+        /* Comments */
+        .comments { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; padding: 20px; }
+        .comments-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+        .comment { display: flex; gap: 12px; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }
+        .comment-avatar { width: 36px; height: 36px; border-radius: 50%; background: #f0f0f0; flex-shrink: 0; }
+        .comment-content { flex: 1; }
+        .comment-user { font-weight: 600; font-size: 13px; }
+        .comment-text { font-size: 14px; margin-top: 5px; line-height: 1.5; }
+        .comment-time { font-size: 11px; color: #999; margin-top: 5px; }
+        .comment-actions { display: flex; gap: 15px; margin-top: 10px; }
+        .comment-action { font-size: 12px; color: #999; cursor: pointer; }
+
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #eee; display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
+        .bottom-nav-item { text-align: center; cursor: pointer; }
+        .bottom-nav-icon { font-size: 22px; }
+        .bottom-nav-label { font-size: 10px; color: #999; margin-top: 3px; }
+        .bottom-nav-item.active .bottom-nav-label { color: #ff2442; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">盲盒圈</div>
+            <div class="search">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="搜索盲盒、品牌、话题...">
+            </div>
+            <nav class="nav">
+                <a href="#">发现</a>
+                <a href="#">关注</a>
+                <a href="#">消息</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="stories">
+        <div class="stories-scroll">
+            <div class="story">
+                <div class="story-avatar">
+                    <div style="width: 100%; height: 100%; border-radius: 50%; background: #ff6b6b; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">+</div>
+                </div>
+                <div class="story-name">你的故事</div>
+            </div>
+            <div class="story">
+                <div class="story-avatar">
+                    <div style="width: 100%; height: 100%; border-radius: 50%; background: #4facfe; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">🎭</div>
+                </div>
+                <div class="story-name">泡泡玛特</div>
+            </div>
+            <div class="story">
+                <div class="story-avatar">
+                    <div style="width: 100%; height: 100%; border-radius: 50%; background: #f093fb; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">🦄</div>
+                </div>
+                <div class="story-name">52TOYS</div>
+            </div>
+            <div class="story">
+                <div class="story-avatar">
+                    <div style="width: 100%; height: 100%; border-radius: 50%; background: #43e97b; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">🎪</div>
+                </div>
+                <div class="story-name">寻找独角兽</div>
+            </div>
+            <div class="story">
+                <div class="story-avatar">
+                    <div style="width: 100%; height: 100%; border-radius: 50%; background: #fa709a; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">🎨</div>
+                </div>
+                <div class="story-name">TOP TOY</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="feed">
+        <article class="post">
+            <div class="post-header">
+                <div class="post-avatar"></div>
+                <div>
+                    <div class="post-user">潮玩少女Luna</div>
+                    <div class="post-location">上海 · 泡泡玛特旗舰店</div>
+                </div>
+                <div class="post-more">⋯</div>
+            </div>
+            <div class="post-image">
+                <div class="post-badge">🎁 开盒分享</div>
+            </div>
+            <div class="post-actions">
+                <span class="post-action">❤️</span>
+                <span class="post-action">💬</span>
+                <span class="post-action">↗️</span>
+                <span class="post-action" style="margin-left: auto;">🔖</span>
+            </div>
+            <div class="post-likes">2,580 次点赞</div>
+            <div class="post-caption">
+                <strong>潮玩少女Luna</strong> 今天开到了MOLLY的隐藏款！太开心了！😭💕 这个配色真的绝了，做工也超级精致！泡泡玛特yyds！
+            </div>
+            <div class="post-tags">
+                <span class="tag">#盲盒开箱</span>
+                <span class="tag">#MOLLY</span>
+                <span class="tag">#泡泡玛特</span>
+                <span class="tag">#隐藏款</span>
+            </div>
+            <div class="post-time">2小时前</div>
+        </article>
+
+        <article class="post">
+            <div class="post-header">
+                <div class="post-avatar" style="background: #4facfe;"></div>
+                <div>
+                    <div class="post-user">收藏家小王</div>
+                    <div class="post-location">北京 · 三里屯</div>
+                </div>
+                <div class="post-more">⋯</div>
+            </div>
+            <div class="post-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+            <div class="post-actions">
+                <span class="post-action">❤️</span>
+                <span class="post-action">💬</span>
+                <span class="post-action">↗️</span>
+                <span class="post-action" style="margin-left: auto;">🔖</span>
+            </div>
+            <div class="post-likes">1,890 次点赞</div>
+            <div class="post-caption">
+                <strong>收藏家小王</strong> 整盒端了DIMOO水族馆系列！每个都好可爱！最喜欢那个小丑鱼的设计🐠 还有海豚和水母也好萌！
+            </div>
+            <div class="post-tags">
+                <span class="tag">#DIMOO</span>
+                <span class="tag">#水族馆系列</span>
+                <span class="tag">#整盒端</span>
+            </div>
+            <div class="post-time">5小时前</div>
+        </article>
+    </section>
+
+    <section class="trending">
+        <h2 class="trending-title">🔥 热门盲盒</h2>
+        <div class="trending-list">
+            <div class="trending-item">
+                <div class="trending-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                <div class="trending-name">MOLLY 宇航员</div>
+                <div class="trending-likes">12.5万收藏</div>
+            </div>
+            <div class="trending-item">
+                <div class="trending-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+                <div class="trending-name">DIMOO 水族馆</div>
+                <div class="trending-likes">8.9万收藏</div>
+            </div>
+            <div class="trending-item">
+                <div class="trending-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
+                <div class="trending-name">SKULLPANDA</div>
+                <div class="trending-likes">6.7万收藏</div>
+            </div>
+            <div class="trending-item">
+                <div class="trending-image" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"></div>
+                <div class="trending-name">LABUBU 森林</div>
+                <div class="trending-likes">5.2万收藏</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="data-card">
+        <h3 class="data-card-title">📊 盲盒市场数据</h3>
+        <div class="data-grid">
+            <div class="data-item">
+                <div class="data-value">500亿</div>
+                <div class="data-label">2025年市场规模</div>
+            </div>
+            <div class="data-item">
+                <div class="data-value">35%</div>
+                <div class="data-label">年增长率</div>
+            </div>
+            <div class="data-item">
+                <div class="data-value">2.5亿</div>
+                <div class="data-label">活跃用户</div>
+            </div>
+            <div class="data-item">
+                <div class="data-value">180元</div>
+                <div class="data-label">客单价</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="brands">
+        <h2 class="brands-title">🏷️ 热门品牌</h2>
+        <div class="brand-scroll">
+            <div class="brand-card">
+                <div class="brand-logo">🎭</div>
+                <div class="brand-name">泡泡玛特</div>
+                <div class="brand-followers">1200万粉丝</div>
+            </div>
+            <div class="brand-card">
+                <div class="brand-logo">🦄</div>
+                <div class="brand-name">52TOYS</div>
+                <div class="brand-followers">890万粉丝</div>
+            </div>
+            <div class="brand-card">
+                <div class="brand-logo">🎪</div>
+                <div class="brand-name">寻找独角兽</div>
+                <div class="brand-followers">650万粉丝</div>
+            </div>
+            <div class="brand-card">
+                <div class="brand-logo">🎨</div>
+                <div class="brand-name">TOP TOY</div>
+                <div class="brand-followers">520万粉丝</div>
+            </div>
+            <div class="brand-card">
+                <div class="brand-logo">🌟</div>
+                <div class="brand-name">若来</div>
+                <div class="brand-followers">380万粉丝</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="comments">
+        <h3 class="comments-title">💬 热门评论</h3>
+        <div class="comment">
+            <div class="comment-avatar"></div>
+            <div class="comment-content">
+                <div class="comment-user">盲盒达人</div>
+                <div class="comment-text">这个隐藏款太好看了！我也想要！请问在哪里买的？</div>
+                <div class="comment-time">1小时前</div>
+                <div class="comment-actions">
+                    <span class="comment-action">回复</span>
+                    <span class="comment-action">❤️ 128</span>
+                </div>
+            </div>
+        </div>
+        <div class="comment">
+            <div class="comment-avatar" style="background: #f093fb;"></div>
+            <div class="comment-content">
+                <div class="comment-user">收藏爱好者</div>
+                <div class="comment-text">MOLLY永远的神！我已经集齐了三个系列了！</div>
+                <div class="comment-time">3小时前</div>
+                <div class="comment-actions">
+                    <span class="comment-action">回复</span>
+                    <span class="comment-action">❤️ 89</span>
+                </div>
+            </div>
+        </div>
+        <div class="comment">
+            <div class="comment-avatar" style="background: #43e97b;"></div>
+            <div class="comment-content">
+                <div class="comment-user">新手小白</div>
+                <div class="comment-text">刚入坑，请问新手推荐买哪个系列？</div>
+                <div class="comment-time">5小时前</div>
+                <div class="comment-actions">
+                    <span class="comment-action">回复</span>
+                    <span class="comment-action">❤️ 45</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <nav class="bottom-nav">
+        <div class="bottom-nav-item active">
+            <div class="bottom-nav-icon">🏠</div>
+            <div class="bottom-nav-label">首页</div>
+        </div>
+        <div class="bottom-nav-item">
+            <div class="bottom-nav-icon">🔍</div>
+            <div class="bottom-nav-label">发现</div>
+        </div>
+        <div class="bottom-nav-item">
+            <div class="bottom-nav-icon">➕</div>
+            <div class="bottom-nav-label">发布</div>
+        </div>
+        <div class="bottom-nav-item">
+            <div class="bottom-nav-icon">💬</div>
+            <div class="bottom-nav-label">消息</div>
+        </div>
+        <div class="bottom-nav-item">
+            <div class="bottom-nav-icon">👤</div>
+            <div class="bottom-nav-label">我的</div>
+        </div>
+    </nav>
+
+    <script>
+        // 点赞动画
+        document.querySelectorAll('.post-action').forEach(action => {
+            action.addEventListener('click', function() {
+                if (this.textContent === '❤️') {
+                    this.style.transform = 'scale(1.3)';
+                    setTimeout(() => { this.style.transform = 'scale(1)'; }, 200);
+                }
+            });
+        });
+
+        // 底部导航切换
+        document.querySelectorAll('.bottom-nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.bottom-nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 双击点赞
+        document.querySelectorAll('.post-image').forEach(image => {
+            image.addEventListener('dblclick', function() {
+                const heart = document.createElement('div');
+                heart.textContent = '❤️';
+                heart.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:80px;transition:transform 0.3s;z-index:10;';
+                this.appendChild(heart);
+                setTimeout(() => { heart.style.transform = 'translate(-50%,-50%) scale(1)'; }, 10);
+                setTimeout(() => { heart.style.transform = 'translate(-50%,-50%) scale(0)'; }, 800);
+                setTimeout(() => { heart.remove(); }, 1100);
+            });
+        });
+    </script>
+</body>
+</html>
