@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "wiki/Coze学习路径.md",
+                "file": "wiki/全职管家.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Coze学习路径"
+              "title": "全职管家"
             }
           }
         ]
@@ -182,8 +182,9 @@
   },
   "active": "c3149beba3569601",
   "lastOpenFiles": [
-    "wiki/index.md",
+    "wiki/多Agent并行头脑风暴.md",
     "wiki/Coze学习路径.md",
+    "wiki/index.md",
     "wiki/Coze平台.md",
     "wiki/Coze 从零基础到商业落地学习路径.md",
     "未命名.canvas",
@@ -217,7 +218,6 @@
     "镇秦/结构/六弧分解.md",
     "镇秦/结构/三卷结构.md",
     "镇秦/人物/徐福.md",
-    "镇秦/人物/张良.md",
-    "镇秦/人物/韩非.md"
+    "镇秦/人物/张良.md"
   ]
 }

@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI项目落地如何产生实际效益 · 10专家头脑风暴</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   VIEWPORT FITTING: MANDATORY BASE STYLES
+   =========================================== */
+html, body { height: 100%; overflow-x: hidden; margin: 0; padding: 0; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+
+.slide {
+    width: 100vw; height: 100vh; height: 100dvh;
+    overflow: hidden; scroll-snap-align: start;
+    display: flex; flex-direction: column; position: relative;
+}
+.slide-content {
+    flex: 1; display: flex; flex-direction: column;
+    justify-content: center; max-height: 100%; overflow: hidden;
+    padding: var(--slide-padding);
+}
+
+:root {
+    --title-size: clamp(1.5rem, 5vw, 4rem);
+    --h2-size: clamp(1.25rem, 3.5vw, 2.5rem);
+    --h3-size: clamp(1rem, 2.5vw, 1.75rem);
+    --body-size: clamp(0.75rem, 1.5vw, 1.125rem);
+    --small-size: clamp(0.65rem, 1vw, 0.875rem);
+    --slide-padding: clamp(1rem, 4vw, 4rem);
+    --content-gap: clamp(0.5rem, 2vw, 2rem);
+    --element-gap: clamp(0.25rem, 1vw, 1rem);
+    --c-bg: #080c17; --c-card: #111827;
+    --c-cyan: #00e5ff; --c-magenta: #e040fb;
+    --c-blue: #448aff; --c-gold: #ffd740;
+    --c-green: #69f0ae; --c-red: #ff5252;
+    --c-text: #e0e6f0; --c-dim: #8892a8;
+}
+
+.card, .container, .content-box {
+    max-width: min(90vw, 1000px);
+    max-height: min(80vh, 700px);
+}
+.feature-list, .bullet-list { gap: clamp(0.4rem, 1vh, 1rem); }
+.feature-list li, .bullet-list li { font-size: var(--body-size); line-height: 1.4; }
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+}
+img, .image-container { max-width: 100%; max-height: min(50vh, 400px); object-fit: contain; }
+
+@media (max-height: 700px) {
+    :root { --slide-padding: clamp(0.75rem, 3vw, 2rem); --content-gap: clamp(0.4rem, 1.5vw, 1rem); --title-size: clamp(1.25rem, 4.5vw, 2.5rem); --h2-size: clamp(1rem, 3vw, 1.75rem); }
+}
+@media (max-height: 600px) {
+    :root { --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem); --content-gap: clamp(0.3rem, 1vw, 0.75rem); --title-size: clamp(1.1rem, 4vw, 2rem); --body-size: clamp(0.7rem, 1.2vw, 0.95rem); }
+    .nav-dots, .keyboard-hint, .decorative { display: none; }
+}
+@media (max-height: 500px) {
+    :root { --slide-padding: clamp(0.4rem, 2vw, 1rem); --title-size: clamp(1rem, 3.5vw, 1.5rem); --h2-size: clamp(0.9rem, 2.5vw, 1.25rem); --body-size: clamp(0.65rem, 1vw, 0.85rem); }
+}
+@media (max-width: 600px) {
+    :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+    .grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+    html { scroll-behavior: auto; }
+}
+
+/* ===========================================
+   NEON CYBER THEME OVERRIDES
+   =========================================== */
+body {
+    background: var(--c-bg); color: var(--c-text);
+    font-family: 'Space Grotesk', 'Noto Sans SC', system-ui, sans-serif;
+}
+
+/* Background Effects */
+.bg-grid { position: absolute; inset: 0; background-image: radial-gradient(circle at 20% 30%, rgba(0,229,255,0.06) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(224,64,251,0.05) 0%, transparent 50%), linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px); background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px; pointer-events: none; z-index: 0; }
+.bg-glow { position: absolute; border-radius: 50%; filter: blur(200px); opacity: 0.15; pointer-events: none; z-index: 0; }
+.bg-glow-cyan { width: 600px; height: 600px; background: var(--c-cyan); top: -200px; left: -100px; }
+.bg-glow-magenta { width: 500px; height: 500px; background: var(--c-magenta); bottom: -200px; right: -100px; }
+
+/* Typography */
+h1 { font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif; font-weight: 700; font-size: var(--title-size); line-height: 1.1; margin: 0; background: linear-gradient(135deg, var(--c-cyan) 0%, #80deea 40%, var(--c-magenta) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+h2 { font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif; font-weight: 600; font-size: var(--h2-size); margin: 0; color: var(--c-cyan); }
+h3 { font-weight: 600; font-size: var(--h3-size); margin: 0; color: var(--c-text); }
+.neon-tag { display: inline-block; padding: 0.2em 0.8em; border-radius: 999px; font-size: var(--small-size); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; border: 1px solid rgba(0,229,255,0.3); color: var(--c-cyan); background: rgba(0,229,255,0.08); }
+.neon-tag.magenta { border-color: rgba(224,64,251,0.3); color: var(--c-magenta); background: rgba(224,64,251,0.08); }
+.neon-tag.gold { border-color: rgba(255,215,64,0.4); color: var(--c-gold); background: rgba(255,215,64,0.08); }
+.neon-tag.green { border-color: rgba(105,240,174,0.3); color: var(--c-green); background: rgba(105,240,174,0.08); }
+
+/* Cards */
+.data-card {
+    background: var(--c-card); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; padding: clamp(0.8rem, 2vw, 1.5rem);
+    backdrop-filter: blur(20px); position: relative; overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.data-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,229,255,0.12); }
+.data-card .number { font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; line-height: 1;
+    background: linear-gradient(135deg, var(--c-cyan), var(--c-magenta));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.data-card .label { font-size: var(--small-size); color: var(--c-dim); margin-top: 0.3em; }
+.data-card.cyan-b { border-left: 3px solid var(--c-cyan); }
+.data-card.magenta-b { border-left: 3px solid var(--c-magenta); }
+.data-card.gold-b { border-left: 3px solid var(--c-gold); }
+
+/* Progress Bar */
+.progress-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; margin: 0.5em 0; }
+.progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--c-cyan), var(--c-magenta)); }
+.progress-fill.green-f { background: linear-gradient(90deg, var(--c-cyan), var(--c-green)); }
+.progress-fill.gold-f { background: linear-gradient(90deg, var(--c-gold), var(--c-magenta)); }
+
+/* Navigation */
+.nav-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 3rem; backdrop-filter: blur(20px); background: rgba(8,12,23,0.85); border-bottom: 1px solid rgba(255,255,255,0.05); }
+.nav-bar .logo { font-weight: 700; font-size: 0.9rem; color: var(--c-cyan); letter-spacing: 0.05em; }
+.nav-bar .slide-counter { font-size: 0.8rem; color: var(--c-dim); }
+.nav-dots { position: fixed; right: 1.5rem; top: 50%; transform: translateY(-50%); z-index: 100; display: flex; flex-direction: column; gap: 0.6rem; }
+.nav-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); cursor: pointer; transition: all 0.3s; border: none; padding: 0; }
+.nav-dot.active { background: var(--c-cyan); box-shadow: 0 0 12px rgba(0,229,255,0.5); transform: scale(1.3); }
+.keyboard-hint { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); z-index: 100; font-size: 0.7rem; color: rgba(255,255,255,0.25); letter-spacing: 0.05em; }
+
+/* Animations */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+.reveal-delay-6 { transition-delay: 0.6s; }
+
+/* Mind Map */
+.mindmap { position: relative; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: clamp(0.8rem, 2vw, 1.5rem); }
+.mm-node { padding: clamp(0.5rem, 1.5vw, 1rem) clamp(0.8rem, 2vw, 1.5rem); border-radius: 12px; font-weight: 600; font-size: var(--small-size); text-align: center; border: 1px solid rgba(255,255,255,0.1); background: rgba(17,24,39,0.8); backdrop-filter: blur(10px); position: relative; }
+.mm-node.center { border-color: var(--c-cyan); background: rgba(0,229,255,0.1); font-size: var(--body-size); }
+.mm-node:hover { border-color: var(--c-cyan); box-shadow: 0 0 20px rgba(0,229,255,0.15); }
+
+/* Flow */
+.flow-row { display: flex; align-items: center; justify-content: center; gap: clamp(0.5rem, 2vw, 1.5rem); flex-wrap: wrap; }
+.flow-arrow { color: var(--c-cyan); font-size: 1.5rem; opacity: 0.5; }
+
+/* Top-right decor */
+.corner-decor { position: absolute; top: 0; right: 0; width: 200px; height: 200px; background: radial-gradient(circle, rgba(0,229,255,0.1) 0%, transparent 70%); pointer-events: none; }
+
+/* Case project card */
+.project-card { background: linear-gradient(135deg, rgba(0,229,255,0.05), rgba(224,64,251,0.05)); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; }
+.project-card .proj-header { padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 1rem; }
+.project-card .proj-icon { font-size: 2rem; }
+.project-card .proj-body { padding: 1rem 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+
+/* ROI highlight */
+.roi-badge { display: inline-flex; align-items: center; gap: 0.3em; padding: 0.3em 0.8em; border-radius: 8px; font-weight: 700; font-size: var(--small-size); background: rgba(105,240,174,0.12); color: var(--c-green); border: 1px solid rgba(105,240,174,0.2); }
+
+/* Executive quote */
+.exec-quote { font-size: clamp(1rem, 2vw, 1.5rem); font-style: italic; line-height: 1.6; color: var(--c-text); padding: 1.5rem 2rem; border-left: 4px solid var(--c-cyan); background: rgba(0,229,255,0.04); border-radius: 0 12px 12px 0; margin: 1rem 0; }
+
+/* Small stat */
+.stat-row { display: flex; gap: clamp(1rem, 3vw, 3rem); flex-wrap: wrap; justify-content: center; }
+.stat-item { text-align: center; }
+.stat-value { font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 900; color: var(--c-cyan); line-height: 1.1; }
+.stat-label { font-size: var(--small-size); color: var(--c-dim); margin-top: 0.2em; }
+
+/* Step timeline */
+.timeline { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+.timeline-step { flex: 1; min-width: 100px; max-width: 200px; text-align: center; padding: 1rem 0.5rem; border-radius: 12px; background: rgba(17,24,39,0.8); border: 1px solid rgba(255,255,255,0.06); position: relative; }
+.timeline-step .step-num { font-size: 1.5rem; font-weight: 900; color: var(--c-cyan); }
+.timeline-step .step-label { font-size: var(--small-size); margin-top: 0.3em; }
+.timeline-step .step-meta { font-size: 0.65rem; color: var(--c-dim); margin-top: 0.2em; }
+
+/* List with checkmarks */
+.check-list { list-style: none; padding: 0; }
+.check-list li { padding: 0.3em 0; font-size: var(--body-size); display: flex; align-items: flex-start; gap: 0.5em; }
+.check-list li::before { content: '◆'; color: var(--c-cyan); font-size: 0.6em; margin-top: 0.4em; flex-shrink: 0; }
+
+/* Metrics inline */
+.metric-inline { display: inline-flex; align-items: center; gap: 0.3em; }
+.metric-val { font-weight: 900; font-size: 1.1em; }
+.metric-up { color: var(--c-green); }
+.metric-down { color: var(--c-red); }
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .nav-bar { padding: 0 1rem; }
+    .nav-dots { right: 0.5rem; }
+    .flow-arrow { display: none; }
+    .timeline { flex-direction: column; }
+    .timeline-step { max-width: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav-bar">
+    <span class="logo">◆ AI效益头脑风暴 · 10专家会议</span>
+    <span class="slide-counter"><span id="cur">1</span> / <span id="tot">8</span></span>
+</nav>
+<div class="nav-dots" id="navDots"></div>
+<div class="keyboard-hint">↑↓ 或 滚轮 翻页 · ESC 全览</div>
+
+<!-- ============================================================
+     SLIDE 1: TITLE
+     ============================================================ -->
+<section class="slide" id="s1">
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-cyan"></div>
+    <div class="bg-glow bg-glow-magenta"></div>
+    <div class="slide-content" style="align-items: center; text-align: center;">
+        <div class="reveal">
+            <span class="neon-tag">10位AI专家 · 并行头脑风暴</span>
+        </div>
+        <h1 class="reveal reveal-delay-1" style="margin: 0.5em 0 0.3em;">
+            AI具体项目的落地<br>如何产生实际效益
+        </h1>
+        <p class="reveal reveal-delay-2" style="font-size: var(--h3-size); color: var(--c-dim); max-width: 700px; margin: 0.5em auto;">
+            从第一性原理出发，10维度深度分析 →
+            3个本地项目实战验证 → 可执行的效益路线图
+        </p>
+        <div class="reveal reveal-delay-3 stat-row" style="margin-top: 2rem;">
+            <div class="stat-item"><div class="stat-value">10</div><div class="stat-label">专业岗位</div></div>
+            <div class="stat-item"><div class="stat-value" style="color: var(--c-magenta);">3</div><div class="stat-label">本地案例</div></div>
+            <div class="stat-item"><div class="stat-value" style="color: var(--c-gold);">1</div><div class="stat-label">统一汇报</div></div>
+            <div class="stat-item"><div class="stat-value" style="color: var(--c-green);">100天</div><div class="stat-label">执行路线图</div></div>
+        </div>
+        <p class="reveal reveal-delay-4" style="font-size: var(--small-size); color: var(--c-dim); margin-top: 2rem;">
+            会议主席：Claude Opus 4.8 · 2026年7月5日
+        </p>
+    </div>
+    <div class="corner-decor"></div>
+</section>
+
+<!-- ============================================================
+     SLIDE 2: MIND MAP / TABLE OF CONTENTS
+     ============================================================ -->
+<section class="slide" id="s2">
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-cyan" style="opacity:0.08;"></div>
+    <div class="slide-content">
+        <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+            <span class="neon-tag">会议议程</span>
+            <h2 style="margin-top: 0.3em;">10维度思维导图</h2>
+            <p style="color: var(--c-dim); font-size: var(--small-size);">每个岗位独立输出 → 交叉验证 → 本地案例融合</p>
+        </div>
+        <div class="mindmap reveal reveal-delay-1">
+            <div class="mm-node center">🎯 核心议题<br>AI项目效益落地</div>
+            <div class="mm-node">💰 商业价值<br>ROI≥200%</div>
+            <div class="mm-node">🏗️ 技术架构<br>5大鸿沟</div>
+            <div class="mm-node">📦 产品策略<br>AI适合度</div>
+            <div class="mm-node">📊 成本经济<br>TCO模型</div>
+            <div class="mm-node">🛡️ 风险管理<br>3线防御</div>
+            <div class="mm-node">📈 数据策略<br>飞轮设计</div>
+            <div class="mm-node">🎨 用户体验<br>信任3要素</div>
+            <div class="mm-node">🏭 规模运营<br>5级阶梯</div>
+            <div class="mm-node">⚔️ 竞争策略<br>复合壁垒</div>
+            <div class="mm-node">🚀 落地执行<br>100天作战图</div>
+        </div>
+        <div class="reveal reveal-delay-2 flow-row" style="margin-top: var(--content-gap);">
+            <span class="neon-tag">第1层 Why</span><span class="flow-arrow">→</span>
+            <span class="neon-tag cyan">第2层 What</span><span class="flow-arrow">→</span>
+            <span class="neon-tag magenta">第3层 How</span><span class="flow-arrow">→</span>
+            <span class="neon-tag green">本地验证</span>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 3: FIRST PRINCIPLES → THREE-TIER VALUE
+     ============================================================ -->
+<section class="slide" id="s3">
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-cyan" style="top:0;left:auto;right:-100px;opacity:0.1;"></div>
+    <div class="slide-content">
+        <div class="reveal" style="text-align: center; margin-bottom: 1.5rem;">
+            <span class="neon-tag magenta">第一性原理</span>
+            <h2 style="margin-top: 0.3em;">AI商业价值的三个层次</h2>
+        </div>
+        <div class="grid reveal reveal-delay-1" style="grid-template-columns: repeat(3, 1fr);">
+            <!-- Level 1 -->
+            <div class="data-card cyan-b">
+                <div class="number">L1</div>
+                <h3 style="color:var(--c-cyan);">效率层</h3>
+                <p style="font-size:var(--small-size); color:var(--c-dim);">替代重复性认知劳动</p>
+                <div class="progress-bar"><div class="progress-fill green-f" style="width:95%;"></div></div>
+                <ul class="check-list" style="font-size:var(--small-size);">
+                    <li>客服人力 <b style="color:var(--c-green);">↓60-70%</b></li>
+                    <li>合同审查 <b style="color:var(--c-green);">↓75-85%</b> 时间</li>
+                    <li>报表生成 <b style="color:var(--c-green);">↓90%+</b></li>
+                    <li>500人企业年省 <b style="color:var(--c-cyan);">300-330万</b></li>
+                </ul>
+                <p style="font-size:0.65rem; color:var(--c-dim); margin-top:0.5em;">ROI目标：<b style="color:var(--c-green);">>200%</b> · 回收期 <b><6个月</b></p>
+            </div>
+            <!-- Level 2 -->
+            <div class="data-card magenta-b">
+                <div class="number" style="background: linear-gradient(135deg, var(--c-magenta), var(--c-gold)); -webkit-background-clip: text; background-clip: text;">L2</div>
+                <h3 style="color:var(--c-magenta);">增强层</h3>
+                <p style="font-size:var(--small-size); color:var(--c-dim);">提升人类决策质量</p>
+                <div class="progress-bar"><div class="progress-fill gold-f" style="width:75%;"></div></div>
+                <ul class="check-list" style="font-size:var(--small-size);">
+                    <li>电商推荐 <b style="color:var(--c-green);">GMV↑60-120%</b></li>
+                    <li>销售线索转化 <b style="color:var(--c-green);">↑2-3倍</b></li>
+                    <li>库存成本 <b style="color:var(--c-green);">↓15-25%</b></li>
+                    <li>坏账损失 <b style="color:var(--c-green);">减半</b></li>
+                </ul>
+                <p style="font-size:0.65rem; color:var(--c-dim); margin-top:0.5em;">ROI目标：<b style="color:var(--c-gold);">>100%</b> · 回收期 <b><12个月</b></p>
+            </div>
+            <!-- Level 3 -->
+            <div class="data-card gold-b">
+                <div class="number" style="background: linear-gradient(135deg, var(--c-gold), var(--c-red)); -webkit-background-clip: text; background-clip: text;">L3</div>
+                <h3 style="color:var(--c-gold);">变革层</h3>
+                <p style="font-size:var(--small-size); color:var(--c-dim);">创造全新商业模式</p>
+                <div class="progress-bar"><div class="progress-fill" style="width:50%; background:linear-gradient(90deg,var(--c-gold),var(--c-red));"></div></div>
+                <ul class="check-list" style="font-size:var(--small-size);">
+                    <li>AI原生SaaS（按结果付费）</li>
+                    <li>个性化内容工业级生产</li>
+                    <li>AI Agent即服务</li>
+                    <li><b style="color:var(--c-gold);">TAM 10-100倍</b>于效率层</li>
+                </ul>
+                <p style="font-size:0.65rem; color:var(--c-dim); margin-top:0.5em;">ROI目标：<b>>50%</b> · 回收期 <b><24个月</b>（3年视角）</p>
+            </div>
+        </div>
+        <div class="reveal reveal-delay-2" style="text-align: center; margin-top: 1rem;">
+            <p style="font-size: var(--small-size); color: var(--c-dim);">
+                <b style="color: var(--c-cyan);">核心公式：</b>
+                真实价值 = (可量化经济收益 × 实现概率) − (显性成本 × 隐藏成本倍数 2-4x) − 机会成本
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 4: FROM POC TO PRODUCTION — 5 GAPS
+     ============================================================ -->
+<section class="slide" id="s4">
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-magenta" style="top:auto;bottom:-100px;left:-100px;opacity:0.1;"></div>
+    <div class="slide-content">
+        <div class="reveal" style="text-align: center; margin-bottom: 1rem;">
+            <span class="neon-tag">技术 × 经济 × 执行</span>
+            <h2 style="margin-top: 0.3em;">落地的5大核心战场</h2>
+            <p style="color: var(--c-dim); font-size: var(--small-size);">90%的AI项目死在POC到规模化之间——每个鸿沟都有具体解决方案</p>
+        </div>
+        <div class="grid reveal reveal-delay-1" style="grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 1rem;">
+            <div class="data-card">
+                <span class="neon-tag" style="margin-bottom:0.5em;">⚡ 战场1</span>
+                <h3 style="font-size:var(--body-size);">幻觉控制与输出可靠性</h3>
+                <p style="font-size:var(--small-size); color:var(--c-dim);">幻觉率 15-20% → <b style="color:var(--c-green);">2-5%</b></p>
+                <p style="font-size:0.65rem; color:var(--c-dim);">结构化输出强制 + RAG正确实施 + 事实性校验层 + 风险分级人工确认<br>投入：3-5人月</p>
+            </div>
+            <div class="data-card">
+                <span class="neon-tag magenta" style="margin-bottom:0.5em;">⚡ 战场2</span>
+                <h3 style="font-size:var(--body-size);">推理延迟与成本控制</h3>
+                <p style="font-size:var(--small-size); color:var(--c-dim);">分级路由：简单→小模型 <b style="color:var(--c-green);"><100ms</b></p>
+                <p style="font-size:0.65rem; color:var(--c-dim);">语义缓存减少30-50%调用 + 批处理降低成本50%<br>月API费用>6.4万→自建盈亏平衡</p>
+            </div>
+            <div class="data-card">
+                <span class="neon-tag gold" style="margin-bottom:0.5em;">⚡ 战场3</span>
+                <h3 style="font-size:var(--body-size);">数据就绪度 — 80%失败根源</h3>
+                <p style="font-size:var(--small-size); color:var(--c-dim);">数据准备成本 = 模型成本 <b style="color:var(--c-red);">×3-5倍</b></p>
+                <p style="font-size:0.65rem; color:var(--c-dim);">5维度评估（完整性/准确性/一致性/时效/可获取）<br>任一<3分=No-Go</p>
+            </div>
+            <div class="data-card">
+                <span class="neon-tag green" style="margin-bottom:0.5em;">⚡ 战场4</span>
+                <h3 style="font-size:var(--body-size);">组织变革 — 人机信任建立</h3>
+                <p style="font-size:var(--small-size); color:var(--c-dim);">采纳率 = 感知价值 − 感知成本</p>
+                <p style="font-size:0.65rem; color:var(--c-dim);">怀疑→试用→依赖→推广 4阶段<br>TTFV <5分钟 = 生死线</p>
+            </div>
+            <div class="data-card">
+                <span class="neon-tag" style="margin-bottom:0.5em;">⚡ 战场5</span>
+                <h3 style="font-size:var(--body-size);">规模化阶梯 — 5级跃迁</h3>
+                <p style="font-size:var(--small-size); color:var(--c-dim);">L0→L4存活率：100%→<b style="color:var(--c-red);"><2%</b></p>
+                <p style="font-size:0.65rem; color:var(--c-dim);">盈亏平衡通常在L2中期-L3早期<br>累计投入1500-2000万，18-24个月</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 5: OPTIMAL PATH — 2026 GOLDEN WINDOW
+     ============================================================ -->
+<section class="slide" id="s5">
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-cyan" style="opacity:0.12;"></div>
+    <div class="slide-content">
+        <div class="reveal" style="text-align: center; margin-bottom: 1.5rem;">
+            <span class="neon-tag green">2026黄金窗口</span>
+            <h2 style="margin-top: 0.3em;">AI落地最优路径 & 竞争壁垒</h2>
+        </div>
+        <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: min(90vw, 1000px); margin: 0 auto;">
+            <!-- Left: Best Paths -->
+            <div>
+                <h3 style="color:var(--c-cyan); font-size:var(--body-size); margin-bottom:0.8em;">🎯 2026年3大最优落地方向</h3>
+                <div class="data-card" style="margin-bottom:0.8rem;">
+                    <span class="neon-tag">TOP 1</span>
+                    <b style="font-size:var(--small-size);">AI智能客服 & 运营自动化</b>
+                    <p style="font-size:0.65rem; color:var(--c-dim); margin:0.3em 0 0;">中型电商年省200-500万 · 人力↓50-70% · 2-4周MVP · <span class="roi-badge">ROI 300%+</span></p>
+                </div>
+                <div class="data-card" style="margin-bottom:0.8rem;">
+                    <span class="neon-tag magenta">TOP 2</span>
+                    <b style="font-size:var(--small-size);">AI精准营销 & 个性化推荐</b>
+                    <p style="font-size:0.65rem; color:var(--c-dim); margin:0.3em 0 0;">营销ROI从1:3提升到1:5-1:8 · 增量年利润200-600万 · <span class="roi-badge">ROI 200%+</span></p>
+                </div>
+                <div class="data-card">
+                    <span class="neon-tag gold">TOP 3</span>
+                    <b style="font-size:var(--small-size);">AI代码助手 研发效能提升</b>
+                    <p style="font-size:0.65rem; color:var(--c-dim); margin:0.3em 0 0;">30人团队净省330-345万/年 · 效率↑30-55% · Bug密度↓20-40% · <span class="roi-badge">ROI 200%+</span></p>
+                </div>
+            </div>
+            <!-- Right: Moat -->
+            <div>
+                <h3 style="color:var(--c-magenta); font-size:var(--body-size); margin-bottom:0.8em;">🏰 复合壁垒 = 真正护城河</h3>
+                <div class="data-card" style="margin-bottom:0.8rem;">
+                    <p style="font-size:var(--small-size); color:var(--c-gold); font-weight:700; margin:0;">竞争优势 = 独占数据(35%) + 行业know-how(25%) + 用户关系(20%) + 品牌信任(12%) + 网络效应(8%)</p>
+                </div>
+                <div class="data-card" style="margin-bottom:0.8rem;">
+                    <span class="neon-tag">6个月法则</span>
+                    <p style="font-size:0.65rem; color:var(--c-dim); margin:0.3em 0 0;">如果你的产品优势能在6个月内被竞品用下一代基础模型复现——你就不是真正的先发者，你只是给后来者验证了PMF。</p>
+                </div>
+                <div class="data-card">
+                    <span class="neon-tag magenta">小团队优势</span>
+                    <p style="font-size:0.65rem; color:var(--c-dim); margin:0.3em 0 0;">决策速度（2-3天 vs 6-8周）× 迭代频率 × 场景聚焦（一个功能做到99分） — 不在大厂的战场打大厂的战争</p>
+                </div>
+            </div>
+        </div>
+        <div class="reveal reveal-delay-2" style="text-align: center; margin-top: 1rem;">
+            <p style="font-size:var(--small-size);">
+                <b style="color: var(--c-cyan);">2026年核心判断：</b>
+                模型能力充分成熟 · 传统行业渗透率<15% · 试错成本为2023年的1/10 · <b style="color: var(--c-gold);">先发者12-18个月效率壁垒，后来者需2-3年追赶</b>
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 6: LOCAL CASE 1 — GAME BOOSTER ANALYSIS
+     ============================================================ -->
+<section class="slide" id="s6">
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-magenta" style="opacity:0.08;"></div>
+    <div class="slide-content">
+        <div class="reveal" style="text-align: center; margin-bottom: 1rem;">
+            <span class="neon-tag magenta">本地案例深度剖析 #1</span>
+            <h2 style="margin-top: 0.3em;">🎮 游戏加速器 vs ✍️ 写作工作流</h2>
+            <p style="color: var(--c-dim); font-size: var(--small-size);">用10专家框架透视你的两个本地项目，找到AI注入的最佳增效点</p>
+        </div>
+        <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: min(90vw, 1100px); margin: 0 auto;">
+            <!-- Game Booster -->
+            <div class="project-card">
+                <div class="proj-header">
+                    <span class="proj-icon">🎮</span>
+                    <div>
+                        <b style="color:var(--c-cyan);">Game Booster v1.1</b>
+                        <p style="font-size:0.65rem; color:var(--c-dim); margin:0;">PyQt6 · 系统优化工具 · 需管理员权限</p>
+                    </div>
+                </div>
+                <div class="proj-body">
+                    <div style="font-size:var(--small-size);">
+                        <b style="color:var(--c-red);">当前状态：零AI</b>
+                        <p style="font-size:0.65rem; color:var(--c-dim); margin:0.2em 0;">纯规则驱动的系统加速工具<br>功能：电源计划/进程清理/还原点</p>
+                    </div>
+                    <div style="font-size:var(--small-size);">
+                        <b style="color:var(--c-gold);">AI增效机会</b>
+                        <p style="font-size:0.65rem; color:var(--c-dim); margin:0.2em 0;">
+                            ✅ AI智能进程优先级（学习用户习惯）<br>
+                            ✅ 游戏场景自动识别+配置切换<br>
+                            ✅ 智能网络路由优化<br>
+                            ✅ 异常性能诊断Agent
+                        </p>
+                    </div>
+                    <div style="font-size:var(--small-size);">
+                        <b style="color:var(--c-green);">预估效益</b>
+                        <p style="font-size:0.65rem; color:var(--c-dim); margin:0.2em 0;">
+                            差异化壁垒 ↑ · 用户体验 ↑<br>
+                            从"工具"升级为"智能助手"<br>
+                            适合策略：极致体验（策略B）
+                        </p>
+                    </div>
+                    <div style="font-size:var(--small-size);">
+                        <b style="color:var(--c-dim);">AI适合度</b>
+                        <p style="font-size:0.65rem; margin:0.2em 0;">
+                            频率3 · 复杂度3 · 容错4 · 规模2 = <b style="color:var(--c-gold);">12分（边缘）</b>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Writing Workflow -->
+            <div class="project-card">
+                <div class="proj-header">
+                    <span class="proj-icon">✍️</span>
+                    <div>
+                        <b style="color:var(--c-magenta);">写作工作流 v2.0</b>
+                        <p style="font-size:0.65rem; color:var(--c-dim); margin:0;">6 Agent团队 · 真实LLM推理 · 42项验收</p>
+                    </div>
+                </div>
+                <div class="proj-body">
+                    <div style="font-size:var(--small-size);">
+                        <b style="color:var(--c-green);">当前状态：AI原生</b>
+                        <p style="font-size:0.65rem; color:var(--c-dim); margin:0.2em 0;">6Agent分工：调研/读者/灵感/创作/编辑/验收<br>支持DeepSeek/Qwen/OpenAI</p>
+                    </div>
+                    <div style="font-size:var(--small-size);">
+                        <b style="color:var(--c-gold);">深层价值点</b>
+                        <p style="font-size:0.65rem; color:var(--c-dim); margin:0.2em 0;">
+                            ✅ 写作全流程AI工程化<br>
+                            ✅ 数据飞轮（创作→编辑反馈→提升）<br>
+                            ✅ 可复制到其他内容品类
+                        </p>
+                    </div>
+                    <div style="font-size:var(--small-size);">
+                        <b style="color:var(--c-green);">规模化路径</b>
+                        <p style="font-size:0.65rem; color:var(--c-dim); margin:0.2em 0;">
+                            从个人工具→团队工具→SaaS<br>
+                            内容电商/自媒体/出版均有需求<br>
+                            适合策略：极致垂直（策略A）
+                        </p>
+                    </div>
+                    <div style="font-size:var(--small-size);">
+                        <b style="color:var(--c-dim);">AI适合度</b>
+                        <p style="font-size:0.65rem; margin:0.2em 0;">
+                            频率5 · 复杂度4 · 容错3 · 规模4 = <b style="color:var(--c-green);">16分（非常适合）</b>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 7: DEEP DIVE — AI TRANSFORMATION ROADMAP FOR BOTH
+     ============================================================ -->
+<section class="slide" id="s7">
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-cyan" style="opacity:0.1;"></div>
+    <div class="slide-content">
+        <div class="reveal" style="text-align: center; margin-bottom: 1rem;">
+            <span class="neon-tag green">从分析到行动</span>
+            <h2 style="margin-top: 0.3em;">两个项目的AI效益提升路线</h2>
+            <p style="color: var(--c-dim); font-size: var(--small-size);">10专家框架 × 本地项目 = 可执行改造方案</p>
+        </div>
+        <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: min(90vw, 1100px); margin: 0 auto;">
+            <!-- Game Booster Roadmap -->
+            <div>
+                <h3 style="color:var(--c-cyan); font-size:var(--body-size); margin-bottom:0.8em;">🎮 Game Booster → AI智能加速</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div class="data-card cyan-b" style="padding:0.7rem 1rem;">
+                        <b style="font-size:var(--small-size); color:var(--c-cyan);">阶段1：嵌入型AI（2-4周）</b>
+                        <p style="font-size:0.65rem; color:var(--c-dim); margin:0.2em 0;">后台AI检测游戏进程 → 自动推荐优化配置<br>用户无感知，体验增强 · 开发量：<b>3-5人天</b></p>
+                    </div>
+                    <div class="data-card magenta-b" style="padding:0.7rem 1rem;">
+                        <b style="font-size:var(--small-size); color:var(--c-magenta);">阶段2：对话型AI（4-8周）</b>
+                        <p style="font-size:0.65rem; color:var(--c-dim); margin:0.2em 0;">AI加速顾问："我的游戏卡顿怎么办？"→诊断+方案<br>API调用本地小模型控制成本 · <b>ROI预期 150%+</b></p>
+                    </div>
+                    <div class="data-card gold-b" style="padding:0.7rem 1rem;">
+                        <b style="font-size:var(--small-size); color:var(--c-gold);">关键风险 & 缓解</b>
+                        <p style="font-size:0.65rem; color:var(--c-dim); margin:0.2em 0;">❌ 管理员权限限制 → 降级为非管理员模式<br>❌ 用户采纳率 → 嵌入型策略降低学习成本</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Writing Workflow Roadmap -->
+            <div>
+                <h3 style="color:var(--c-magenta); font-size:var(--body-size); margin-bottom:0.8em;">✍️ 写作工作流 → 规模化SaaS</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div class="data-card magenta-b" style="padding:0.7rem 1rem;">
+                        <b style="font-size:var(--small-size); color:var(--c-magenta);">阶段1：数据飞轮启动（现在）</b>
+                        <p style="font-size:0.65rem; color:var(--c-dim); margin:0.2em 0;">每次创作→编辑反馈→Bad Case标注→迭代<br>积累1000+写作领域标注数据 · 零额外成本</p>
+                    </div>
+                    <div class="data-card gold-b" style="padding:0.7rem 1rem;">
+                        <b style="font-size:var(--small-size); color:var(--c-gold);">阶段2：垂直化产品化（3-6月）</b>
+                        <p style="font-size:0.65rem; color:var(--c-dim); margin:0.2em 0;">Web界面+用户系统+按量计费<br>先攻网文/自媒体两个子赛道 · <b>目标ROI 300%+</b></p>
+                    </div>
+                    <div class="data-card cyan-b" style="padding:0.7rem 1rem;">
+                        <b style="font-size:var(--small-size); color:var(--c-cyan);">关键优势 & 风险</b>
+                        <p style="font-size:0.65rem; color:var(--c-dim); margin:0.2em 0;">✅ 独占领域提示词+工作流 = 数据护城河<br>❌ 大厂可能切入 → 绑定创作社区+专属风格模型</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="reveal reveal-delay-2" style="text-align: center; margin-top: 0.8rem;">
+            <div class="exec-quote" style="font-size:var(--small-size); padding:0.8rem 1.5rem; margin:0;">
+                两个项目恰好代表了AI落地的两种范式：<b style="color:var(--c-cyan);">Game Booster</b>——在传统工具中<b>嵌入AI</b>提升体验，考验的是"让AI隐形"的UX功力；<b style="color:var(--c-magenta);">写作工作流</b>——<b>AI原生</b>的垂直SaaS雏形，考验的是数据飞轮和行业壁垒的构建。两者都值得投入，但优先级不同：写作工作流AI适合度16分 vs 加速器12分。
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 8: EXECUTION ROADMAP + CONCLUSION
+     ============================================================ -->
+<section class="slide" id="s8">
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-cyan" style="top:0;right:-50px;opacity:0.12;"></div>
+    <div class="bg-glow bg-glow-magenta" style="bottom:-50px;left:-50px;opacity:0.08;"></div>
+    <div class="slide-content">
+        <div class="reveal" style="text-align: center; margin-bottom: 1rem;">
+            <span class="neon-tag">执行路线图</span>
+            <h2 style="margin-top: 0.3em;">AI效益落地的100天 + 结论</h2>
+        </div>
+        <div class="reveal reveal-delay-1">
+            <div class="timeline" style="margin-bottom: 1.5rem;">
+                <div class="timeline-step"><div class="step-num">D0-7</div><div class="step-label">场景锁定<br>数据摸底</div><div class="step-meta">ICE评分<br>人工基线</div></div>
+                <div class="timeline-step" style="border-color:rgba(0,229,255,0.3);"><div class="step-num" style="color:var(--c-cyan);">D8-21</div><div class="step-label">MVP-AI<br>构建验证</div><div class="step-meta">最简Pipeline<br>效果评审</div></div>
+                <div class="timeline-step" style="border-color:rgba(224,64,251,0.3);"><div class="step-num" style="color:var(--c-magenta);">D22-42</div><div class="step-label">灰度测试<br>快速迭代</div><div class="step-meta">5-8友好用户<br>日修复循环</div></div>
+                <div class="timeline-step" style="border-color:rgba(255,215,64,0.4);"><div class="step-num" style="color:var(--c-gold);">D43-70</div><div class="step-label">A/B实验<br>硬数据验证</div><div class="step-meta">p<0.05<br>ROI计算</div></div>
+                <div class="timeline-step" style="border-color:rgba(105,240,174,0.4);"><div class="step-num" style="color:var(--c-green);">D71-100</div><div class="step-label">规模化决策<br>知识沉淀</div><div class="step-meta">全量/限定/<br>维持/关停</div></div>
+            </div>
+        </div>
+        <!-- Conclusion cards -->
+        <div class="reveal reveal-delay-2" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: min(90vw, 1000px); margin: 0 auto;">
+            <div class="data-card cyan-b">
+                <h3 style="font-size:var(--body-size); color:var(--c-cyan);">🧠 第一性结论</h3>
+                <p style="font-size:var(--small-size);">AI效益 = 可归因(对照组) × 可量化(￥) × 可持续(规模经济) · 缺一不可</p>
+            </div>
+            <div class="data-card magenta-b">
+                <h3 style="font-size:var(--body-size); color:var(--c-magenta);">⚠️ 最高优先级</h3>
+                <p style="font-size:var(--small-size);">数据就绪度评估 → 低于门槛立即暂停 · 80%项目死在数据，不是模型</p>
+            </div>
+            <div class="data-card gold-b">
+                <h3 style="font-size:var(--body-size); color:var(--c-gold);">🚀 立即行动</h3>
+                <p style="font-size:var(--small-size);">写作工作流优先规模化（AI适合度16/20）· 游戏加速器做嵌入型AI原型</p>
+            </div>
+        </div>
+        <div class="reveal reveal-delay-3" style="text-align: center; margin-top: 1rem;">
+            <p style="font-size:var(--body-size); font-weight:700; color:var(--c-text);">
+                会议结论：AI不是魔法，是工程。从L1效率层切入，用数据飞轮建立壁垒，
+                <br><b style="color:var(--c-cyan);">100天内拿出可量化的ROI数字</b>——这是唯一值得走的AI落地路径。
+            </p>
+            <p style="font-size:var(--small-size); color:var(--c-dim); margin-top:0.5em;">
+                10专家头脑风暴 · 2026-07-05 · 会议主席 Claude Opus 4.8<br>
+                本地项目：E:/软件开发/game_booster & writing-workflow
+            </p>
+        </div>
+    </div>
+    <div class="corner-decor"></div>
+</section>
+
+<!-- ============================================================
+     SCRIPT: Presentation Controller
+     ============================================================ -->
+<script>
+(function() {
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+    let current = 0;
+    let isTransitioning = false;
+
+    document.getElementById('tot').textContent = total;
+
+    // Build nav dots
+    const dotsContainer = document.getElementById('navDots');
+    for (let i = 0; i < total; i++) {
+        const dot = document.createElement('button');
+        dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+        dot.addEventListener('click', () => goTo(i));
+        dotsContainer.appendChild(dot);
+    }
+    const dots = document.querySelectorAll('.nav-dot');
+
+    function updateUI() {
+        document.getElementById('cur').textContent = current + 1;
+        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+        // Update URL hash
+        if (window.location.hash !== '#s' + (current + 1)) {
+            history.replaceState(null, '', '#s' + (current + 1));
+        }
+    }
+
+    function goTo(index) {
+        if (isTransitioning || index === current || index < 0 || index >= total) return;
+        isTransitioning = true;
+        current = index;
+        slides[current].scrollIntoView({ behavior: 'smooth' });
+        updateUI();
+        // Reveal animations
+        const reveals = slides[current].querySelectorAll('.reveal');
+        reveals.forEach(el => el.classList.add('visible'));
+        setTimeout(() => { isTransitioning = false; }, 800);
+    }
+
+    function next() { goTo(current + 1); }
+    function prev() { goTo(current - 1); }
+
+    // Keyboard
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+        if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+        if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+        if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
+        if (e.key === 'Escape') {
+            // Overview mode: show all slides as thumbnails
+            document.querySelector('html').style.scrollSnapType = 'none';
+            setTimeout(() => { document.querySelector('html').style.scrollSnapType = 'y mandatory'; }, 3000);
+        }
+    });
+
+    // Mouse wheel (debounced)
+    let wheelTimeout;
+    document.addEventListener('wheel', e => {
+        if (wheelTimeout) return;
+        wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
+        if (e.deltaY > 30) next();
+        else if (e.deltaY < -30) prev();
+    }, { passive: true });
+
+    // Touch swipe
+    let touchStartY = 0;
+    document.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+    document.addEventListener('touchend', e => {
+        const diff = touchStartY - e.changedTouches[0].clientY;
+        if (Math.abs(diff) > 50) { diff > 0 ? next() : prev(); }
+    });
+
+    // Intersection Observer for reveal + slide tracking
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const idx = Array.from(slides).indexOf(entry.target);
+                if (idx !== -1 && idx !== current) {
+                    current = idx;
+                    updateUI();
+                }
+                // Reveal children
+                entry.target.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+            }
+        });
+    }, { threshold: 0.5 });
+
+    slides.forEach(s => observer.observe(s));
+
+    // Initialize first slide reveals
+    setTimeout(() => {
+        slides[0].querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+    }, 100);
+
+    // Handle initial hash
+    if (window.location.hash) {
+        const match = window.location.hash.match(/s(\d+)/);
+        if (match) {
+            const idx = parseInt(match[1]) - 1;
+            if (idx >= 0 && idx < total) {
+                setTimeout(() => goTo(idx), 300);
+            }
+        }
+    }
+
+    updateUI();
+})();
+</script>
+</body>
+</html>
