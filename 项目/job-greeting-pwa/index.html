@@ -1,0 +1,3519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="description" content="智投 - AI求职招呼语生成器，智能生成个性化求职打招呼语">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="智投">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔷</text></svg>">
+<link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIuaZruaKleOAkOS5i+W4uOWRveivremDqOeUn+aIkOWZqCIsCiAgInNob3J0X25hbWUiOiAi5pmu5oqVIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwYTBhMGYiLAogICJ0aGVtZV9jb2xvciI6ICIjMGEwYTBmIiwKICAiaWNvbnMiOiBbewogICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWwsPHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48dGV4dCB5PScuOWVtJyBmb250LXNpemU9JzkwJz7wn5S2PC90ZXh0Pjwvc3ZnPiIsCiAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogIH1dfQ==">
+<title>智投 - AI求职招呼语生成器</title>
+<style>
+/* ================================================================
+   智投 - AI求职招呼语生成器 | Single-File PWA
+   暗色 Teal 主题 · 移动端优先 · 零依赖 · 纯 HTML/CSS/JS
+   ================================================================ */
+
+/* ----- CSS Custom Properties ----- */
+:root {
+  --bg: #0a0a0f;
+  --bg-card: #14141f;
+  --bg-card-hover: #1a1a2a;
+  --bg-card-raised: #1c1c2e;
+  --bg-input: #0d0d16;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-active: rgba(13, 148, 136, 0.4);
+  --text: #e0e0e8;
+  --text-secondary: #9090a8;
+  --text-muted: #5a5a72;
+  --accent: #0D9488;
+  --accent-hover: #0fa89a;
+  --accent-muted: rgba(13, 148, 136, 0.12);
+  --accent-border: rgba(13, 148, 136, 0.25);
+  --accent-glow: rgba(13, 148, 136, 0.18);
+  --danger: #ef4444;
+  --danger-muted: rgba(239, 68, 68, 0.08);
+  --warning: #f59e0b;
+  --warning-muted: rgba(245, 158, 11, 0.1);
+  --success: #22c55e;
+  --info: #3b82f6;
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --radius-sm: 6px;
+  --font-stack: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+/* ----- Reset & Base ----- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  font-family: var(--font-stack);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+}
+input,
+textarea,
+select {
+  font-family: inherit;
+  outline: none;
+  border: none;
+}
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* ----- Layout ----- */
+.app-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: calc(var(--safe-top) + 8px) 16px calc(var(--safe-bottom) + 100px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ----- Offline Banner ----- */
+.offline-banner {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--warning-muted);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-btn);
+  font-size: 0.82rem;
+  color: var(--warning);
+  animation: fadeSlideIn 0.3s ease;
+}
+.offline-banner.visible {
+  display: flex;
+}
+
+/* ----- PWA Install Prompt ----- */
+.install-prompt {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-active);
+  border-radius: var(--radius-card);
+  font-size: 0.82rem;
+  color: var(--text);
+  animation: fadeSlideIn 0.3s ease;
+}
+.install-prompt.visible {
+  display: flex;
+}
+.install-prompt .install-text {
+  flex: 1;
+  font-size: 0.82rem;
+}
+.install-prompt .btn-install {
+  min-height: 36px;
+  padding: 0 16px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-btn);
+  font-weight: 600;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.install-prompt .btn-install:hover {
+  background: var(--accent-hover);
+}
+.install-prompt .btn-dismiss {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+/* ----- Animations ----- */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ----- Header ----- */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+  padding: 4px 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+.header-title .icon {
+  font-size: 1.3rem;
+}
+.header-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.header-actions button {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  min-height: 34px;
+}
+.header-actions button:active {
+  background: var(--bg-card-hover);
+  color: var(--text);
+}
+
+/* ----- Sections ----- */
+.section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  animation: fadeSlideIn 0.35s ease both;
+}
+.section:nth-child(2) {
+  animation-delay: 0.04s;
+}
+.section:nth-child(3) {
+  animation-delay: 0.08s;
+}
+.section:nth-child(4) {
+  animation-delay: 0.12s;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+.section-header h2 {
+  font-size: 0.92rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+}
+.section-header .collapse-icon {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: transform var(--transition-normal);
+}
+.section.collapsed .section-body {
+  display: none;
+}
+.section.collapsed .collapse-icon {
+  transform: rotate(-90deg);
+}
+
+/* ----- Form Fields ----- */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+@media (max-width: 400px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.field label {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.field input,
+.field textarea {
+  background: var(--bg-input);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  padding: 10px 12px;
+  font-size: 0.86rem;
+  transition: border-color var(--transition-fast);
+  width: 100%;
+}
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.field input {
+  min-height: 42px;
+}
+.field textarea {
+  resize: vertical;
+  min-height: 68px;
+}
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Skill Tags */
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--accent-muted);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  transition: all var(--transition-fast);
+  animation: tagIn 0.2s ease;
+}
+@keyframes tagIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.skill-tag .remove-tag {
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0.6;
+  margin-left: 2px;
+}
+.skill-tag .remove-tag:hover {
+  opacity: 1;
+}
+.skill-input-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.skill-input-row input {
+  flex: 1;
+  background: var(--bg-input);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  padding: 7px 10px;
+  font-size: 0.8rem;
+  min-height: 34px;
+}
+.skill-input-row input:focus {
+  border-color: var(--accent);
+}
+.skill-input-row button {
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-btn);
+  padding: 0 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-height: 34px;
+  transition: background var(--transition-fast);
+}
+.skill-input-row button:hover {
+  background: var(--accent-hover);
+}
+.skill-input-row button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ----- Auto-save & Clear Row ----- */
+.bg-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+.save-indicator {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+}
+.save-indicator.saved {
+  color: var(--success);
+}
+.btn-clear-bg {
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.73rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  padding: 4px 12px;
+  min-height: 30px;
+  transition: all var(--transition-fast);
+}
+.btn-clear-bg:hover {
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ----- JD Textarea ----- */
+.jd-textarea {
+  width: 100%;
+  min-height: 160px;
+  background: var(--bg-input);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 14px;
+  font-size: 0.86rem;
+  line-height: 1.7;
+  resize: vertical;
+  transition: border-color var(--transition-fast);
+}
+.jd-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.jd-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+.jd-meta .char-count {
+  transition: color var(--transition-fast);
+}
+.jd-meta .char-count.warn {
+  color: var(--warning);
+}
+.jd-meta .char-count.over {
+  color: var(--danger);
+}
+
+/* ----- API Status Row ----- */
+.api-status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: var(--bg-input);
+  border-radius: var(--radius-btn);
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+.api-status-row .status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.api-status-row .status-dot.ok {
+  background: var(--success);
+}
+.api-status-row .status-dot.warn {
+  background: var(--warning);
+}
+.api-status-row .status-dot.error {
+  background: var(--danger);
+}
+.api-status-row button {
+  background: none;
+  color: var(--accent);
+  font-size: 0.76rem;
+  text-decoration: underline;
+  padding: 2px 4px;
+  margin-left: auto;
+}
+.api-status-row button:hover {
+  color: var(--accent-hover);
+}
+
+/* ----- Generate Button (sticky bottom) ----- */
+.generate-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: 10px 16px calc(var(--safe-bottom) + 16px);
+  background: linear-gradient(to top, var(--bg) 70%, transparent);
+  max-width: 600px;
+  margin: 0 auto;
+}
+.generate-btn {
+  width: 100%;
+  min-height: 48px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-btn);
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--transition-normal);
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+.generate-btn:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(13, 148, 136, 0.28);
+}
+.generate-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+.generate-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.generate-btn .spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+.generate-btn.loading .spinner {
+  display: block;
+}
+.generate-btn.loading .btn-text {
+  display: block;
+}
+
+/* ----- Error Card ----- */
+.error-card {
+  display: none;
+  background: var(--danger-muted);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-card);
+  padding: 14px 16px;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.error-card.visible {
+  display: flex;
+}
+.error-card .error-msg {
+  flex: 1;
+  min-width: 180px;
+  font-size: 0.82rem;
+  color: var(--danger);
+  line-height: 1.5;
+}
+.error-card .btn-retry {
+  background: var(--danger);
+  color: #fff;
+  border-radius: var(--radius-btn);
+  padding: 8px 18px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-height: 36px;
+  white-space: nowrap;
+}
+.error-card .btn-retry:hover {
+  opacity: 0.9;
+}
+
+/* ----- Results Area ----- */
+.results-area {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+.results-area.visible {
+  display: flex;
+}
+
+.result-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  animation: fadeSlideIn 0.4s ease both;
+}
+.result-card:nth-child(2) {
+  animation-delay: 0.08s;
+}
+.result-card:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.result-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+.result-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--accent-muted);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+.quality-tag {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  visibility: hidden;
+}
+.quality-tag.visible {
+  visibility: visible;
+}
+.quality-tag.good {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--success);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+.quality-tag.ok {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--info);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+.quality-tag.low {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.result-content {
+  font-size: 0.86rem;
+  line-height: 1.8;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 50px;
+}
+.result-content.streaming::after {
+  content: "▊";
+  animation: blink 0.8s step-end infinite;
+  color: var(--accent);
+}
+
+.result-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.result-actions .btn-copy {
+  min-height: 36px;
+  padding: 0 16px;
+  border-radius: var(--radius-btn);
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all var(--transition-fast);
+  background: var(--accent);
+  color: #fff;
+  min-width: 100px;
+  justify-content: center;
+}
+.result-actions .btn-copy:hover {
+  background: var(--accent-hover);
+}
+.result-actions .btn-copy.copied {
+  background: var(--success);
+}
+
+/* ----- Overlay System ----- */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.65);
+  animation: fadeIn 0.2s ease;
+}
+.overlay.visible {
+  display: block;
+}
+
+.overlay-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(420px, 90vw);
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  animation: slideInRight 0.25s ease;
+  padding-bottom: var(--safe-bottom);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.panel-header h3 {
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+.panel-close {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.panel-close:hover {
+  color: var(--text);
+}
+
+.panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.panel-footer {
+  padding: 14px 18px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.panel-footer .btn-save {
+  width: 100%;
+  min-height: 44px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-btn);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.panel-footer .btn-save:hover {
+  background: var(--accent-hover);
+}
+
+/* Settings form */
+.setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.setting-group label {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.setting-group input,
+.setting-group select {
+  background: var(--bg-input);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  padding: 10px 12px;
+  font-size: 0.84rem;
+  min-height: 40px;
+}
+.setting-group input:focus,
+.setting-group select:focus {
+  border-color: var(--accent);
+}
+.setting-group select option {
+  background: var(--bg-card);
+  color: var(--text);
+}
+.setting-hint {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+/* ----- History List ----- */
+.history-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 14px;
+  cursor: default;
+  transition: border-color var(--transition-fast);
+}
+.history-item:hover {
+  border-color: var(--border-active);
+}
+.history-item .hi-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.history-item .hi-badge {
+  font-size: 0.68rem;
+  background: var(--accent-muted);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.history-item .hi-preview {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.history-item .hi-greeting {
+  margin-top: 6px;
+}
+.history-item .hi-strategy-label {
+  font-size: 0.7rem;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+.history-item .hi-strategy-text {
+  font-size: 0.8rem;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 6px;
+}
+.history-item .hi-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.history-item .hi-actions button {
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: var(--radius-btn);
+  font-size: 0.74rem;
+  font-weight: 600;
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.history-item .hi-actions button:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.history-item .hi-actions button.btn-hi-delete:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.history-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px 20px;
+  font-size: 0.84rem;
+  line-height: 1.8;
+}
+
+/* ----- Onboarding Overlay ----- */
+.onboarding-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(0, 0, 0, 0.85);
+  align-items: center;
+  justify-content: center;
+}
+.onboarding-overlay.visible {
+  display: flex;
+}
+
+.onboarding-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 28px 24px;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+}
+.onboarding-card .step-indicator {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all var(--transition-normal);
+}
+.step-dot.active {
+  background: var(--accent);
+  width: 24px;
+  border-radius: 4px;
+}
+.onboarding-card h3 {
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+}
+.onboarding-card p {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.onboarding-card .onboard-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.onboarding-card .onboard-actions button {
+  min-height: 40px;
+  padding: 0 20px;
+  border-radius: var(--radius-btn);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-onboard-next {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-onboard-next:hover {
+  background: var(--accent-hover);
+}
+.btn-onboard-skip {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.btn-onboard-skip:hover {
+  color: var(--text-secondary);
+}
+
+/* ----- Toast ----- */
+.toast {
+  position: fixed;
+  bottom: calc(var(--safe-bottom) + 20px);
+  left: 50%;
+  transform: translateX(-50%) translateY(120px);
+  background: var(--bg-card-raised);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  padding: 10px 20px;
+  font-size: 0.82rem;
+  z-index: 400;
+  transition: transform var(--transition-normal);
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ----- Scrollbar ----- */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ----- Focus visible ----- */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ----- iOS safe area padding for sticky elements ----- */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .generate-section {
+    padding-bottom: calc(var(--safe-bottom) + 16px);
+  }
+}
+
+/* ----- Selection ----- */
+::selection {
+  background: rgba(13, 148, 136, 0.3);
+  color: #fff;
+}
+
+/* ===== Resume Upload & Parse System ===== */
+
+/* ----- Resume Upload Zone ----- */
+.resume-upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px 16px;
+  text-align: center;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  margin-bottom: 14px;
+  background: var(--bg-input);
+}
+.resume-upload-zone:hover,
+.resume-upload-zone.drag-over {
+  border-color: var(--accent);
+  background: var(--accent-muted);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+.resume-upload-zone .upload-icon {
+  font-size: 2rem;
+  margin-bottom: 6px;
+  display: block;
+}
+.resume-upload-zone .upload-title {
+  font-size: 0.86rem;
+  color: var(--text);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.resume-upload-zone .upload-hint {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.btn-upload-resume {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-btn);
+  padding: 8px 18px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  min-height: 36px;
+  transition: background var(--transition-fast);
+}
+.btn-upload-resume:hover {
+  background: var(--accent-hover);
+}
+
+/* ----- Resume Parse Status ----- */
+.resume-parse-status {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-active);
+  border-radius: var(--radius-card);
+  margin-bottom: 14px;
+  animation: fadeSlideIn 0.3s ease;
+}
+.resume-parse-status.visible {
+  display: flex;
+}
+.resume-parse-status .parse-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+.resume-parse-status .parse-text {
+  flex: 1;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.btn-cancel-parse {
+  background: none;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  padding: 4px 10px;
+  font-size: 0.73rem;
+  min-height: 28px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.btn-cancel-parse:hover {
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ----- Resume Parse Error ----- */
+.resume-parse-error {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--danger-muted);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-card);
+  margin-bottom: 14px;
+  animation: fadeSlideIn 0.3s ease;
+}
+.resume-parse-error.visible {
+  display: flex;
+}
+.resume-parse-error .error-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.resume-parse-error .error-text {
+  flex: 1;
+  font-size: 0.8rem;
+  color: var(--danger);
+  line-height: 1.5;
+}
+.btn-dismiss-error {
+  background: none;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  padding: 4px 10px;
+  font-size: 0.73rem;
+  min-height: 28px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.btn-dismiss-error:hover {
+  color: var(--text);
+}
+
+/* ----- Resume Text Preview ----- */
+.resume-preview-area {
+  display: none;
+  margin-bottom: 14px;
+  animation: fadeSlideIn 0.3s ease;
+}
+.resume-preview-area.visible {
+  display: block;
+}
+.resume-preview-area .preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+}
+.resume-preview-area textarea {
+  width: 100%;
+  min-height: 120px;
+  max-height: 300px;
+  background: var(--bg-input);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  resize: vertical;
+  font-family: var(--font-stack);
+}
+.resume-preview-area textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.resume-preview-area .preview-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  justify-content: flex-end;
+}
+.resume-preview-area .preview-actions button {
+  min-height: 34px;
+  padding: 0 16px;
+  border-radius: var(--radius-btn);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.btn-confirm-parse {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-confirm-parse:hover {
+  background: var(--accent-hover);
+}
+.btn-confirm-parse:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.btn-cancel-preview {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.btn-cancel-preview:hover {
+  color: var(--text-secondary);
+  border-color: var(--text-muted);
+}
+
+/* ----- Resume Parse Result Card ----- */
+.resume-parse-result {
+  display: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border-active);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  margin-bottom: 14px;
+  animation: fadeSlideIn 0.35s ease;
+}
+.resume-parse-result.visible {
+  display: block;
+}
+.resume-parse-result .parse-result-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--success);
+}
+.resume-parse-result .parse-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+.resume-parse-result .parse-field-label {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  white-space: nowrap;
+  min-width: 60px;
+  flex-shrink: 0;
+}
+.resume-parse-result .parse-field-value {
+  color: var(--text);
+  word-break: break-word;
+}
+.resume-parse-result .parse-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.resume-parse-result .parse-skill-tag {
+  display: inline-block;
+  background: var(--accent-muted);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  border-radius: 14px;
+  padding: 2px 10px;
+  font-size: 0.74rem;
+}
+.resume-parse-result .parse-highlights {
+  margin-top: 6px;
+}
+.resume-parse-result .parse-highlight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 0.82rem;
+  color: var(--warning);
+  line-height: 1.5;
+}
+.resume-parse-result .parse-highlight-item .hl-dot {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.resume-parse-result .parse-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.resume-parse-result .parse-actions button {
+  min-height: 36px;
+  padding: 0 18px;
+  border-radius: var(--radius-btn);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.btn-reparse {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn-reparse:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+.btn-apply-resume {
+  background: var(--accent);
+  color: #fff;
+  flex: 1;
+}
+.btn-apply-resume:hover {
+  background: var(--accent-hover);
+}
+</style>
+</head>
+<body>
+
+  <!-- ============================================================
+  App Container
+  ============================================================ -->
+  <div class="app-container">
+
+    <!-- Offline Banner -->
+    <div class="offline-banner" id="offlineBanner" role="alert" aria-live="assertive">
+      <span>⚠️</span> 当前处于离线状态，生成功能不可用
+    </div>
+
+    <!-- PWA Install Prompt -->
+    <div class="install-prompt" id="installPrompt" role="dialog" aria-label="安装应用">
+      <span class="install-text">📲 安装此应用，可离线使用</span>
+      <button class="btn-install" id="btnInstall">安装</button>
+      <button class="btn-dismiss" id="btnDismissInstall" aria-label="关闭">✕</button>
+    </div>
+
+    <!-- =========================================================
+    Header
+    ========================================================= -->
+    <header class="app-header">
+      <div class="header-title">
+        <span class="icon">🔷</span>智投 — AI求职招呼语生成器
+      </div>
+      <div class="header-actions">
+        <button id="btnOpenSettings" aria-label="设置" title="设置 API Key 和模型">
+          <span>⚙</span> 设置
+        </button>
+        <button id="btnOpenHistory" aria-label="历史记录" title="查看历史记录">
+          <span>📋</span> 历史
+        </button>
+      </div>
+    </header>
+
+    <!-- =========================================================
+    Section 1: User Background (collapsible)
+    ========================================================= -->
+    <section class="section" id="sectionBg" aria-label="用户背景">
+      <div class="section-header" id="toggleBg" role="button" tabindex="0" aria-expanded="true">
+        <h2><span>👤</span> 我的背景</h2>
+        <span class="collapse-icon">▼</span>
+      </div>
+      <div class="section-body">
+
+        <!-- Resume Upload Zone -->
+        <div class="resume-upload-zone" id="resumeUploadZone" role="button" tabindex="0" aria-label="上传简历">
+          <span class="upload-icon">📄</span>
+          <div class="upload-title">上传简历，自动解析背景信息</div>
+          <div class="upload-hint">支持 PDF · Word · TXT 文件</div>
+          <button class="btn-upload-resume" id="btnUploadResume">选择文件</button>
+          <input type="file" id="resumeFileInput" accept=".pdf,.docx,.doc,.txt" hidden>
+        </div>
+
+        <!-- Resume Parse Status -->
+        <div class="resume-parse-status" id="resumeParseStatus">
+          <span class="parse-spinner"></span>
+          <span class="parse-text" id="resumeParseText">正在解析文件...</span>
+          <button class="btn-cancel-parse" id="btnCancelParse">取消</button>
+        </div>
+
+        <!-- Resume Parse Error -->
+        <div class="resume-parse-error" id="resumeParseError">
+          <span class="error-icon">❌</span>
+          <span class="error-text" id="resumeParseErrorText"></span>
+          <button class="btn-dismiss-error" id="btnDismissParseError">关闭</button>
+        </div>
+
+        <!-- Resume Text Preview -->
+        <div class="resume-preview-area" id="resumePreviewArea">
+          <div class="preview-header">
+            <span>📝 简历文本预览（可编辑）</span>
+            <span style="font-size:0.7rem;color:var(--text-muted);" id="resumeCharCount">0 字</span>
+          </div>
+          <textarea id="resumePreviewText" placeholder="在此编辑或粘贴简历文本..." maxlength="10000"></textarea>
+          <div class="preview-actions">
+            <button class="btn-cancel-preview" id="btnCancelPreview">取消</button>
+            <button class="btn-confirm-parse" id="btnConfirmParse">发送 AI 解析</button>
+          </div>
+        </div>
+
+        <!-- Resume Parse Result -->
+        <div class="resume-parse-result" id="resumeParseResult">
+          <div class="parse-result-header">✅ 解析完成</div>
+          <div class="parse-fields-container" id="resumeParseFields"></div>
+          <div class="parse-actions">
+            <button class="btn-reparse" id="btnReparse">重新解析</button>
+            <button class="btn-apply-resume" id="btnApplyResume">确认使用，自动填充</button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="inputName">姓名 / 昵称</label>
+            <input type="text" id="inputName" placeholder="如：张三" maxlength="30" autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="inputTarget">求职方向</label>
+            <input type="text" id="inputTarget" placeholder="如：前端开发工程师" maxlength="60" autocomplete="off">
+          </div>
+        </div>
+        <div class="field">
+          <label>核心技能</label>
+          <div class="skill-tags" id="skillTagsContainer"></div>
+          <div class="skill-input-row">
+            <input type="text" id="skillInput" placeholder="输入技能，回车或点击添加" maxlength="30" autocomplete="off">
+            <button id="btnAddSkill">添加</button>
+          </div>
+        </div>
+        <div class="field" style="margin-top:8px;">
+          <label for="inputExperience">关键经历</label>
+          <textarea id="inputExperience" placeholder="简要描述关键经历、项目经验或亮点...可用数字量化成果" rows="3" maxlength="800"></textarea>
+        </div>
+        <div class="bg-footer">
+          <span class="save-indicator" id="saveIndicator">已自动保存</span>
+          <button class="btn-clear-bg" id="btnClearBg">清空背景</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+    Section 2: JD Input
+    ========================================================= -->
+    <section class="section" id="sectionJd" aria-label="岗位JD">
+      <div class="section-header">
+        <h2><span>📋</span> 岗位 JD</h2>
+      </div>
+      <textarea class="jd-textarea" id="jdInput" placeholder="在此粘贴职位描述（JD）文本...支持从 BOSS 直聘等平台直接粘贴" maxlength="5000" aria-label="岗位描述输入"></textarea>
+      <div class="jd-meta">
+        <span class="char-count" id="jdCharCount">字数: 0 / 5000</span>
+        <span style="font-size:0.7rem;color:var(--text-muted);">Ctrl+Enter 快速生成</span>
+      </div>
+      <div class="api-status-row">
+        <span class="status-dot warn" id="apiStatusDot"></span>
+        <span id="apiStatusText">API Key 未配置 — 点击设置</span>
+        <button id="btnGoSettings">去设置 →</button>
+      </div>
+    </section>
+
+    <!-- =========================================================
+    Generate Button (sticky bottom)
+    ========================================================= -->
+    <div class="generate-section" id="generateSection">
+      <button class="generate-btn" id="btnGenerate" disabled>
+        <span class="spinner"></span>
+        <span class="btn-text">生成招呼语 →</span>
+      </button>
+    </div>
+
+    <!-- =========================================================
+    Error Card
+    ========================================================= -->
+    <div class="error-card" id="errorCard" role="alert">
+      <span>❌</span>
+      <span class="error-msg" id="errorMsg"></span>
+      <button class="btn-retry" id="btnRetry">重试</button>
+    </div>
+
+    <!-- =========================================================
+    Section 3: Results
+    ========================================================= -->
+    <div class="results-area" id="resultsArea">
+      <!-- Dynamically filled -->
+    </div>
+
+  </div><!-- /.app-container -->
+
+  <!-- ============================================================
+  Settings Overlay (slide-in panel)
+  ============================================================ -->
+  <div class="overlay" id="overlaySettings">
+    <div class="overlay-panel" role="dialog" aria-label="设置面板" aria-modal="true">
+      <div class="panel-header">
+        <h3>⚙ 设置</h3>
+        <button class="panel-close" id="btnCloseSettings" aria-label="关闭设置">✕</button>
+      </div>
+      <div class="panel-body">
+        <div class="setting-group">
+          <label for="selectProvider">AI 服务商</label>
+          <select id="selectProvider">
+            <option value="deepseek">DeepSeek（推荐）</option>
+            <option value="openai">OpenAI（兼容）</option>
+            <option value="custom">自定义端点</option>
+          </select>
+        </div>
+
+        <div class="setting-group" id="groupCustomEndpoint" style="display:none;">
+          <label for="inputCustomEndpoint">自定义 API 端点</label>
+          <input type="url" id="inputCustomEndpoint" placeholder="https://api.example.com/v1/chat/completions" autocomplete="off">
+          <div class="setting-hint">需兼容 OpenAI Chat Completions 格式</div>
+        </div>
+
+        <div class="setting-group">
+          <label for="inputApiKey">API Key</label>
+          <input type="password" id="inputApiKey" placeholder="sk-..." autocomplete="off">
+          <div class="setting-hint">密钥仅保存在浏览器本地，不会上传到任何第三方</div>
+        </div>
+
+        <div class="setting-group">
+          <label for="inputModel">模型名称</label>
+          <input type="text" id="inputModel" placeholder="deepseek-chat" autocomplete="off">
+        </div>
+
+        <div class="setting-group">
+          <label for="inputMaxTokens">最大输出长度 (tokens)</label>
+          <input type="number" id="inputMaxTokens" value="2000" min="100" max="8000" step="100">
+          <div class="setting-hint">范围: 100-8000，建议 1500-2500</div>
+        </div>
+
+        <div class="setting-group">
+          <label for="inputTemperature">创意程度 (temperature)</label>
+          <input type="range" id="inputTemperature" min="0" max="100" value="70" style="accent-color:var(--accent);">
+          <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:var(--text-muted);">
+            <span>精准 (0)</span><span id="temperatureLabel">0.7</span><span>创意 (1.0)</span>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <button class="btn-save" id="btnSaveSettings">保存设置</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+  History Overlay (slide-in panel)
+  ============================================================ -->
+  <div class="overlay" id="overlayHistory">
+    <div class="overlay-panel" role="dialog" aria-label="历史记录" aria-modal="true">
+      <div class="panel-header">
+        <h3>📋 历史记录</h3>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button id="btnClearHistory" style="background:none;color:var(--danger);font-size:0.74rem;border:1px solid rgba(239,68,68,0.3);border-radius:var(--radius-btn);padding:4px 10px;min-height:30px;cursor:pointer;">清空全部</button>
+          <button class="panel-close" id="btnCloseHistory" aria-label="关闭历史">✕</button>
+        </div>
+      </div>
+      <div class="panel-body" id="historyList">
+        <div class="history-empty">暂无历史记录<br>生成招呼语后会自动保存到这里</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+  Onboarding Overlay
+  ============================================================ -->
+  <div class="onboarding-overlay visible" id="onboardingOverlay" role="dialog" aria-label="新手指引" aria-modal="true">
+    <div class="onboarding-card">
+      <div class="step-indicator" id="stepIndicator">
+        <span class="step-dot active"></span>
+        <span class="step-dot"></span>
+        <span class="step-dot"></span>
+      </div>
+      <h3 id="onboardTitle">欢迎使用智投</h3>
+      <p id="onboardDesc">帮你快速生成贴合岗位的个性化求职招呼语，提高 BOSS 直聘回复率。</p>
+      <div class="onboard-actions">
+        <button class="btn-onboard-skip" id="btnOnboardSkip">跳过</button>
+        <button class="btn-onboard-next" id="btnOnboardNext">下一步 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+  Toast
+  ============================================================ -->
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+
+  <!-- ============================================================
+  ALL JAVASCRIPT INLINE
+  ============================================================ -->
+  <script>
+  'use strict';
+
+  /* ===================================================================
+     智投 — AI求职招呼语生成器
+     单文件 PWA · 零依赖 · 暗色 Teal 主题
+     模块: PWA壳 / UI层 / 用户背景管理 / JD解析 / AI API集成
+           Prompt模板 / 招呼语展示 / 复制 / 历史记录 / 移动UX / 自检
+     =================================================================== */
+
+  // ============================
+  // 1. CONSTANTS
+  // ============================
+  var STORAGE_KEY = 'zhtou_data_v2';
+  var HISTORY_MAX = 20;
+  var JD_MAX_LENGTH = 5000;
+  var DEBOUNCE_MS = 500;
+  var API_ENDPOINTS = {
+    deepseek: 'https://api.deepseek.com/v1/chat/completions',
+    openai: 'https://api.openai.com/v1/chat/completions',
+  };
+  var DEFAULT_MODELS = {
+    deepseek: 'deepseek-chat',
+    openai: 'gpt-4o-mini',
+    custom: 'deepseek-chat',
+  };
+
+  // Six hook strategies for diverse greetings
+  var HOOK_STRATEGIES = [
+    {
+      id: 'number',     name: '数字钩子', icon: '🔢',
+      hint: '【数字钩子 — 最高优先级策略】用求职者背景中最亮眼的量化数据打头阵。第1句话必须包含一个具体数字（年限/数据成果/项目数）。HR在0.5秒扫描中会下意识计算数字的真实性，这给了你多0.5秒的注意力窗口。示例结构："X年经验 + 数据成果"直接开场，无需任何铺垫或客套。'
+    },
+    {
+      id: 'resonance',  name: '共鸣钩子', icon: '💡',
+      hint: '【共鸣钩子 — 建立情感连接】先表达对该公司/行业/产品的深度理解和认同，展现你真正研究过这家公司。不要泛泛说"贵司很优秀"，要具体到业务线、产品特征或行业动态。先用精准洞察拉近距离，再自然地过渡到自身匹配度。示例："看到贵司最近在做XX方向，我之前恰好经手过..."'
+    },
+    {
+      id: 'question',   name: '问题钩子', icon: '❓',
+      hint: '【问题钩子 — 激发好奇心与对话】以一个与岗位直接相关的专业问题开篇，暗示你了解这个岗位的核心挑战。关键在于问题必须具体、专业、切中痛点，不能是"贵司需要什么样的人"这种泛泛之问。抛出问题后顺势展示你能如何解决它。示例结构：专业问题→暗示你有答案→证据支撑。'
+    },
+    {
+      id: 'achievement',name: '成就钩子', icon: '🏆',
+      hint: '【成就钩子 — 用结果说话】开门见山直接亮出你最相关的1-2个可验证成就，用数据说话。不要铺垫，不要礼貌用语，第一句就是干货。成就必须与JD需求直接对应，让HR一眼看到"这个人做过我们需要的"。示例结构：核心成就→关联JD中的需求→表达行动意愿。'
+    },
+    {
+      id: 'insight',    name: '洞察钩子', icon: '🔍',
+      hint: '【洞察钩子 — 展现深层理解】从JD中挖掘出隐含需求——那些没明说但实际需要的。例如JD写"数据驱动"，实际可能需要Excel+SQL+报表分析能力；写"抗压能力强"，实际可能加班多或业务波动大。展示你对这个岗位本质需求的深层理解，让HR觉得"这个人比我们更懂这个岗位需要什么"。'
+    },
+    {
+      id: 'sincere',    name: '真诚钩子', icon: '💬',
+      hint: '【真诚钩子 — 人格化表达】用最自然、最像真人的语气表达，避免一切模板话术。展示真实的个性和动机，可以适度展现不完美（如"这段经历不算长，但学到了..."），反而更可信。关键是要让人读完后觉得这是一个活生生的人在聊天，不是AI生成的。示例结构：真实动机→经历关联→自然的行动邀请。'
+    },
+  ];
+
+  // ============================
+  // 2. GLOBAL STATE
+  // ============================
+  var state = {
+    userBg: { name: '', target: '', skills: [], experience: '' },
+    jdText: '',
+    apiSettings: { provider: 'deepseek', endpoint: '', apiKey: '', model: '', maxTokens: 2000, temperature: 0.7 },
+    greetingHistory: [],
+    onboardingCompleted: false,
+    isGenerating: false,
+    isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
+    abortController: null,
+  };
+
+  // Resume parse state (not persisted)
+  var resumeState = {
+    parsedText: '',       // raw text extracted from file
+    aiResult: null,       // structured data from AI
+    isParsing: false,     // whether AI parsing is in progress
+    cancelToken: false,   // cancel flag for AI parsing
+    parseError: '',       // latest error message
+  };
+
+  // ============================
+  // 3. DOM CACHE
+  // ============================
+  function $(sel) { return document.querySelector(sel); }
+  function $$(sel) { return document.querySelectorAll(sel); }
+
+  var dom = {
+    offlineBanner: $('#offlineBanner'),
+    installPrompt: $('#installPrompt'),
+    // Header
+    btnOpenSettings: $('#btnOpenSettings'),
+    btnOpenHistory: $('#btnOpenHistory'),
+    // Section: Background
+    sectionBg: $('#sectionBg'),
+    toggleBg: $('#toggleBg'),
+    inputName: $('#inputName'),
+    inputTarget: $('#inputTarget'),
+    inputExperience: $('#inputExperience'),
+    skillTagsContainer: $('#skillTagsContainer'),
+    skillInput: $('#skillInput'),
+    btnAddSkill: $('#btnAddSkill'),
+    saveIndicator: $('#saveIndicator'),
+    btnClearBg: $('#btnClearBg'),
+    // Section: JD
+    jdInput: $('#jdInput'),
+    jdCharCount: $('#jdCharCount'),
+    apiStatusDot: $('#apiStatusDot'),
+    apiStatusText: $('#apiStatusText'),
+    btnGoSettings: $('#btnGoSettings'),
+    // Generate
+    btnGenerate: $('#btnGenerate'),
+    // Error
+    errorCard: $('#errorCard'),
+    errorMsg: $('#errorMsg'),
+    btnRetry: $('#btnRetry'),
+    // Results
+    resultsArea: $('#resultsArea'),
+    // Settings overlay
+    overlaySettings: $('#overlaySettings'),
+    selectProvider: $('#selectProvider'),
+    groupCustomEndpoint: $('#groupCustomEndpoint'),
+    inputCustomEndpoint: $('#inputCustomEndpoint'),
+    inputApiKey: $('#inputApiKey'),
+    inputModel: $('#inputModel'),
+    inputMaxTokens: $('#inputMaxTokens'),
+    inputTemperature: $('#inputTemperature'),
+    temperatureLabel: $('#temperatureLabel'),
+    btnSaveSettings: $('#btnSaveSettings'),
+    btnCloseSettings: $('#btnCloseSettings'),
+    // History overlay
+    overlayHistory: $('#overlayHistory'),
+    historyList: $('#historyList'),
+    btnClearHistory: $('#btnClearHistory'),
+    btnCloseHistory: $('#btnCloseHistory'),
+    // Onboarding
+    onboardingOverlay: $('#onboardingOverlay'),
+    stepIndicator: $('#stepIndicator'),
+    onboardTitle: $('#onboardTitle'),
+    onboardDesc: $('#onboardDesc'),
+    btnOnboardSkip: $('#btnOnboardSkip'),
+    btnOnboardNext: $('#btnOnboardNext'),
+    // Toast
+    toast: $('#toast'),
+    // Install prompt
+    btnInstall: $('#btnInstall'),
+    btnDismissInstall: $('#btnDismissInstall'),
+    // Resume upload & parse
+    resumeUploadZone: $('#resumeUploadZone'),
+    btnUploadResume: $('#btnUploadResume'),
+    resumeFileInput: $('#resumeFileInput'),
+    resumeParseStatus: $('#resumeParseStatus'),
+    resumeParseText: $('#resumeParseText'),
+    btnCancelParse: $('#btnCancelParse'),
+    resumeParseError: $('#resumeParseError'),
+    resumeParseErrorText: $('#resumeParseErrorText'),
+    btnDismissParseError: $('#btnDismissParseError'),
+    resumePreviewArea: $('#resumePreviewArea'),
+    resumePreviewText: $('#resumePreviewText'),
+    resumeCharCount: $('#resumeCharCount'),
+    btnConfirmParse: $('#btnConfirmParse'),
+    btnCancelPreview: $('#btnCancelPreview'),
+    resumeParseResult: $('#resumeParseResult'),
+    resumeParseFields: $('#resumeParseFields'),
+    btnReparse: $('#btnReparse'),
+    btnApplyResume: $('#btnApplyResume'),
+  };
+
+  // ============================
+  // 4. SELF-CHECK SYSTEM
+  // ============================
+  function selfCheck() {
+    var checks = [];
+    try {
+      localStorage.setItem('__zhtou_test__', '1');
+      localStorage.removeItem('__zhtou_test__');
+      checks.push({ name: 'localStorage', pass: true });
+    } catch (e) {
+      checks.push({ name: 'localStorage', pass: false, msg: '本地存储不可用，数据无法保存' });
+    }
+    if (navigator.clipboard) {
+      checks.push({ name: 'Clipboard API', pass: true });
+    } else {
+      checks.push({ name: 'Clipboard API', pass: false, msg: '剪贴板 API 不可用，将使用降级方案' });
+    }
+    if (typeof fetch !== 'undefined') {
+      checks.push({ name: 'Fetch API', pass: true });
+    } else {
+      checks.push({ name: 'Fetch API', pass: false, msg: '浏览器不支持 Fetch API' });
+    }
+    if ('serviceWorker' in navigator) {
+      checks.push({ name: 'Service Worker', pass: true });
+    } else {
+      checks.push({ name: 'Service Worker', pass: false, msg: '不支持离线缓存' });
+    }
+    return checks;
+  }
+
+  // ============================
+  // 5. DATA PERSISTENCE (localStorage CRUD, debounce autosave)
+  // ============================
+  function loadData() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      var data = JSON.parse(raw);
+      if (data.userBg) {
+        state.userBg.name = data.userBg.name || '';
+        state.userBg.target = data.userBg.target || '';
+        state.userBg.skills = data.userBg.skills || [];
+        state.userBg.experience = data.userBg.experience || '';
+      }
+      if (data.apiSettings) {
+        state.apiSettings.provider = data.apiSettings.provider || 'deepseek';
+        state.apiSettings.endpoint = data.apiSettings.endpoint || '';
+        state.apiSettings.apiKey = data.apiSettings.apiKey || '';
+        state.apiSettings.model = data.apiSettings.model || '';
+        state.apiSettings.maxTokens = data.apiSettings.maxTokens || 2000;
+        state.apiSettings.temperature = data.apiSettings.temperature != null ? data.apiSettings.temperature : 0.7;
+      }
+      if (data.greetingHistory) state.greetingHistory = data.greetingHistory;
+      if (data.onboardingCompleted !== undefined) state.onboardingCompleted = data.onboardingCompleted;
+    } catch (e) {
+      console.warn('[智投] 数据加载失败，使用默认设置', e);
+    }
+  }
+
+  var _saveTimer = null;
+  function saveData(immediate) {
+    if (immediate) {
+      doSave();
+    } else {
+      if (_saveTimer) clearTimeout(_saveTimer);
+      _saveTimer = setTimeout(doSave, DEBOUNCE_MS);
+    }
+  }
+
+  function doSave() {
+    try {
+      var data = {
+        userBg: state.userBg,
+        apiSettings: state.apiSettings,
+        greetingHistory: state.greetingHistory,
+        onboardingCompleted: state.onboardingCompleted,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      updateSaveIndicator(true);
+    } catch (e) {
+      updateSaveIndicator(false);
+    }
+  }
+
+  function updateSaveIndicator(saved) {
+    if (saved) {
+      var now = new Date();
+      var time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+      dom.saveIndicator.textContent = '已自动保存 ' + time;
+      dom.saveIndicator.className = 'save-indicator saved';
+      // fade back to normal after 2s
+      clearTimeout(updateSaveIndicator._t);
+      updateSaveIndicator._t = setTimeout(function () {
+        dom.saveIndicator.className = 'save-indicator';
+      }, 2000);
+    } else {
+      dom.saveIndicator.textContent = '保存失败';
+      dom.saveIndicator.className = 'save-indicator';
+    }
+  }
+
+  // ============================
+  // 6. UI SYNC
+  // ============================
+  function syncBgToUI() {
+    dom.inputName.value = state.userBg.name;
+    dom.inputTarget.value = state.userBg.target;
+    dom.inputExperience.value = state.userBg.experience;
+    renderSkillTags();
+  }
+
+  function syncBgFromUI() {
+    state.userBg.name = dom.inputName.value.trim();
+    state.userBg.target = dom.inputTarget.value.trim();
+    state.userBg.experience = dom.inputExperience.value.trim();
+    saveData();
+    updateGenerateButton();
+  }
+
+  function renderSkillTags() {
+    dom.skillTagsContainer.innerHTML = state.userBg.skills.map(function (s) {
+      return '<span class="skill-tag">' + escapeHtml(s) +
+        '<span class="remove-tag" data-skill="' + escapeHtmlAttr(s) + '" aria-label="移除 ' + escapeHtml(s) + '">x</span></span>';
+    }).join('');
+    // Bind remove handlers
+    var removes = dom.skillTagsContainer.querySelectorAll('.remove-tag');
+    for (var i = 0; i < removes.length; i++) {
+      removes[i].addEventListener('click', function (e) {
+        e.stopPropagation();
+        var skill = this.getAttribute('data-skill');
+        state.userBg.skills = state.userBg.skills.filter(function (s) { return s !== skill; });
+        renderSkillTags();
+        saveData();
+      });
+    }
+  }
+
+  function syncSettingsToUI() {
+    var s = state.apiSettings;
+    dom.selectProvider.value = s.provider;
+    dom.inputCustomEndpoint.value = s.endpoint || '';
+    dom.inputApiKey.value = s.apiKey || '';
+    dom.inputModel.value = s.model || DEFAULT_MODELS[s.provider] || '';
+    dom.inputMaxTokens.value = s.maxTokens || 2000;
+    var tempVal = Math.round((s.temperature || 0.7) * 100);
+    dom.inputTemperature.value = tempVal;
+    dom.temperatureLabel.textContent = (tempVal / 100).toFixed(1);
+    updateCustomEndpointVisibility();
+    updateApiStatusRow();
+  }
+
+  function updateCustomEndpointVisibility() {
+    dom.groupCustomEndpoint.style.display = state.apiSettings.provider === 'custom' ? 'flex' : 'none';
+  }
+
+  function updateApiStatusRow() {
+    var s = state.apiSettings;
+    var hasKey = !!s.apiKey;
+    dom.apiStatusDot.className = 'status-dot ' + (hasKey ? 'ok' : 'warn');
+    dom.apiStatusText.textContent = hasKey
+      ? 'API Key 已配置 (' + (s.provider === 'custom' ? '自定义' : providerLabel(s.provider)) + ' | ' + (s.model || '默认模型') + ')'
+      : 'API Key 未配置 — 点击设置';
+    dom.btnGoSettings.style.display = hasKey ? 'none' : '';
+  }
+
+  function providerLabel(p) {
+    if (p === 'deepseek') return 'DeepSeek';
+    if (p === 'openai') return 'OpenAI';
+    return '自定义';
+  }
+
+  // ============================
+  // 7. GENERATE BUTTON STATE
+  // ============================
+  function updateGenerateButton() {
+    var hasBg = !!(state.userBg.name || state.userBg.target || state.userBg.skills.length > 0);
+    var hasJD = state.jdText.trim().length >= 10;
+    var hasKey = !!state.apiSettings.apiKey;
+    var online = state.isOnline;
+    var generating = state.isGenerating;
+    dom.btnGenerate.disabled = !(hasBg && hasJD && hasKey && online && !generating);
+  }
+
+  function setGenerating(active) {
+    state.isGenerating = active;
+    dom.btnGenerate.classList.toggle('loading', active);
+    if (active) {
+      dom.btnGenerate.querySelector('.btn-text').textContent = '生成中...';
+    } else {
+      dom.btnGenerate.querySelector('.btn-text').textContent = '生成招呼语 →';
+    }
+    updateGenerateButton();
+  }
+
+  // ============================
+  // 8. JD PARSING
+  // ============================
+  function onJdInput() {
+    var text = dom.jdInput.value;
+    var len = text.length;
+    state.jdText = text;
+    dom.jdCharCount.textContent = '字数: ' + len + ' / ' + JD_MAX_LENGTH;
+    dom.jdCharCount.className = 'char-count' +
+      (len > JD_MAX_LENGTH * 0.9 ? (len >= JD_MAX_LENGTH ? ' over' : ' warn') : '');
+    updateGenerateButton();
+  }
+
+  function extractJDKeywords(text) {
+    if (!text || text.length < 20) return [];
+    var cleaned = text.replace(/[【】\[\]\(\)（）\n\r\t]/g, ' ').replace(/\s+/g, ' ').trim();
+    var segments = cleaned.split(/[，。,、；;：:\s]+/).filter(function (s) { return s.length >= 3 && s.length <= 20; });
+    var seen = {};
+    var keywords = [];
+    for (var i = 0; i < segments.length && keywords.length < 15; i++) {
+      var key = segments[i].toLowerCase();
+      if (!seen[key]) {
+        seen[key] = true;
+        keywords.push(segments[i]);
+      }
+    }
+    return keywords;
+  }
+
+  function checkJDQuality(text) {
+    if (!text || text.length < 10) return { level: 'low', score: 0, tip: 'JD 内容太短，建议至少粘贴 100 字以获得更好的招呼语' };
+    if (text.length < 100) return { level: 'low', score: 30, tip: 'JD 内容较少，建议补充更多职位描述细节' };
+    if (text.length < 300) return { level: 'ok', score: 60, tip: 'JD 内容适中，基本可用' };
+    return { level: 'good', score: 90, tip: 'JD 内容充分，可生成高质量招呼语' };
+  }
+
+  // ============================
+  // 9. PROMPT TEMPLATE SYSTEM
+  // ============================
+  function buildSystemPrompt(strategyIndex) {
+    var strategy = HOOK_STRATEGIES[strategyIndex];
+    var bg = state.userBg;
+    var skillList = bg.skills.length > 0 ? bg.skills.join('、') : '未填写';
+    var safeName = bg.name || '求职者';
+    var safeTarget = bg.target || '未指定';
+    var safeExp = bg.experience || '未填写';
+
+    return [
+      '你是一位资深求职策略顾问，拥有10年BOSS直聘招聘平台经验，累计帮2000+求职者优化过招呼语，回复率提升平均3.7倍。',
+      '',
+      '## 求职者背景',
+      '- 称呼：' + safeName,
+      '- 求职方向：' + safeTarget,
+      '- 核心技能：' + skillList,
+      '- 关键经历：' + safeExp,
+      '',
+      '## 你的核心任务',
+      '根据求职者背景和岗位JD，生成一条能打头阵的BOSS直聘招呼语。',
+      '',
+      '## 深度JD分析（生成前必须完成思维过程）',
+      '1. 核心需求提炼：从JD中找出最关键的3个硬性能力要求',
+      '2. 隐性需求推理：JD没说但实际需要的（如"抗压"=加班/业务波动，"数据驱动"=Excel+SQL+报表，"沟通能力强"=跨部门协调+向上汇报）',
+      '3. 团队阶段判断：这个招聘是因为业务扩张、人员替换还是新方向补缺？不同阶段诉求不同',
+      '4. 关键词标记：找出JD中HR最可能扫描的5-8个关键词，招呼语中至少嵌入2-3个',
+      '',
+      '## 招呼语写作铁律（违反任何一条 = 不合格）',
+      '1. 禁止在任何位置使用"您好/尊敬的HR/打扰了/冒昧/感谢您抽出宝贵时间"',
+      '2. 禁止空泛形容词（"学习能力强""认真负责""热爱工作""吃苦耐劳""沟通能力好""团队合作精神"）',
+      '3. 必须有至少1个具体数字或量化数据（从背景经历中提取，不编造）',
+      '4. 必须至少2处提到JD中的具体关键词或要求（让HR看出来你认真看过JD）',
+      '5. 字数严格控制在80-180字（少则信息不足，多则HR不读完）',
+      '6. 不用Markdown、不用特殊符号、不用emoji、纯文本',
+      '7. 把对方当成刚聊过天的熟人，不是领导或陌生权威——用"你"而不是"您"',
+      '8. 每一条表述都必须是"证据 + 关联到JD需求"，不能是"自夸 + 空话"',
+      '9. 直接输出招呼语本身，不要任何前缀如"这是XX版本"、"以下是一段"等',
+      '',
+      '## 参考结构模板',
+      '[钩子句-前20字-让HR停下来]',
+      '[核心匹配句：我的X经验/能力 → 刚好能解决贵司JD中提到的Y需求]',
+      '[价值证据：1-2个具体数字/事例支撑上述匹配，形成"证据链"]',
+      '[行动引导：低门槛的下一步——让对方回复只需动动手指]',
+      '',
+      '## 当前使用的钩子策略',
+      strategy.hint,
+      '',
+      '## 好的招呼语示例',
+      '"2年直播运营经验，单场在线30+人稳定输出。看到贵司在招能够独立策划直播内容的人，我之前做过完整的内容排期→执行→复盘闭环。荔枝平台1.1w关注就是靠这套流程积累的。方便看看我的经历吗？"',
+      '',
+      '## 坏的招呼语示例（严格禁止）',
+      '"您好！我看到贵公司在招聘运营助理岗位，我对此非常感兴趣。我学习能力强，认真负责，有一定的运营经验。希望能有机会加入贵公司。期待您的回复！"',
+      '',
+      '记住：你生成的每一条招呼语，都应该让HR觉得"这个人理解我们在招什么角色"，而不是"又一个机器人海投"。',
+    ].join('\n');
+  }
+
+  function buildUserMessage() {
+    var jd = state.jdText.trim();
+    var keywords = extractJDKeywords(jd);
+    var quality = checkJDQuality(jd);
+    var bg = state.userBg;
+
+    var lines = [
+      '## 岗位JD原文',
+      '下面是招聘方发布的完整岗位描述：',
+      '',
+      '```',
+      jd,
+      '```',
+      '',
+      '## 我的求职背景',
+      '- 求职方向：' + (bg.target || '未指定'),
+      '- 核心技能：' + (bg.skills.length > 0 ? bg.skills.join('、') : '未填写'),
+      '- 关键经历：' + (bg.experience || '未填写'),
+      '',
+      '## JD 数据参考',
+      '- 关键词提取：' + (keywords.length > 0 ? keywords.join(' / ') : '无明显关键词'),
+      '- JD质量评估：' + quality.tip,
+      '- JD字数：' + jd.length + '字',
+      '',
+      '## 你的输出任务',
+      '请你以上面的JD和我的背景信息为基础，生成一条能在BOSS直聘上真正打出高回复率的招呼语。',
+      '',
+      '核心要求：',
+      '1. 前20字让HR停下滚动的手指',
+      '2. 正文让HR觉得"这个人理解我们在招什么"',
+      '3. 结尾让HR自然而然想回复',
+      '4. 读起来像人写的，不像提示词生成的',
+      '5. 必须包含我背景中的至少一个具体数字或数据',
+      '6. 必须至少2处呼应JD中的具体关键词',
+      '',
+      '直接输出招呼语本身，不要任何前缀或后缀说明。',
+    ];
+    return lines.join('\n');
+  }
+
+  // ============================
+  // 10. AI API INTEGRATION (SSE streaming, multi-provider)
+  // ============================
+  function getApiEndpoint() {
+    var s = state.apiSettings;
+    if (s.provider === 'custom') return s.endpoint || 'https://api.deepseek.com/v1/chat/completions';
+    return API_ENDPOINTS[s.provider] || API_ENDPOINTS.deepseek;
+  }
+
+  // Async generator: yields content chunks via SSE streaming
+  function streamGenerate(strategyIndex) {
+    var endpoint = getApiEndpoint();
+    var model = state.apiSettings.model || DEFAULT_MODELS[state.apiSettings.provider] || 'deepseek-chat';
+    var controller = state.abortController;
+
+    var systemContent = buildSystemPrompt(strategyIndex);
+    var userContent = buildUserMessage();
+
+    var bodyPayload;
+    try {
+      bodyPayload = JSON.stringify({
+        model: model,
+        messages: [
+          { role: 'system', content: systemContent },
+          { role: 'user', content: userContent },
+        ],
+        stream: false,
+        temperature: state.apiSettings.temperature || 0.7,
+        max_tokens: Number(state.apiSettings.maxTokens) || 2000,
+        top_p: 0.9,
+      });
+    } catch (e) {
+      return Promise.reject(new Error('请求体序列化失败: ' + e.message));
+    }
+
+    return fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + state.apiSettings.apiKey,
+      },
+      body: bodyPayload,
+      signal: controller ? controller.signal : undefined,
+    }).then(function (response) {
+      if (!response.ok) {
+        return response.text().then(function (body) {
+          var msg = 'API 请求失败 (HTTP ' + response.status + ')';
+          if (response.status === 401) msg = 'API Key 无效或已过期，请检查设置';
+          else if (response.status === 429) msg = 'API 请求频率过高，请稍候重试';
+          else if (response.status === 402) msg = 'API 账户余额不足，请充值';
+          else if (response.status >= 500) msg = 'AI 服务暂时不可用，请稍候重试';
+          else if (body) {
+            try { var j = JSON.parse(body); if (j.error && j.error.message) msg = j.error.message; } catch (e) {}
+          }
+          throw new Error(msg);
+        });
+      }
+      return response.json();
+    }).then(function (data) {
+      var content = '';
+      if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+        content = data.choices[0].message.content;
+      }
+      return { fullText: content };
+    });
+  }
+
+  function readSSEStream(response) {
+    var reader = response.body.getReader();
+    var decoder = new TextDecoder('utf-8');
+    var buffer = '';
+    var cancelled = false;
+    var streamEnded = false;
+
+    if (state.abortController && state.abortController.signal) {
+      state.abortController.signal.addEventListener('abort', function () {
+        cancelled = true;
+        reader.cancel();
+      });
+    }
+
+    function flushBuffer() {
+      if (!buffer.trim()) return null;
+      var line = buffer.trim();
+      buffer = '';
+      if (line.indexOf('data:') !== 0) return null;
+      var data = line.substring(5).trim();
+      if (!data || data === '[DONE]') return null;
+      try {
+        var parsed = JSON.parse(data);
+        var choice = parsed.choices && parsed.choices[0];
+        var content = null;
+        // Compatible with both delta.content (streaming) and message.content (non-streaming fallback)
+        if (choice && choice.delta && choice.delta.content != null) content = choice.delta.content;
+        else if (choice && choice.message && choice.message.content != null) content = choice.message.content;
+        return content || null;
+      } catch (e) { /* skip malformed JSON */ }
+      return null;
+    }
+
+    return {
+      next: function () {
+        if (cancelled || streamEnded) return Promise.resolve({ done: true });
+
+        function pump() {
+          return reader.read().then(function (result) {
+            if (result.done) {
+              streamEnded = true;
+              var flushed = flushBuffer();
+              if (flushed) return { done: false, value: flushed };
+              return { done: true };
+            }
+
+            // Normalize all line endings to \n before processing
+            var chunk = decoder.decode(result.value, { stream: true });
+            chunk = chunk.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            buffer += chunk;
+
+            var lines = buffer.split('\n');
+            // Keep the last partial line in buffer for the next chunk
+            buffer = lines.pop() || '';
+
+            for (var i = 0; i < lines.length; i++) {
+              var line = lines[i].trim();
+              if (!line || line.indexOf('data:') !== 0) continue;
+              var data = line.substring(5).trim();
+              if (!data || data === '[DONE]') {
+                streamEnded = true;
+                // Flush any remaining buffer in case [DONE] came before the final content
+                var flushed = flushBuffer();
+                if (flushed) return { done: false, value: flushed };
+                return { done: true };
+              }
+              try {
+                var parsed = JSON.parse(data);
+                var choice = parsed.choices && parsed.choices[0];
+                var content = null;
+                if (choice && choice.delta && choice.delta.content != null) content = choice.delta.content;
+                else if (choice && choice.message && choice.message.content != null) content = choice.message.content;
+                if (content !== null) return { done: false, value: content };
+              } catch (e) { /* skip malformed JSON chunks */ }
+            }
+            return pump(); // continue reading
+          });
+        }
+        return pump();
+      },
+      return: function () {
+        cancelled = true;
+        streamEnded = true;
+        reader.cancel();
+        return Promise.resolve({ done: true });
+      },
+      [Symbol.asyncIterator]: function () { return this; },
+    };
+  }
+
+  // ============================
+  // 11. GREETING GENERATION ORCHESTRATOR
+  // ============================
+  function pickStrategies() {
+    // Pick 3 random strategies, each carrying its original HOOK_STRATEGIES index
+    var indices = [];
+    for (var i = 0; i < HOOK_STRATEGIES.length; i++) { indices.push(i); }
+    // Fisher-Yates shuffle
+    for (var i = indices.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+    }
+    var pickedIndices = indices.slice(0, 3).sort(function (a, b) { return a - b; });
+    return pickedIndices.map(function (idx) {
+      return { strategy: HOOK_STRATEGIES[idx], hookIndex: idx };
+    });
+  }
+
+  function generateAllGreetings() {
+    // Validate
+    var jdTrimmed = state.jdText.trim();
+    if (jdTrimmed.length < 10) { showError('请先粘贴岗位 JD 文本（至少 10 字）'); return; }
+    if (!state.apiSettings.apiKey) { showError('请先在设置中配置 API Key'); return; }
+    if (!state.isOnline) { showError('当前处于离线状态，无法生成招呼语'); return; }
+
+    // Clear previous
+    hideError();
+    dom.resultsArea.classList.add('visible');
+    dom.resultsArea.innerHTML = '';
+
+    var strategies = pickStrategies();
+    var cards = [];
+
+    // Create DOM cards with streaming cursors
+    for (var i = 0; i < strategies.length; i++) {
+      var card = createResultCard(strategies[i].strategy, i);
+      dom.resultsArea.appendChild(card);
+      cards.push({
+        strategy: strategies[i].strategy,
+        hookIndex: strategies[i].hookIndex,
+        content: '',
+        cardEl: card
+      });
+    }
+
+    setGenerating(true);
+    state.abortController = new AbortController();
+
+    // Generate sequentially through the 3 strategies
+    function generateNext(cardIndex) {
+      if (cardIndex >= cards.length) {
+        // All done
+        setGenerating(false);
+        state.abortController = null;
+        saveToHistory(cards);
+        dom.resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return Promise.resolve();
+      }
+
+      var cd = cards[cardIndex];
+      var contentEl = cd.cardEl.querySelector('.result-content');
+      contentEl.classList.add('streaming');
+
+      // Pass the strategy's original HOOK_STRATEGIES index to the AI
+      return streamGenerate(cd.hookIndex).then(function (result) {
+        var fullText = result.fullText || '';
+        contentEl.classList.remove('streaming');
+        contentEl.textContent = fullText;
+        cd.content = fullText;
+        var q = evaluateQuality(fullText);
+        addQualityTag(cd.cardEl, q);
+        return generateNext(cardIndex + 1);
+      }).catch(function (err) {
+        if (err.name === 'AbortError') {
+          contentEl.textContent = (contentEl.textContent || '') || '生成已取消';
+        } else {
+          contentEl.textContent = '生成失败: ' + err.message;
+        }
+        contentEl.classList.remove('streaming');
+        cd.content = contentEl.textContent;
+        return generateNext(cardIndex + 1);
+      });
+    }
+
+    generateNext(0).catch(function (err) {
+      console.error('[智投] 生成流程出错:', err);
+      setGenerating(false);
+      state.abortController = null;
+    });
+  }
+
+  function createResultCard(strategy, index) {
+    var card = document.createElement('div');
+    card.className = 'result-card';
+    card.style.animationDelay = (index * 0.08) + 's';
+    card.innerHTML =
+      '<div class="result-card-header">' +
+        '<span class="result-badge">' + strategy.icon + ' 版本' + (index + 1) + ' · ' + strategy.name + '</span>' +
+        '<span class="quality-tag">--</span>' +
+      '</div>' +
+      '<div class="result-content streaming"></div>' +
+      '<div class="result-actions">' +
+        '<button class="btn-copy">📋 复制</button>' +
+      '</div>';
+
+    var copyBtn = card.querySelector('.btn-copy');
+    copyBtn.addEventListener('click', function () {
+      var text = card.querySelector('.result-content').textContent;
+      copyToClipboard(text, copyBtn);
+    });
+    return card;
+  }
+
+  function addQualityTag(cardEl, quality) {
+    var tag = cardEl.querySelector('.quality-tag');
+    tag.textContent = quality.label;
+    tag.className = 'quality-tag visible ' + quality.level;
+  }
+
+  function evaluateQuality(text) {
+    if (!text || text.length < 30) return { level: 'low', label: '质量较低' };
+    var score = 0;
+    if (text.length >= 80) score++;
+    if (text.length <= 250) score++;
+    if (!/[【】*#\-]/.test(text)) score++;
+    if ((text.match(/[。！？\n]/g) || []).length >= 3) score++;
+    if (!/您好.{0,10}我对.{0,10}感兴趣/.test(text)) score++;
+    if (/\S/.test(text)) score++;
+    if (score >= 5) return { level: 'good', label: '优质' };
+    if (score >= 3) return { level: 'ok', label: '可用' };
+    return { level: 'low', label: '质量较低' };
+  }
+
+  function saveToHistory(cards) {
+    var entry = {
+      id: Date.now(),
+      timestamp: new Date().toISOString(),
+      jdPreview: state.jdText.slice(0, 100).replace(/\n/g, ' '),
+      greetings: cards.map(function (cd) {
+        return { strategy: cd.strategy.name, icon: cd.strategy.icon, content: cd.content };
+      }),
+    };
+    state.greetingHistory.unshift(entry);
+    if (state.greetingHistory.length > HISTORY_MAX) {
+      state.greetingHistory = state.greetingHistory.slice(0, HISTORY_MAX);
+    }
+    saveData(true);
+  }
+
+  // ============================
+  // 12. COPY TO CLIPBOARD
+  // ============================
+  function copyToClipboard(text, btnEl) {
+    if (!text || !text.trim()) {
+      showToast('没有可复制的内容');
+      return;
+    }
+
+    function onSuccess() {
+      if (btnEl) {
+        var orig = btnEl.textContent;
+        btnEl.textContent = '✓ 已复制';
+        btnEl.classList.add('copied');
+        setTimeout(function () {
+          btnEl.textContent = orig;
+          btnEl.classList.remove('copied');
+        }, 2000);
+      }
+      showToast('已复制到剪贴板');
+    }
+
+    function onFail() {
+      showToast('复制失败，请手动选中复制');
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(onSuccess).catch(function () {
+        fallbackCopy(text, onSuccess, onFail);
+      });
+    } else {
+      fallbackCopy(text, onSuccess, onFail);
+    }
+  }
+
+  function fallbackCopy(text, onSuccess, onFail) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      ta.setAttribute('readonly', '');
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      onSuccess();
+    } catch (e) {
+      onFail();
+    }
+  }
+
+  // ============================
+  // 13. TOAST
+  // ============================
+  var _toastTimer = null;
+  function showToast(msg) {
+    dom.toast.textContent = msg;
+    dom.toast.classList.add('show');
+    if (_toastTimer) clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(function () {
+      dom.toast.classList.remove('show');
+    }, 2200);
+  }
+
+  // ============================
+  // 14. ERROR HANDLING
+  // ============================
+  function showError(msg) {
+    dom.errorMsg.textContent = msg;
+    dom.errorCard.classList.add('visible');
+    dom.errorCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function hideError() {
+    dom.errorCard.classList.remove('visible');
+  }
+
+  // ============================
+  // 15. HISTORY RENDERING
+  // ============================
+  function renderHistory() {
+    var list = dom.historyList;
+    if (state.greetingHistory.length === 0) {
+      list.innerHTML = '<div class="history-empty">暂无历史记录<br>生成招呼语后会自动保存到这里</div>';
+      return;
+    }
+
+    list.innerHTML = state.greetingHistory.map(function (entry, idx) {
+      var date = new Date(entry.timestamp);
+      var timeStr = date.toLocaleString('zh-CN', {
+        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+      var preview = entry.jdPreview || '(未保存 JD 预览)';
+      var greetingsHtml = entry.greetings.map(function (g, gi) {
+        return '<div class="hi-greeting">' +
+          '<div class="hi-strategy-label">' + g.icon + ' ' + g.strategy + '</div>' +
+          '<div class="hi-strategy-text">' + escapeHtml(g.content || '(空)') + '</div>' +
+          '<button class="hi-copy-btn" data-entry="' + idx + '" data-greet="' + gi + '">📋 复制此条</button>' +
+        '</div>';
+      }).join('');
+      return '<div class="history-item">' +
+        '<div class="hi-meta">' +
+          '<span>' + timeStr + '</span>' +
+          '<span class="hi-badge">' + entry.greetings.length + ' 个版本</span>' +
+        '</div>' +
+        '<div class="hi-preview">JD: ' + escapeHtml(preview) + '</div>' +
+        greetingsHtml +
+        '<div class="hi-actions">' +
+          '<button class="btn-hi-delete" data-entry="' + idx + '">🗑 删除此条</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    // Bind copy buttons
+    var copyBtns = list.querySelectorAll('.hi-copy-btn');
+    for (var i = 0; i < copyBtns.length; i++) {
+      copyBtns[i].addEventListener('click', function (e) {
+        e.stopPropagation();
+        var ei = parseInt(this.getAttribute('data-entry'), 10);
+        var gi = parseInt(this.getAttribute('data-greet'), 10);
+        var entry = state.greetingHistory[ei];
+        var text = entry && entry.greetings[gi] ? entry.greetings[gi].content : '';
+        copyToClipboard(text, this);
+      });
+    }
+
+    // Bind delete buttons
+    var delBtns = list.querySelectorAll('.btn-hi-delete');
+    for (var j = 0; j < delBtns.length; j++) {
+      delBtns[j].addEventListener('click', function (e) {
+        e.stopPropagation();
+        var ei = parseInt(this.getAttribute('data-entry'), 10);
+        if (confirm('确定删除这条历史记录吗？')) {
+          state.greetingHistory.splice(ei, 1);
+          saveData(true);
+          renderHistory();
+          showToast('已删除');
+        }
+      });
+    }
+  }
+
+  // ============================
+  // 16. OVERLAY PANELS
+  // ============================
+  function openSettings() { dom.overlaySettings.classList.add('visible'); }
+  function closeSettings() { dom.overlaySettings.classList.remove('visible'); }
+  function openHistory() {
+    renderHistory();
+    dom.overlayHistory.classList.add('visible');
+  }
+  function closeHistory() { dom.overlayHistory.classList.remove('visible'); }
+
+  // ============================
+  // 17. ONBOARDING
+  // ============================
+  var onboardingSteps = [
+    {
+      title: '欢迎使用智投',
+      desc: '帮你快速生成贴合岗位的个性化求职招呼语，提高 BOSS 直聘回复率。填写背景、粘贴 JD、一键生成三个不同风格的招呼语。'
+    },
+    {
+      title: '配置 API Key',
+      desc: '使用前需配置 DeepSeek API Key（或其他兼容服务商）。点击右上角⚙"设置"进行配置。密钥仅保存在本地浏览器中，不会上传到任何第三方。'
+    },
+    {
+      title: '开始使用',
+      desc: '填写你的背景信息 → 粘贴岗位 JD → 点击"生成招呼语"。每次生成 3 个不同钩子策略的招呼语供你选择，选最合适的一条复制发送即可。Ctrl+Enter 可快速生成。'
+    }
+  ];
+  var onboardStep = 0;
+
+  function showOnboarding() {
+    onboardStep = 0;
+    renderOnboardStep();
+    dom.onboardingOverlay.classList.add('visible');
+  }
+
+  function renderOnboardStep() {
+    var step = onboardingSteps[onboardStep];
+    dom.onboardTitle.textContent = step.title;
+    dom.onboardDesc.textContent = step.desc;
+    var dots = $$('#stepIndicator .step-dot');
+    for (var i = 0; i < dots.length; i++) {
+      dots[i].classList.toggle('active', i === onboardStep);
+    }
+    dom.btnOnboardSkip.style.display = onboardStep === 2 ? 'none' : '';
+    dom.btnOnboardNext.textContent = onboardStep === 2 ? '开始使用' : '下一步 →';
+  }
+
+  function nextOnboardStep() {
+    if (onboardStep >= 2) { hideOnboarding(); return; }
+    onboardStep++;
+    renderOnboardStep();
+  }
+
+  function hideOnboarding() {
+    dom.onboardingOverlay.classList.remove('visible');
+    state.onboardingCompleted = true;
+    saveData(true);
+  }
+
+  // ============================
+  // 18. PWA
+  // ============================
+  var deferredPrompt = null;
+
+  function initPWA() {
+    // Install prompt
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      dom.installPrompt.classList.add('visible');
+    });
+    window.addEventListener('appinstalled', function () {
+      deferredPrompt = null;
+      dom.installPrompt.classList.remove('visible');
+      showToast('应用已安装');
+    });
+
+    // Register inline Service Worker
+    if ('serviceWorker' in navigator) {
+      var swCode =
+        'var CACHE_NAME = "zhtou-v2";' +
+        'self.addEventListener("install", function(e) {' +
+        '  e.waitUntil(caches.open(CACHE_NAME).then(function(c) { return c.addAll(["."]); }));' +
+        '  self.skipWaiting();' +
+        '});' +
+        'self.addEventListener("activate", function(e) {' +
+        '  e.waitUntil(caches.keys().then(function(keys) {' +
+        '    return Promise.all(keys.map(function(k) { if (k !== CACHE_NAME) return caches.delete(k); }));' +
+        '  }));' +
+        '  self.clients.claim();' +
+        '});' +
+        'self.addEventListener("fetch", function(e) {' +
+        '  if (e.request.method !== "GET") return;' +
+        '  e.respondWith(' +
+        '    caches.match(e.request).then(function(c) {' +
+        '      return c || fetch(e.request).then(function(r) {' +
+        '        if (r && r.status === 200 && r.type === "basic") {' +
+        '          var clone = r.clone(); caches.open(CACHE_NAME).then(function(cache) { cache.put(e.request, clone); });' +
+        '        }' +
+        '        return r;' +
+        '      }).catch(function() { return c; });' +
+        '    })' +
+        '  );' +
+        '});';
+      var swBlob = new Blob([swCode], { type: 'application/javascript' });
+      var swUrl = URL.createObjectURL(swBlob);
+      navigator.serviceWorker.register(swUrl, { scope: './' }).then(function () {
+        console.log('[智投] Service Worker 注册成功');
+      }).catch(function () {
+        // SW registration failure is non-fatal
+      });
+    }
+  }
+
+  // ============================
+  // 19. ONLINE / OFFLINE
+  // ============================
+  function updateOnlineStatus() {
+    state.isOnline = navigator.onLine;
+    dom.offlineBanner.classList.toggle('visible', !state.isOnline);
+    updateGenerateButton();
+  }
+
+  // ============================
+  // 20. UTILITY FUNCTIONS
+  // ============================
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  }
+
+  function escapeHtmlAttr(str) {
+    return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // ============================
+  // 21.5. RESUME UPLOAD & PARSE SYSTEM
+  // ============================
+
+  // --- File Upload Triggers ---
+  function triggerResumeUpload() {
+    hideResumeParseError();
+    dom.resumeFileInput.value = '';
+    dom.resumeFileInput.click();
+  }
+
+  // --- Drag & Drop ---
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    dom.resumeUploadZone.classList.add('drag-over');
+  }
+
+  function handleDragLeave(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    dom.resumeUploadZone.classList.remove('drag-over');
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    dom.resumeUploadZone.classList.remove('drag-over');
+    var file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) processResumeFile(file);
+  }
+
+  // --- File Processing ---
+  function handleFileSelected(e) {
+    var file = e.target.files && e.target.files[0];
+    if (file) processResumeFile(file);
+  }
+
+  function processResumeFile(file) {
+    var validTypes = /\.(pdf|docx|doc|txt)$/i;
+    if (!validTypes.test(file.name)) {
+      showResumeParseError('不支持的文件格式，请上传 PDF、Word 或 TXT 文件');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      showResumeParseError('文件过大（最大 10MB），请压缩后重试');
+      return;
+    }
+
+    hideResumeParseError();
+    hideResumeParseResult();
+    dom.resumeParseStatus.classList.add('visible');
+    dom.resumeParseText.textContent = '正在解析文件: ' + file.name + '...';
+
+    var ext = file.name.split('.').pop().toLowerCase();
+    if (ext === 'txt') {
+      parseTxtFile(file);
+    } else if (ext === 'pdf') {
+      parsePdfFile(file);
+    } else {
+      parseDocxFile(file);
+    }
+  }
+
+  // --- TXT Parser ---
+  function parseTxtFile(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var text = reader.result;
+      handleFileTextExtracted(text);
+    };
+    reader.onerror = function () {
+      showResumeParseError('文件读取失败，请重试');
+      dom.resumeParseStatus.classList.remove('visible');
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  // --- PDF Parser (PDF.js) ---
+  function parsePdfFile(file) {
+    loadPdfJs(function (pdfjsLib) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        var typedarray = new Uint8Array(reader.result);
+        pdfjsLib.getDocument({ data: typedarray }).promise.then(function (pdf) {
+          var pages = [];
+          var loaded = 0;
+          var total = pdf.numPages;
+
+          function extractPage(pageNum) {
+            pdf.getPage(pageNum).then(function (page) {
+              page.getTextContent().then(function (textContent) {
+                var pageText = textContent.items.map(function (item) { return item.str; }).join(' ');
+                pages[pageNum - 1] = pageText;
+                loaded++;
+                dom.resumeParseText.textContent = '正在解析 PDF (' + loaded + '/' + total + ' 页)...';
+                if (loaded === total) {
+                  var fullText = pages.join('\n').trim();
+                  handleFileTextExtracted(fullText);
+                }
+              });
+            });
+          }
+
+          for (var p = 1; p <= total; p++) {
+            extractPage(p);
+          }
+        }).catch(function () {
+          showResumeParseError('PDF 文件损坏或无法解析，请确认文件完整后重试');
+          dom.resumeParseStatus.classList.remove('visible');
+        });
+      };
+      reader.onerror = function () {
+        showResumeParseError('文件读取失败，请重试');
+        dom.resumeParseStatus.classList.remove('visible');
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  // --- DOCX Parser (mammoth.js) ---
+  function parseDocxFile(file) {
+    loadMammoth(function (mammoth) {
+      mammoth.extractRawText({ arrayBuffer: file }).then(function (result) {
+        handleFileTextExtracted(result.value);
+      }).catch(function () {
+        showResumeParseError('Word 文件解析失败，请确认文件完整后重试');
+        dom.resumeParseStatus.classList.remove('visible');
+      });
+    });
+  }
+
+  // --- PDF.js Loading ---
+  var _pdfJsLib = null;
+  var _pdfJsLoading = false;
+  var _pdfJsCallbacks = [];
+
+  function loadPdfJs(cb) {
+    if (_pdfJsLib) { cb(_pdfJsLib); return; }
+    _pdfJsCallbacks.push(cb);
+    if (_pdfJsLoading) return;
+    _pdfJsLoading = true;
+
+    var script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    script.onload = function () {
+      _pdfJsLib = window['pdfjsLib'];
+      if (_pdfJsLib) {
+        _pdfJsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      }
+      var cbs = _pdfJsCallbacks;
+      _pdfJsCallbacks = [];
+      for (var i = 0; i < cbs.length; i++) {
+        try { cbs[i](_pdfJsLib); } catch (e) { console.warn('[智投] PDF.js callback error:', e); }
+      }
+    };
+    script.onerror = function () {
+      _pdfJsLoading = false;
+      _pdfJsCallbacks = [];
+      showResumeParseError('PDF.js 库加载失败，请检查网络连接后重试');
+      dom.resumeParseStatus.classList.remove('visible');
+    };
+    document.head.appendChild(script);
+  }
+
+  // --- Mammoth.js Loading ---
+  var _mammothLib = null;
+  var _mammothLoading = false;
+  var _mammothCallbacks = [];
+
+  function loadMammoth(cb) {
+    if (_mammothLib) { cb(_mammothLib); return; }
+    _mammothCallbacks.push(cb);
+    if (_mammothLoading) return;
+    _mammothLoading = true;
+
+    var script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+    script.onload = function () {
+      _mammothLib = window['mammoth'];
+      var cbs = _mammothCallbacks;
+      _mammothCallbacks = [];
+      for (var i = 0; i < cbs.length; i++) {
+        try { cbs[i](_mammothLib); } catch (e) { console.warn('[智投] mammoth.js callback error:', e); }
+      }
+    };
+    script.onerror = function () {
+      _mammothLoading = false;
+      _mammothCallbacks = [];
+      showResumeParseError('Word 解析库加载失败，请检查网络连接后重试');
+      dom.resumeParseStatus.classList.remove('visible');
+    };
+    document.head.appendChild(script);
+  }
+
+  // --- Handle extracted text ---
+  function handleFileTextExtracted(text) {
+    dom.resumeParseStatus.classList.remove('visible');
+
+    if (!text || text.trim().length < 20) {
+      showResumeParseError('文件内容过短（少于20字），请确认文件包含有效的简历文本');
+      return;
+    }
+
+    resumeState.parsedText = text.trim();
+    dom.resumePreviewText.value = resumeState.parsedText;
+    updateResumeCharCount();
+    dom.resumePreviewArea.classList.add('visible');
+    dom.resumePreviewArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function updateResumeCharCount() {
+    var len = dom.resumePreviewText.value.length;
+    dom.resumeCharCount.textContent = len + ' 字 / 10000';
+  }
+
+  // --- Resend preview text to AI ---
+  function confirmAndParse() {
+    var text = dom.resumePreviewText.value.trim();
+    if (text.length < 20) {
+      showResumeParseError('简历文本太短（至少20字），请补充更多内容');
+      return;
+    }
+    resumeState.parsedText = text;
+    hideResumeParseError();
+    dom.resumePreviewArea.classList.remove('visible');
+    callAIForResumeParse(text);
+  }
+
+  // --- AI Resume Parsing ---
+  function buildResumeParsePrompt(resumeText) {
+    return {
+      system: [
+        '你是简历信息提取专家。从简历中提取结构化信息，只返回JSON。',
+        '',
+        '## 提取规则',
+        '- name: 真实姓名（去除非姓名内容）',
+        '- target: 求职方向（从简历中的"求职意向"或经历推断）',
+        '- skills: 核心技能列表（技术栈、工具、专业能力，只提取简历中明确提到的）',
+        '- experience: 关键经历摘要（保留具体数据！保留具体数字！50字以内）',
+        '- highlights: 3条最有竞争力的亮点（每条15字以内，必须包含具体数字或结果）',
+        '- workYears: 工作年限推断（如"1-3年""应届"）',
+        '',
+        '## 硬性规则',
+        '1. 绝不编造——没有的信息填null或空',
+        '2. 数字必须保留原始数值（如"增长30%"→保留30%）',
+        '3. 只返回合法JSON，不要任何markdown标记，不要```json',
+        '4. 技能列表只提取简历中明确提到的，不要推测',
+      ].join('\n'),
+
+      user: '请从以下简历文本中提取结构化信息（纯JSON输出）：\n\n' + resumeText,
+    };
+  }
+
+  function callAIForResumeParse(text) {
+    if (!state.apiSettings.apiKey) {
+      showResumeParseError('请先在设置中配置 API Key 后再解析简历');
+      return;
+    }
+    if (!state.isOnline) {
+      showResumeParseError('当前处于离线状态，无法解析简历');
+      return;
+    }
+
+    resumeState.isParsing = true;
+    resumeState.cancelToken = false;
+    resumeState.aiResult = null;
+
+    var endpoint = getApiEndpoint();
+    var model = state.apiSettings.model || DEFAULT_MODELS[state.apiSettings.provider] || 'deepseek-chat';
+    var prompt = buildResumeParsePrompt(text);
+
+    dom.resumeParseStatus.classList.add('visible');
+    dom.resumeParseText.textContent = 'AI 正在分析简历...';
+    dom.btnCancelParse.style.display = '';
+
+    fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + state.apiSettings.apiKey,
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: 'system', content: prompt.system },
+          { role: 'user', content: prompt.user },
+        ],
+        stream: false,
+        temperature: 0.1,
+        max_tokens: 800,
+        top_p: 0.9,
+      }),
+    })
+    .then(function (response) {
+      if (!response.ok) {
+        return response.text().then(function (body) {
+          var msg = 'AI 请求失败 (HTTP ' + response.status + ')';
+          if (response.status === 401) msg = 'API Key 无效或已过期，请检查设置';
+          else if (response.status === 429) msg = 'API 请求频率过高，请稍候重试';
+          else if (response.status === 402) msg = 'API 账户余额不足，请充值';
+          else if (response.status >= 500) msg = 'AI 服务暂时不可用，请稍候重试';
+          else if (body) {
+            try { var j = JSON.parse(body); if (j.error && j.error.message) msg = j.error.message; } catch (e) {}
+          }
+          throw new Error(msg);
+        });
+      }
+      return response.json();
+    })
+    .then(function (data) {
+      if (resumeState.cancelToken) return;
+      var content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+      if (!content) throw new Error('AI 返回结果为空');
+
+      // Try to parse JSON from response
+      var parsed = tryParseResumeJSON(content);
+      if (!parsed) throw new Error('AI 返回数据格式异常，请重试');
+
+      resumeState.aiResult = parsed;
+      resumeState.isParsing = false;
+      dom.resumeParseStatus.classList.remove('visible');
+      renderResumeParseResult(parsed);
+    })
+    .catch(function (err) {
+      resumeState.isParsing = false;
+      dom.resumeParseStatus.classList.remove('visible');
+      if (!resumeState.cancelToken) {
+        showResumeParseError('AI 解析失败: ' + err.message);
+      }
+    });
+  }
+
+  // Try to parse JSON from AI response, stripping markdown code fences if present
+  function tryParseResumeJSON(text) {
+    if (!text) return null;
+    var cleaned = text.trim();
+
+    // Remove markdown code fences
+    if (cleaned.indexOf('```') === 0) {
+      cleaned = cleaned.replace(/^```(?:json)?\s*\n?/i, '');
+      cleaned = cleaned.replace(/\n?```\s*$/i, '');
+      cleaned = cleaned.trim();
+    }
+
+    try {
+      return JSON.parse(cleaned);
+    } catch (e) {
+      // Try to find JSON object in the text
+      var match = cleaned.match(/\{[\s\S]*\}/);
+      if (match) {
+        try {
+          return JSON.parse(match[0]);
+        } catch (e2) {
+          return null;
+        }
+      }
+      return null;
+    }
+  }
+
+  // --- Render Parse Result ---
+  function renderResumeParseResult(parsed) {
+    var skillsHtml = '';
+    if (parsed.skills && Array.isArray(parsed.skills) && parsed.skills.length > 0) {
+      skillsHtml = '<div class="parse-skills">' +
+        parsed.skills.map(function (s) { return '<span class="parse-skill-tag">' + escapeHtml(s) + '</span>'; }).join('') +
+        '</div>';
+    }
+
+    var highlightsHtml = '';
+    if (parsed.highlights && Array.isArray(parsed.highlights) && parsed.highlights.length > 0) {
+      highlightsHtml = '<div class="parse-highlights">' +
+        parsed.highlights.map(function (h) {
+          return '<div class="parse-highlight-item"><span class="hl-dot">⭐</span><span>' + escapeHtml(h) + '</span></div>';
+        }).join('') +
+        '</div>';
+    }
+
+    var fieldsHtml = '';
+
+    // Name
+    if (parsed.name) {
+      fieldsHtml += '<div class="parse-field"><span class="parse-field-label">姓名：</span><span class="parse-field-value">' + escapeHtml(parsed.name) + '</span></div>';
+    }
+
+    // Target
+    if (parsed.target) {
+      fieldsHtml += '<div class="parse-field"><span class="parse-field-label">求职方向：</span><span class="parse-field-value">' + escapeHtml(parsed.target) + '</span></div>';
+    }
+
+    // Skills
+    if (skillsHtml) {
+      fieldsHtml += '<div class="parse-field"><span class="parse-field-label">核心技能：</span>' + skillsHtml + '</div>';
+    }
+
+    // Experience
+    if (parsed.experience) {
+      fieldsHtml += '<div class="parse-field"><span class="parse-field-label">关键经历：</span><span class="parse-field-value">' + escapeHtml(parsed.experience) + '</span></div>';
+    }
+
+    // Work years
+    if (parsed.workYears) {
+      fieldsHtml += '<div class="parse-field"><span class="parse-field-label">工作年限：</span><span class="parse-field-value">' + escapeHtml(parsed.workYears) + '</span></div>';
+    }
+
+    // Highlights
+    if (highlightsHtml) {
+      fieldsHtml += highlightsHtml;
+    }
+
+    dom.resumeParseFields.innerHTML = fieldsHtml;
+    dom.resumeParseResult.classList.add('visible');
+    dom.resumeParseResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // --- Apply parse result to form ---
+  function applyResumeResult() {
+    if (!resumeState.aiResult) return;
+    var parsed = resumeState.aiResult;
+
+    // Fill name
+    if (parsed.name) {
+      state.userBg.name = parsed.name;
+      dom.inputName.value = parsed.name;
+    }
+
+    // Fill target
+    if (parsed.target) {
+      state.userBg.target = parsed.target;
+      dom.inputTarget.value = parsed.target;
+    }
+
+    // Fill skills (merge, avoid duplicates)
+    if (parsed.skills && Array.isArray(parsed.skills)) {
+      for (var i = 0; i < parsed.skills.length; i++) {
+        var skill = parsed.skills[i].trim();
+        if (skill && state.userBg.skills.indexOf(skill) === -1 && state.userBg.skills.length < 10) {
+          state.userBg.skills.push(skill);
+        }
+      }
+      renderSkillTags();
+    }
+
+    // Fill experience
+    if (parsed.experience) {
+      var newExp = parsed.experience.trim();
+
+      // Append highlights to experience as "亮点" section
+      if (parsed.highlights && Array.isArray(parsed.highlights) && parsed.highlights.length > 0) {
+        var hasExistingHighlights = state.userBg.experience && state.userBg.experience.trim();
+        if (hasExistingHighlights) {
+          newExp = state.userBg.experience + '\n\n亮点：\n' + parsed.highlights.map(function (h, i) {
+            return (i + 1) + '. ' + h;
+          }).join('\n');
+        } else {
+          newExp = newExp + '\n\n亮点：\n' + parsed.highlights.map(function (h, i) {
+            return (i + 1) + '. ' + h;
+          }).join('\n');
+        }
+      }
+
+      state.userBg.experience = newExp;
+      dom.inputExperience.value = newExp;
+    }
+
+    // Save and show toast
+    saveData();
+    updateGenerateButton();
+    showToast('简历信息已自动填充 ✓');
+
+    // Scroll to top of background section
+    dom.sectionBg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // --- Reparse: go back to preview and retry ---
+  function reparseResume() {
+    hideResumeParseResult();
+    dom.resumePreviewText.value = resumeState.parsedText;
+    updateResumeCharCount();
+    dom.resumePreviewArea.classList.add('visible');
+    dom.resumePreviewArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // --- Cancel AI parse ---
+  function cancelResumeParse() {
+    resumeState.cancelToken = true;
+    resumeState.isParsing = false;
+    dom.resumeParseStatus.classList.remove('visible');
+  }
+
+  // --- Error handling ---
+  function showResumeParseError(msg) {
+    resumeState.parseError = msg;
+    dom.resumeParseErrorText.textContent = msg;
+    dom.resumeParseError.classList.add('visible');
+    dom.resumeParseError.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function hideResumeParseError() {
+    resumeState.parseError = '';
+    dom.resumeParseError.classList.remove('visible');
+  }
+
+  function hideResumeParseResult() {
+    resumeState.aiResult = null;
+    dom.resumeParseResult.classList.remove('visible');
+  }
+
+  function handleResumePreviewInput() {
+    updateResumeCharCount();
+  }
+
+  // Cancel preview - clear preview area and go back to upload zone
+  function cancelResumePreview() {
+    resumeState.parsedText = '';
+    dom.resumePreviewText.value = '';
+    dom.resumePreviewArea.classList.remove('visible');
+    dom.resumeUploadZone.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // ============================
+  // 22. EVENT BINDING
+  // ============================
+  function bindEvents() {
+    // Background section collapse
+    dom.toggleBg.addEventListener('click', function () {
+      dom.sectionBg.classList.toggle('collapsed');
+      var collapsed = dom.sectionBg.classList.contains('collapsed');
+      dom.toggleBg.setAttribute('aria-expanded', String(!collapsed));
+    });
+
+    // Background field auto-save on input
+    dom.inputName.addEventListener('input', syncBgFromUI);
+    dom.inputTarget.addEventListener('input', syncBgFromUI);
+    dom.inputExperience.addEventListener('input', syncBgFromUI);
+
+    // Add skill
+    dom.btnAddSkill.addEventListener('click', addSkill);
+    dom.skillInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); addSkill(); }
+    });
+
+    // Clear background
+    dom.btnClearBg.addEventListener('click', function () {
+      if (confirm('确定清空所有背景信息吗？此操作不可恢复。')) {
+        state.userBg = { name: '', target: '', skills: [], experience: '' };
+        syncBgToUI();
+        saveData(true);
+        showToast('背景信息已清空');
+      }
+    });
+
+    // JD input
+    dom.jdInput.addEventListener('input', onJdInput);
+
+    // Generate button
+    dom.btnGenerate.addEventListener('click', function () {
+      if (!state.isGenerating) generateAllGreetings();
+    });
+
+    // Retry button
+    dom.btnRetry.addEventListener('click', function () {
+      hideError();
+      generateAllGreetings();
+    });
+
+    // Settings panel
+    dom.btnOpenSettings.addEventListener('click', openSettings);
+    dom.btnCloseSettings.addEventListener('click', closeSettings);
+    dom.overlaySettings.addEventListener('click', function (e) {
+      if (e.target === dom.overlaySettings) closeSettings();
+    });
+    dom.btnSaveSettings.addEventListener('click', saveSettings);
+    dom.selectProvider.addEventListener('change', function () {
+      var prov = dom.selectProvider.value;
+      state.apiSettings.provider = prov;
+      updateCustomEndpointVisibility();
+      if (!dom.inputModel.value) {
+        dom.inputModel.placeholder = DEFAULT_MODELS[prov] || '输入模型名称';
+      }
+    });
+    dom.inputTemperature.addEventListener('input', function () {
+      dom.temperatureLabel.textContent = (parseInt(dom.inputTemperature.value) / 100).toFixed(1);
+    });
+
+    // History panel
+    dom.btnOpenHistory.addEventListener('click', openHistory);
+    dom.btnCloseHistory.addEventListener('click', closeHistory);
+    dom.overlayHistory.addEventListener('click', function (e) {
+      if (e.target === dom.overlayHistory) closeHistory();
+    });
+    dom.btnClearHistory.addEventListener('click', function () {
+      if (confirm('确定清空所有历史记录吗？此操作不可恢复。')) {
+        state.greetingHistory = [];
+        saveData(true);
+        renderHistory();
+        showToast('历史记录已清空');
+      }
+    });
+
+    // Go to settings from status row
+    dom.btnGoSettings.addEventListener('click', openSettings);
+
+    // Install prompt
+    dom.btnInstall.addEventListener('click', function () {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function () {
+          deferredPrompt = null;
+          dom.installPrompt.classList.remove('visible');
+        });
+      }
+    });
+    dom.btnDismissInstall.addEventListener('click', function () {
+      dom.installPrompt.classList.remove('visible');
+    });
+
+    // Onboarding
+    dom.btnOnboardNext.addEventListener('click', nextOnboardStep);
+    dom.btnOnboardSkip.addEventListener('click', hideOnboarding);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        closeSettings();
+        closeHistory();
+      }
+      // Ctrl+Enter or Cmd+Enter to generate
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !state.isGenerating && !dom.btnGenerate.disabled) {
+        e.preventDefault();
+        generateAllGreetings();
+      }
+    });
+
+    // Online/offline detection
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    // --- Resume Upload & Parse Events ---
+    // Click upload zone or button
+    dom.resumeUploadZone.addEventListener('click', triggerResumeUpload);
+    dom.btnUploadResume.addEventListener('click', function (e) {
+      e.stopPropagation();
+      triggerResumeUpload();
+    });
+    dom.resumeFileInput.addEventListener('change', handleFileSelected);
+
+    // Drag & drop on upload zone
+    dom.resumeUploadZone.addEventListener('dragover', handleDragOver);
+    dom.resumeUploadZone.addEventListener('dragleave', handleDragLeave);
+    dom.resumeUploadZone.addEventListener('drop', handleDrop);
+
+    // Keyboard accessibility for upload zone
+    dom.resumeUploadZone.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        triggerResumeUpload();
+      }
+    });
+
+    // Cancel parse
+    dom.btnCancelParse.addEventListener('click', cancelResumeParse);
+
+    // Dismiss parse error
+    dom.btnDismissParseError.addEventListener('click', hideResumeParseError);
+
+    // Preview textarea input
+    dom.resumePreviewText.addEventListener('input', handleResumePreviewInput);
+
+    // Confirm parse (send to AI)
+    dom.btnConfirmParse.addEventListener('click', confirmAndParse);
+
+    // Cancel preview
+    dom.btnCancelPreview.addEventListener('click', cancelResumePreview);
+
+    // Apply resume result to form
+    dom.btnApplyResume.addEventListener('click', applyResumeResult);
+
+    // Reparse
+    dom.btnReparse.addEventListener('click', reparseResume);
+
+    // Save on unload
+    window.addEventListener('beforeunload', function () { doSave(); });
+    window.addEventListener('pagehide', function () { doSave(); });
+  }
+
+  function addSkill() {
+    var val = dom.skillInput.value.trim();
+    if (!val) return;
+    if (state.userBg.skills.indexOf(val) !== -1) { showToast('该技能已存在'); return; }
+    if (state.userBg.skills.length >= 10) { showToast('最多添加 10 个技能'); return; }
+    state.userBg.skills.push(val);
+    dom.skillInput.value = '';
+    renderSkillTags();
+    saveData();
+  }
+
+  function saveSettings() {
+    var apiKey = dom.inputApiKey.value.trim();
+    var provider = dom.selectProvider.value;
+    var endpoint = dom.inputCustomEndpoint.value.trim();
+    var model = dom.inputModel.value.trim();
+    var maxTokens = parseInt(dom.inputMaxTokens.value) || 2000;
+    var temperature = parseInt(dom.inputTemperature.value) / 100;
+
+    if (provider === 'custom' && !endpoint) { showToast('请输入自定义 API 端点'); return; }
+
+    state.apiSettings.provider = provider;
+    state.apiSettings.endpoint = endpoint;
+    state.apiSettings.apiKey = apiKey || state.apiSettings.apiKey; // keep old if empty
+    state.apiSettings.model = model || DEFAULT_MODELS[provider] || 'deepseek-chat';
+    state.apiSettings.maxTokens = Math.min(Math.max(maxTokens, 100), 8000);
+    state.apiSettings.temperature = temperature;
+
+    syncSettingsToUI();
+    saveData(true);
+    closeSettings();
+    showToast('设置已保存 ✓');
+  }
+
+  // ============================
+  // 22. INIT
+  // ============================
+  function init() {
+    // Self-check
+    var checks = selfCheck();
+    var failed = checks.filter(function (c) { return !c.pass; });
+    if (failed.length > 0) {
+      console.warn('[智投] 自检警告:', failed.map(function (f) { return f.name + ': ' + f.msg; }).join(', '));
+    }
+
+    // Load data
+    loadData();
+
+    // Sync UI
+    syncBgToUI();
+    syncSettingsToUI();
+    onJdInput();
+    updateOnlineStatus();
+
+    // Bind events
+    bindEvents();
+
+    // Init PWA
+    initPWA();
+
+    // Onboarding
+    if (!state.onboardingCompleted) {
+      showOnboarding();
+    }
+
+    // Log ready
+    console.log('[智投] 初始化完成 | 自检: ' + checks.length + ' 项, ' +
+      '失败: ' + failed.length + ' | 有背景: ' + !!(state.userBg.name || state.userBg.target) +
+      ' | 有Key: ' + !!state.apiSettings.apiKey + ' | 在线: ' + state.isOnline);
+  }
+
+  // Boot on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  </script>
+
+</body>
+</html>
