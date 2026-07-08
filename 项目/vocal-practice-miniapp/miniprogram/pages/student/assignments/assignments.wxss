@@ -1,6 +1,0 @@
-.page-title { font-size: 36rpx; font-weight: 700; margin-bottom: 24rpx; }
-.assign-title { font-size: 32rpx; font-weight: 600; margin-bottom: 8rpx; }
-.assign-meta { font-size: 26rpx; color: var(--primary); margin-bottom: 6rpx; }
-.assign-desc { font-size: 26rpx; color: var(--text-light); margin-bottom: 12rpx; line-height: 1.6; }
-.assign-footer { display: flex; justify-content: space-between; font-size: 24rpx; color: var(--text-light); }
-.assign-deadline { color: #e74c3c; }

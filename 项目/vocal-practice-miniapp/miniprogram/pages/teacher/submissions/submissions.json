@@ -1,6 +1,0 @@
-{
-  "usingComponents": {
-    "audio-player": "/components/audio-player/audio-player"
-  },
-  "navigationBarTitleText": "学生提交"
-}

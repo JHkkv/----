@@ -1,6 +1,0 @@
-{
-  "usingComponents": {
-    "audio-recorder": "/components/audio-recorder/audio-recorder"
-  },
-  "navigationBarTitleText": "练习提交"
-}
