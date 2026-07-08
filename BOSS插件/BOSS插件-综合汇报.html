@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOSS直聘AI求职插件 — 综合分析与战略汇报</title>
+<style>
+/* ===========================================
+   VIEWPORT FITTING: MANDATORY BASE STYLES
+   =========================================== */
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+    background: #0a0a0f;
+    color: #e0e0e0;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+}
+html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+}
+.slide {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: #0a0a0f;
+}
+.slide-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-height: 100%;
+    overflow: hidden;
+    padding: var(--slide-padding, clamp(1rem, 4vw, 4rem));
+}
+:root {
+    --title-size: clamp(1.5rem, 5vw, 4rem);
+    --h2-size: clamp(1.25rem, 3.5vw, 2.5rem);
+    --h3-size: clamp(1rem, 2.5vw, 1.75rem);
+    --body-size: clamp(0.75rem, 1.5vw, 1.125rem);
+    --small-size: clamp(0.65rem, 1vw, 0.875rem);
+    --slide-padding: clamp(1rem, 4vw, 4rem);
+    --content-gap: clamp(0.5rem, 2vw, 2rem);
+    --element-gap: clamp(0.25rem, 1vw, 1rem);
+    --teal: #0D9488;
+    --teal-glow: rgba(13, 148, 136, 0.3);
+    --red: #EF4444;
+    --amber: #F59E0B;
+    --green: #22C55E;
+    --blue: #3B82F6;
+    --purple: #8B5CF6;
+    --surface: #14141f;
+    --border: rgba(255,255,255,0.06);
+}
+/* ===========================================
+   GLOBAL STYLES
+   =========================================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+h1 { font-size: var(--title-size); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; }
+h2 { font-size: var(--h2-size); font-weight: 700; line-height: 1.25; }
+h3 { font-size: var(--h3-size); font-weight: 600; line-height: 1.3; }
+p, li { font-size: var(--body-size); line-height: 1.55; }
+.small { font-size: var(--small-size); opacity: 0.65; }
+.gradient-text {
+    background: linear-gradient(135deg, #0D9488 0%, #34D399 50%, #6EE7B7 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.accent { color: var(--teal); }
+.red { color: var(--red); }
+.amber { color: var(--amber); }
+.green { color: var(--green); }
+.blue { color: var(--blue); }
+.purple { color: var(--purple); }
+
+/* Slide indicator */
+.slide-indicator {
+    position: fixed; right: 1.5rem; top: 50%; transform: translateY(-50%);
+    z-index: 1000; display: flex; flex-direction: column; gap: 0.6rem;
+}
+.slide-indicator .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.2); transition: all 0.3s ease; cursor: pointer;
+}
+.slide-indicator .dot.active { background: var(--teal); box-shadow: 0 0 10px var(--teal-glow); }
+.slide-num {
+    position: fixed; bottom: 1.5rem; right: 2rem; z-index: 1000;
+    font-size: var(--small-size); color: rgba(255,255,255,0.35);
+    font-variant-numeric: tabular-nums; font-family: "SF Mono", "JetBrains Mono", monospace;
+}
+
+/* Cards */
+.card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: clamp(0.8rem, 1.5vw, 1.5rem);
+}
+.card-grid { display: grid; gap: clamp(0.5rem, 1.5vw, 1.2rem); }
+.card-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.card-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Badge */
+.badge {
+    display: inline-block; padding: 0.15em 0.6em; border-radius: 4px;
+    font-size: var(--small-size); font-weight: 600;
+}
+.badge-danger { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+.badge-warn { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
+.badge-ok { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+.badge-info { background: rgba(59,130,246,0.15); color: var(--blue); border: 1px solid rgba(59,130,246,0.25); }
+
+/* Animations */
+.reveal { opacity: 0; transform: translateY(20px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+
+/* Ambient bg */
+.ambient-orb {
+    position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.08; pointer-events: none;
+}
+.ambient-orb.teal { background: #0D9488; width: 40vw; height: 40vw; top: -10%; right: -10%; }
+.ambient-orb.blue { background: #3B82F6; width: 30vw; height: 30vw; bottom: -15%; left: -10%; }
+
+.flex-between { display: flex; justify-content: space-between; align-items: center; gap: var(--content-gap); }
+.mt-auto { margin-top: auto; }
+.gap-sm { gap: var(--element-gap); }
+.gap-md { gap: var(--content-gap); }
+
+/* Matrix grid */
+.matrix { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; }
+.matrix > * { background: var(--surface); padding: clamp(0.5rem, 1vw, 1rem); display: flex; align-items: center; }
+.matrix .header { background: rgba(13,148,136,0.12); font-weight: 700; font-size: var(--small-size); }
+
+/* Vertical bar */
+.vbar { width: 4px; border-radius: 2px; flex-shrink: 0; }
+.vbar.teal { background: var(--teal); }
+.vbar.red { background: var(--red); }
+.vbar.amber { background: var(--amber); }
+
+@media (max-width: 768px) {
+    .card-grid.cols-2, .card-grid.cols-3, .card-grid.cols-4 { grid-template-columns: 1fr; }
+    .flex-between { flex-direction: column; align-items: flex-start; }
+    .slide-indicator { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- Slide Indicator -->
+<nav class="slide-indicator" id="indicator"></nav>
+<div class="slide-num" id="slideNum">01 / 12</div>
+
+<!-- ============================================
+     SLIDE 1: TITLE
+     ============================================ -->
+<section class="slide" id="s1">
+<div class="ambient-orb teal"></div>
+<div class="ambient-orb blue"></div>
+<div class="slide-content" style="align-items:center; text-align:center;">
+    <p class="reveal small" style="letter-spacing: 0.2em; text-transform: uppercase;">13-Agent Collaborative Analysis · July 2026</p>
+    <h1 class="reveal reveal-delay-1" style="margin-top: var(--content-gap);">
+        智投 — <span class="gradient-text">BOSS直聘AI求职插件</span>
+    </h1>
+    <p class="reveal reveal-delay-2" style="max-width: 650px; margin-top: var(--content-gap); opacity: 0.7;">
+        10位专家并行分析 + 3位对抗审查者交叉验证<br>
+        从第一性原理出发的浏览器插件产品战略
+    </p>
+    <div class="reveal reveal-delay-3 card-grid cols-4" style="margin-top: clamp(1.5rem, 4vw, 3rem); width: 100%; max-width: 750px;">
+        <div class="card" style="text-align:center;"><div style="font-size:1.8rem;">🧠</div><p class="small">第一性原理</p></div>
+        <div class="card" style="text-align:center;"><div style="font-size:1.8rem;">⚔️</div><p class="small">对抗性审查</p></div>
+        <div class="card" style="text-align:center;"><div style="font-size:1.8rem;">🔬</div><p class="small">10专家并行</p></div>
+        <div class="card" style="text-align:center;"><div style="font-size:1.8rem;">🗺️</div><p class="small">100天路线图</p></div>
+    </div>
+    <p class="reveal reveal-delay-4 small" style="margin-top: var(--content-gap);">按 ↓ 或滚轮浏览 · 共12页</p>
+</div>
+</section>
+
+<!-- ============================================
+     SLIDE 2: 分析架构总览
+     ============================================ -->
+<section class="slide" id="s2">
+<div class="slide-content">
+    <h2 class="reveal">分析架构：<span class="gradient-text">13 Agent协作</span></h2>
+    <p class="reveal reveal-delay-1 small" style="margin-top: 0.3rem;">两阶段并行：10专家分析 → 3审查者对抗验证</p>
+    <div class="reveal reveal-delay-2 card-grid cols-2" style="margin-top: var(--content-gap);">
+        <div class="card">
+            <h3 style="color:var(--teal);">Phase 1 · 10位专家</h3>
+            <div style="display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.5rem;">
+                <span class="badge badge-info">用户需求&第一性原理</span>
+                <span class="badge badge-info">技术架构</span>
+                <span class="badge badge-info">Prompt工程</span>
+                <span class="badge badge-info">法律合规</span>
+                <span class="badge badge-info">数据安全</span>
+                <span class="badge badge-info">产品体验</span>
+                <span class="badge badge-info">竞争分析</span>
+                <span class="badge badge-info">可维护性</span>
+                <span class="badge badge-info">成本ROI</span>
+                <span class="badge badge-info">落地执行</span>
+            </div>
+        </div>
+        <div class="card">
+            <h3 style="color:var(--red);">Phase 2 · 3位审查者</h3>
+            <div style="display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.5rem;">
+                <span class="badge badge-danger">安全与可行性</span>
+                <span class="badge badge-danger">商业与用户价值</span>
+                <span class="badge badge-danger">技术实现挑战</span>
+            </div>
+            <p class="small" style="margin-top:0.8rem;">以最苛刻的怀疑态度找出被忽略的风险和过于乐观的假设</p>
+        </div>
+    </div>
+    <div class="reveal reveal-delay-3" style="margin-top: var(--content-gap); text-align:center;">
+        <p class="small" style="opacity:0.5;">方法论来源：多Agent头脑风暴工作流（2026-07-05归档）+ 多Agent协作工作流（7Agent团队）</p>
+    </div>
+</div>
+</section>
+
+<!-- ============================================
+     SLIDE 3: 第一性原理核心洞察
+     ============================================ -->
+<section class="slide" id="s3">
+<div class="slide-content">
+    <h2 class="reveal">第一性原理：<span class="gradient-text">找工作的本质</span></h2>
+    <div class="reveal reveal-delay-1 card" style="margin-top: var(--content-gap); background: rgba(13,148,136,0.06); border-color: rgba(13,148,136,0.2);">
+        <p style="font-family: 'SF Mono', 'JetBrains Mono', monospace; font-size: var(--h3-size); text-align:center;">
+            求职成功概率 = <span class="accent">f(匹配度, 信号强度, 速度优势, 运气噪音)</span>
+        </p>
+    </div>
+    <div class="reveal reveal-delay-2 card-grid cols-2" style="margin-top: var(--content-gap);">
+        <div class="card">
+            <h3><span class="accent">⚡</span> 最大时间黑洞：写招呼语</h3>
+            <p style="margin-top:0.3rem;">每岗位2-5分钟 | 自动化率70% | 80%结构重复 | 仅20%真正定制</p>
+            <p class="small" style="margin-top:0.3rem;">黄金窗口：岗位发布后<strong style="color:var(--amber);">4小时内</strong>收到50%+招呼语，速度=竞争力</p>
+        </div>
+        <div class="card">
+            <h3><span class="accent">🎯</span> 前20字定生死</h3>
+            <p style="margin-top:0.3rem;">HR扫描0.5-2秒 | 预览仅显示前20字 | 信号强度=证据数/字数</p>
+            <p class="small" style="margin-top:0.3rem;">"您好，我对岗位感兴趣"→信号=0 | <strong style="color:var(--green);">数字+匹配点=信号MAX</strong></p>
+        </div>
+    </div>
+    <div class="reveal reveal-delay-3 card" style="margin-top: var(--content-gap); padding: clamp(0.6rem, 1.2vw, 1rem);">
+        <p class="small" style="text-align:center;"><strong>核心推导：</strong>插件第一价值≠帮投更快 | 插件第一价值=<span class="accent">帮写更准</span>（招呼语信号强度↑ + 投递策略反馈闭环）</p>
+    </div>
+</div>
+</section>
+
+<!-- ============================================
+     SLIDE 4: 功能优先级矩阵
+     ============================================ -->
+<section class="slide" id="s4">
+<div class="slide-content">
+    <h2 class="reveal">功能优先级：<span class="gradient-text">影响×可自动化</span>矩阵</h2>
+    <div class="reveal reveal-delay-1 matrix" style="margin-top: var(--content-gap); max-width: 800px; align-self: center;">
+        <div class="header"></div>
+        <div class="header" style="text-align:center;">高自动化程度</div>
+        <div class="header" style="text-align:center;">低自动化程度</div>
+        <div style="font-weight:700; writing-mode:vertical-lr; text-orientation:mixed; justify-content:center;">高影响</div>
+        <div style="background:rgba(34,197,94,0.08); flex-direction:column; align-items:flex-start; gap:0.3rem;">
+            <span class="badge badge-ok">P0 AI招呼语生成</span>
+            <span class="badge badge-ok">P0 JD匹配评分</span>
+            <span class="badge badge-ok">P0 投递记录追踪</span>
+            <p class="small"><strong>核心武器区</strong> — MVP必做</p>
+        </div>
+        <div style="background:rgba(59,130,246,0.08); flex-direction:column; align-items:flex-start; gap:0.3rem;">
+            <span class="badge badge-info">P2 投递策略优化</span>
+            <span class="badge badge-info">P3 AI模拟面试</span>
+            <p class="small">战略增强区 — 需数据积累</p>
+        </div>
+        <div style="font-weight:700; writing-mode:vertical-lr; text-orientation:mixed; justify-content:center;">低影响</div>
+        <div style="background:rgba(245,158,11,0.06); flex-direction:column; align-items:flex-start; gap:0.3rem;">
+            <span class="badge badge-warn">P1 一键填充</span>
+            <span class="badge badge-warn">P1 硬条件过滤</span>
+            <p class="small">效率工具区 — 辅助功能</p>
+        </div>
+        <div style="background:rgba(239,68,68,0.06); flex-direction:column; align-items:flex-start; gap:0.3rem;">
+            <span class="badge badge-danger">不做 一键投递</span>
+            <span class="badge badge-danger">不做 批量自动</span>
+            <p class="small">红线区 — 封号风险5/5</p>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- ============================================
+     SLIDE 5: 技术架构快照
+     ============================================ -->
+<section class="slide" id="s5">
+<div class="slide-content">
+    <h2 class="reveal">技术架构：<span class="gradient-text">Chrome Extension MV3</span></h2>
+    <div class="reveal reveal-delay-1 card-grid cols-3" style="margin-top: var(--content-gap);">
+        <div class="card">
+            <h3 style="color:var(--blue);">Offscreen Document</h3>
+            <p style="margin-top:0.3rem;">AI API调用宿主 · 长期运行不回收 · 流式响应缓冲 · 通过Port通信</p>
+            <p class="small" style="margin-top:0.3rem; color:var(--red);">⚠️ 对抗审查发现：不能用SW调用AI（30s回收导致响应丢失）</p>
+        </div>
+        <div class="card">
+            <h3 style="color:var(--purple);">Content Script</h3>
+            <p style="margin-top:0.3rem;">Shadow DOM注入UI · 三层选择器Fallback · 提取JD文本 · 填入招呼语</p>
+            <p class="small" style="margin-top:0.3rem; color:var(--amber);">⚠️ SPA路由监听+MutationObserver竞态需实测</p>
+        </div>
+        <div class="card">
+            <h3 style="color:var(--teal);">配置驱动层</h3>
+            <p style="margin-top:0.3rem;">远程JSON热更新 · 自诊断系统 · 三级降级通知 · Prompt版本A/B测试</p>
+            <p class="small" style="margin-top:0.3rem; color:var(--green);">✓ 改版适配不依赖商店审核</p>
+        </div>
+    </div>
+    <div class="reveal reveal-delay-2 card" style="margin-top: var(--content-gap); padding: clamp(0.6rem, 1.2vw, 1rem);">
+        <p class="small" style="text-align:center;">
+            <strong>存储：</strong>chrome.storage.local(配置) + IndexedDB(投递记录) | <strong>安全：</strong>AES-GCM加密，密钥存sessionStorage | <strong>反检测：</strong>不伪造事件，仅填入文本让用户手动发送
+        </p>
+    </div>
+</div>
+</section>
+
+<!-- ============================================
+     SLIDE 6: Prompt工程核心
+     ============================================ -->
+<section class="slide" id="s6">
+<div class="slide-content">
+    <h2 class="reveal">Prompt体系：<span class="gradient-text">招呼语6种钩子策略</span></h2>
+    <div class="reveal reveal-delay-1 card-grid cols-3" style="margin-top: var(--content-gap);">
+        <div class="card"><h3>1. 数字钩子</h3><p style="margin-top:0.3rem;">"3年运营经验，从0做到月GMV 500万——"</p><p class="small" style="color:var(--green);">信号最强 · 推荐首选</p></div>
+        <div class="card"><h3>2. 匹配钩子</h3><p style="margin-top:0.3rem;">"看到贵司在招XX方向，我的经历高度匹配——"</p><p class="small" style="color:var(--blue);">精准度高</p></div>
+        <div class="card"><h3>3. 成就钩子</h3><p style="margin-top:0.3rem;">"曾帮前司将XX指标提升300%——"</p><p class="small" style="color:var(--purple);">可信度最高</p></div>
+        <div class="card"><h3>4. 问题钩子</h3><p style="margin-top:0.3rem;">"贵司XX问题，我在上家刚好解决过——"</p><p class="small" style="color:var(--amber);">需要深度JD理解</p></div>
+        <div class="card"><h3>5. 关联钩子</h3><p style="margin-top:0.3rem;">"一直在关注贵司新产品，发现我们在XX——"</p><p class="small" style="color:var(--teal);">适合目标公司</p></div>
+        <div class="card"><h3>6. 反模板钩子</h3><p style="margin-top:0.3rem;">"我知道您每天收到100+条'您好'，所以——"</p><p class="small" style="color:var(--red);">差异化MAX</p></div>
+    </div>
+    <div class="reveal reveal-delay-2 card-grid cols-3" style="margin-top: var(--content-gap);">
+        <div class="card"><h3>简历优化</h3><p class="small">3变体：激进重写/保守润色/针对性微调</p><p class="small" style="color:var(--amber);">Sonnet≈¥0.15/次</p></div>
+        <div class="card"><h3>招呼语生成</h3><p class="small">3版本并行：通用/技能对标/短版</p><p class="small" style="color:var(--green);">Haiku≈¥0.009/次</p></div>
+        <div class="card"><h3>匹配评分</h3><p class="small">5维×10分制加权评分+差距分析</p><p class="small" style="color:var(--green);">Haiku≈¥0.02/次</p></div>
+    </div>
+    <p class="reveal reveal-delay-3 small" style="text-align:center; margin-top:1rem;">推荐混合方案：Haiku(招呼语)+Sonnet(简历优化) = <strong style="color:var(--teal);">¥9.7/月/用户</strong></p>
+</div>
+</section>
+
+<!-- ============================================
+     SLIDE 7: 竞品全景 + 差异化
+     ============================================ -->
+<section class="slide" id="s7">
+<div class="slide-content">
+    <h2 class="reveal">竞争格局：<span class="gradient-text">13个竞品的致命缺陷</span></h2>
+    <div class="reveal reveal-delay-1 card" style="margin-top: var(--content-gap); background:rgba(239,68,68,0.06); border-color:rgba(239,68,68,0.2);">
+        <p style="text-align:center;"><span class="red" style="font-size:var(--h2-size); font-weight:800;">316 DAU</span><br><span class="small">品类天花板 — 竞品最大日活仅316，13个竞品全部免费</span></p>
+    </div>
+    <div class="reveal reveal-delay-2 card-grid cols-2" style="margin-top: var(--content-gap);">
+        <div class="card">
+            <h3 style="color:var(--red);">竞品共同致命伤</h3>
+            <ul style="padding-left:1.2em; margin-top:0.5rem; display:flex; flex-direction:column; gap:0.3rem;">
+                <li>全自动化=封号率高（"帮你海投"=账号自杀）</li>
+                <li>AI停留在模板替换（非真正JD理解）</li>
+                <li>同质化严重（功能堆砌无壁垒）</li>
+                <li>移动端缺失（仅Chrome扩展）</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3 style="color:var(--green);">我们的差异化</h3>
+            <ul style="padding-left:1.2em; margin-top:0.5rem; display:flex; flex-direction:column; gap:0.3rem;">
+                <li><strong>不操控页面的AI参谋</strong>（只填文本不点发送）</li>
+                <li>JD深度解读→破局策略（非模板填充）</li>
+                <li>跨平台投递数据飞轮</li>
+                <li>零安装门槛Chrome扩展</li>
+            </ul>
+        </div>
+    </div>
+    <div class="reveal reveal-delay-3 card" style="margin-top: var(--content-gap); padding:clamp(0.6rem,1.2vw,1rem); background:rgba(245,158,11,0.06); border-color:rgba(245,158,11,0.2);">
+        <p class="small" style="text-align:center;"><span class="amber">⚠️ 最大威胁：</span>Boss官方的DeepSeek-R1+南北阁模型。一旦嵌入"AI写招呼语"按钮，第三方插件价值归零。</p>
+    </div>
+</div>
+</section>
+
+<!-- ============================================
+     SLIDE 8: 对抗审查 — 致命伤
+     ============================================ -->
+<section class="slide" id="s8">
+<div class="slide-content">
+    <h2 class="reveal">对抗审查：<span style="color:var(--red);">3大致命伤</span></h2>
+    <div class="reveal reveal-delay-1 card-grid cols-1" style="margin-top: var(--content-gap);">
+        <div class="card" style="border-left:4px solid var(--red);">
+            <div class="flex-between">
+                <div style="display:flex; align-items:center; gap:0.8rem;">
+                    <span class="badge badge-danger" style="font-size:1.2rem;">致命 #1</span>
+                    <div><h3>TAM太小：Chrome扩展碰不到主力用户</h3><p class="small">BOSS用户80-95%在移动端，Web端Chrome扩展天花板≈几千用户。竞品最高316 DAU已验证</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="card" style="border-left:4px solid var(--red);">
+            <div class="flex-between">
+                <div style="display:flex; align-items:center; gap:0.8rem;">
+                    <span class="badge badge-danger" style="font-size:1.2rem;">致命 #2</span>
+                    <div><h3>平台依赖：Boss一个决策归零</h3><p class="small">Boss已投入DeepSeek-R1+南北阁AI。官方"AI写招呼语"按钮上线=第三方插件价值归零。反自动化封杀=所有Chrome扩展团灭</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="card" style="border-left:4px solid var(--red);">
+            <div class="flex-between">
+                <div style="display:flex; align-items:center; gap:0.8rem;">
+                    <span class="badge badge-danger" style="font-size:1.2rem;">致命 #3</span>
+                    <div><h3>商业模式不存在：向失业者收费</h3><p class="small">13个竞品全免费。求职者最缺钱。招呼语对回复率提升未经验证——可能只影响5%，非核心变量</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- ============================================
+     SLIDE 9: 对抗审查 — 内部矛盾
+     ============================================ -->
+<section class="slide" id="s9">
+<div class="slide-content">
+    <h2 class="reveal">对抗审查：<span style="color:var(--amber);">专家内部矛盾</span></h2>
+    <div class="reveal reveal-delay-1 card-grid cols-1" style="margin-top: var(--content-gap);">
+        <div class="card" style="border-left:4px solid var(--amber);">
+            <h3>矛盾#1：安全定位 vs 产品功能</h3>
+            <p style="margin-top:0.3rem;">安全专家："不要操控页面" | 产品设计："自动替换输入框内容" | 技术方案："Shadow DOM注入UI"</p>
+            <p class="small" style="color:var(--amber);">根本分歧：代码修改DOM=在平台检测中与全自动脚本同类</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--amber);">
+            <h3>矛盾#2：数据安全 vs 核心功能</h3>
+            <p style="margin-top:0.3rem;">安全专家："P0级数据绝对不能离开浏览器" | Prompt工程：需要完整简历上下文</p>
+            <p class="small" style="color:var(--amber);">脱敏到"互联网-大厂"粒度→AI生成的个性化价值归零</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--amber);">
+            <h3>矛盾#3：免费优先 vs API燃烧率</h3>
+            <p style="margin-top:0.3rem;">商业策略："6个月免费积累用户" | 成本现实：1000 DAU月燃$7500</p>
+            <p class="small" style="color:var(--amber);">竞品天花板316 DAU vs 成本模型需要的用户规模—谁付钱？</p>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- ============================================
+     SLIDE 10: 对抗审查 — 技术陷阱
+     ============================================ -->
+<section class="slide" id="s10">
+<div class="slide-content">
+    <h2 class="reveal">对抗审查：<span style="color:var(--purple);">技术陷阱</span></h2>
+    <div class="reveal reveal-delay-1 card-grid cols-1" style="margin-top: var(--content-gap);">
+        <div class="card" style="border-left:4px solid var(--purple);">
+            <h3 style="color:var(--red);">CRITICAL: AI调用到底从哪里发起？</h3>
+            <p style="margin-top:0.3rem;">4位专家给了4个互斥答案：SW(30s回收)→CS(CSP阻止)→Popup(失焦销毁)→Gemini Nano(中国不可用)</p>
+            <p class="small" style="color:var(--green);">唯一正解：Offscreen Document(长期运行+不受CSP限制+Port流式通信)</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--purple);">
+            <h3>CRITICAL: 流式输出不能写入chrome.storage</h3>
+            <p style="margin-top:0.3rem;">10-20 token/s × 每次set触发所有onChanged监听器 = 通知风暴 → 延迟从0.5ms飙升到800ms</p>
+            <p class="small" style="color:var(--green);">正确方案：Port长连接直传，每500ms或10token批量flush</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--purple);">
+            <h3>HIGH: 三层选择器Fallback = 维护地狱</h3>
+            <p style="margin-top:0.3rem;">10目标×3层×N页面状态×M用户角色=100+测试用例。BOSS每周2-3次发布，每次可能失效</p>
+            <p class="small" style="color:var(--green);">正确方案：配置驱动+远程热更新+自诊断自动回滚</p>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- ============================================
+     SLIDE 11: 生存建议与修正方案
+     ============================================ -->
+<section class="slide" id="s11">
+<div class="slide-content">
+    <h2 class="reveal">修正方案：<span class="gradient-text">PWA优先 · 移动端覆盖</span></h2>
+    <div class="reveal reveal-delay-1 card-grid cols-2" style="margin-top: var(--content-gap);">
+        <div class="card" style="border: 2px solid rgba(239,68,68,0.3);">
+            <h3 style="color:var(--red);">❌ 放弃方案</h3>
+            <ul style="padding-left:1.2em; margin-top:0.5rem; display:flex; flex-direction:column; gap:0.3rem;">
+                <li>Chrome扩展DOM操控（Shadow DOM注入）</li>
+                <li>一键自动投递/批量沟通</li>
+                <li>Service Worker中调用AI API</li>
+                <li>全部自动化执行路径</li>
+                <li>100天全功能开发路线</li>
+            </ul>
+        </div>
+        <div class="card" style="border: 2px solid rgba(34,197,94,0.3);">
+            <h3 style="color:var(--green);">✅ 推荐方案</h3>
+            <ul style="padding-left:1.2em; margin-top:0.5rem; display:flex; flex-direction:column; gap:0.3rem;">
+                <li><strong>独立PWA + 移动端优先</strong></li>
+                <li>粘贴JD→AI生成→一键复制→切回Boss粘贴</li>
+                <li>不触碰Boss DOM，不违反ToS</li>
+                <li>Offscreen Document承载AI调用</li>
+                <li><strong>10天极简MVP验证</strong></li>
+                <li>找20个真实用户测回复率提升</li>
+            </ul>
+        </div>
+    </div>
+    <div class="reveal reveal-delay-2 card" style="margin-top: var(--content-gap); background:rgba(245,158,11,0.06); border-color:rgba(245,158,11,0.2); text-align:center;">
+        <p><span class="amber" style="font-weight:700;">关键决策：</span>如果10天MVP证明AI招呼语不能显著提升回复率（&lt;15%），果断止损。如果能——再做Chrome扩展。</p>
+    </div>
+</div>
+</section>
+
+<!-- ============================================
+     SLIDE 12: 100天路线图 + 行动建议
+     ============================================ -->
+<section class="slide" id="s12">
+<div class="slide-content">
+    <h2 class="reveal">对罗南杨的<span class="gradient-text">个人建议</span></h2>
+    <div class="reveal reveal-delay-1 card" style="margin-top: var(--content-gap); background:rgba(34,197,94,0.06); border-color:rgba(34,197,94,0.2);">
+        <div class="flex-between">
+            <div><span style="font-size:2rem;">💡</span></div>
+            <div style="flex:1;">
+                <p><strong>主线是求职，不是做产品。</strong>每天至少投15份简历。开发放在晚上或周末。</p>
+                <p class="small" style="margin-top:0.3rem;">警惕"我在做一个能帮我求职的工具"来拖延真正该做的事——投简历。</p>
+            </div>
+        </div>
+    </div>
+    <div class="reveal reveal-delay-2 card-grid cols-3" style="margin-top: var(--content-gap);">
+        <div class="card" style="text-align:center;">
+            <div style="font-size:2rem;">📅</div>
+            <h3 style="color:var(--teal);">第一周</h3>
+            <p class="small">上午投15-20份简历<br>下午开发MVP<br>（2-3天出招呼语生成）</p>
+        </div>
+        <div class="card" style="text-align:center;">
+            <div style="font-size:2rem;">🔄</div>
+            <h3 style="color:var(--blue);">第二周起</h3>
+            <p class="small">用自己的工具投简历<br>效率提升→多投多面<br>继续完善功能</p>
+        </div>
+        <div class="card" style="text-align:center;">
+            <div style="font-size:2rem;">⏱️</div>
+            <h3 style="color:var(--purple);">ROI: 670倍</h3>
+            <p class="small">API月成本¥9.7<br>提前1月就业=¥6500+<br>生存窗口仅1.6个月</p>
+        </div>
+    </div>
+    <div class="reveal reveal-delay-3 card" style="margin-top: var(--content-gap); padding:clamp(0.6rem,1.2vw,1rem); text-align:center;">
+        <p class="small">如果时间紧张 → <strong style="color:var(--teal);">2-3天做最简版</strong>：浏览器控制台粘贴一段JS，输入JD链接→AI生成招呼语。不需要扩展、UI、简历优化。投入产出比最高。</p>
+    </div>
+</div>
+</section>
+
+<!-- ============================================
+     NAVIGATION SCRIPT
+     ============================================ -->
+<script>
+(function() {
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+    const indicator = document.getElementById('indicator');
+    const slideNum = document.getElementById('slideNum');
+
+    // Build indicator dots
+    for (let i = 0; i < total; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.addEventListener('click', () => slides[i].scrollIntoView());
+        indicator.appendChild(dot);
+    }
+    const dots = indicator.querySelectorAll('.dot');
+
+    // Intersection Observer for reveal animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Track current slide
+    const slideObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const idx = Array.from(slides).indexOf(entry.target);
+                dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+                slideNum.textContent = String(idx + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+            }
+        });
+    }, { threshold: 0.5 });
+    slides.forEach(s => slideObserver.observe(s));
+
+    // Keyboard navigation
+    let currentIdx = 0;
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+            e.preventDefault();
+            currentIdx = Math.min(total - 1, currentIdx + 1);
+            slides[currentIdx].scrollIntoView();
+        } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+            e.preventDefault();
+            currentIdx = Math.max(0, currentIdx - 1);
+            slides[currentIdx].scrollIntoView();
+        }
+    });
+
+    // Update currentIdx on scroll snap
+    slideObserver;
+    document.addEventListener('scroll', () => {
+        const closest = Array.from(slides).reduce((prev, curr) => {
+            const prevDist = Math.abs(prev.getBoundingClientRect().top);
+            const currDist = Math.abs(curr.getBoundingClientRect().top);
+            return currDist < prevDist ? curr : prev;
+        });
+        currentIdx = Array.from(slides).indexOf(closest);
+    });
+
+    // Init
+    dots[0]?.classList.add('active');
+})();
+</script>
+
+</body>
+</html>
