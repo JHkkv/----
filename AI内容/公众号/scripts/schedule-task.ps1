@@ -1,5 +1,5 @@
 $taskName = "AI-Daily-Fetch"
-$scriptPath = "f:\AI\scripts\fetch-daily.js"
+$scriptPath = "f:\测试工具\AI内容\公众号\scripts\fetch-daily.js"
 
 $action = New-ScheduledTaskAction -Execute "node" -Argument "`"$scriptPath`""
 $trigger = New-ScheduledTaskTrigger -Daily -At "08:15"

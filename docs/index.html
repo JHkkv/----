@@ -1881,7 +1881,10 @@ a {
   function loadData() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
-      // Fix1: apiKey stored in sessionStorage with base64 encoding
+      // Fix1: apiKey stored in sessionStorage (tab-close auto-clear), base64 encoded
+      // Security model: single-file PWA has no backend — any client-side storage is
+      // inherently readable by XSS. The real defense is CSP + SRI + no eval (CSP-9).
+      // sessionStorage > localStorage because it's tab-scoped and cleared on close.
       var encoded = sessionStorage.getItem('__zh_secret');
       var apiKey = encoded ? atob(encoded) : '';
       if (raw) {
@@ -1953,7 +1956,7 @@ a {
         onboardingCompleted: state.onboardingCompleted,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      // Fix1: Save apiKey to sessionStorage with base64 encoding
+      // Fix1: Save apiKey to sessionStorage (tab-close auto-clear)
       if (state.apiSettings.apiKey) {
         sessionStorage.setItem('__zh_secret', btoa(state.apiSettings.apiKey));
       } else {
@@ -2955,6 +2958,7 @@ a {
 
     var script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    script.integrity = 'sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e';
     script.crossOrigin = 'anonymous';
     script.onload = function () {
       _pdfJsLib = window['pdfjsLib'];
@@ -2989,6 +2993,7 @@ a {
 
     var script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+    script.integrity = 'sha384-nFoSjZIoH3CCp8W639jJyQkuPHinJ2NHe7on1xvlUA7SuGfJAfvMldrsoAVm6ECz';
     script.crossOrigin = 'anonymous';
     script.onload = function () {
       _mammothLib = window['mammoth'];
