@@ -1,4 +1,4 @@
-// fetch-supplement.js — 多源 AI 资讯聚合：HN + arXiv + GitHub
+// fetch-supplement.js — 多源 AI 资讯聚合：HN + arXiv + GitHub + 36Kr
 // 使用 curl 管道以避免 Node.js http 模块在 Windows 下的 IPv6 兼容问题
 const { execSync } = require('child_process');
 const fs = require('fs');
@@ -117,6 +117,40 @@ function fetchGitHub() {
   }
 }
 
+// ---- Source 4: 36Kr (36氪 RSS) ----
+function fetch36Kr() {
+  console.log('  [36Kr] 拉取 RSS...');
+  try {
+    const xml = curlJSON('https://36kr.com/feed');
+    if (!xml) throw new Error('empty');
+    const items = [];
+    const itemBlocks = xml.split('<item>').slice(1);
+    for (const block of itemBlocks.slice(0, 20)) {
+      const titleMatch = block.match(/<title>(.*?)<\/title>/);
+      const linkMatch = block.match(/<link>\s*(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?\s*<\/link>/);
+      const descMatch = block.match(/<description>\s*(?:<!\[CDATA\[)?((?:.|\n)*?)(?:\]\]>)?\s*<\/description>/);
+      const dateMatch = block.match(/<pubDate>(.*?)<\/pubDate>/);
+      if (titleMatch) {
+        const title = titleMatch[1].replace(/\s+/g, ' ').trim();
+        const url = linkMatch ? linkMatch[1].trim() : '';
+        let summary = '';
+        if (descMatch) {
+          summary = descMatch[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().slice(0, 200);
+        }
+        items.push({ title, url, summary, source: '36Kr', publishedAt: dateMatch ? dateMatch[1].trim() : '' });
+      }
+    }
+    // 过滤 AI 相关
+    const aiKeywords = /AI|大模型|LLM|Agent|prompt|智能体|生成式|机器学习|深度学习|开源|Claude|OpenAI|DeepSeek|GPT|chatbot|机器人|RAG|多模态|推理|训练/i;
+    const filtered = items.filter(i => aiKeywords.test(i.title) || aiKeywords.test(i.summary));
+    console.log(`  36Kr: ${filtered.length}/${items.length} 条 (AI 过滤)`);
+    return filtered;
+  } catch (e) {
+    console.error('    36Kr 失败:', e.message);
+    return [];
+  }
+}
+
 // ---- Main ----
 (async () => {
   console.log(`[${new Date().toLocaleTimeString('zh-CN', { hour12: false })}] 多源聚合采集中...\n`);
@@ -124,12 +158,13 @@ function fetchGitHub() {
   const hnItems = fetchHN();
   const arxivItems = fetchArXiv();
   const ghItems = fetchGitHub();
+  const krItems = fetch36Kr();
 
-  const all = [...hnItems, ...arxivItems, ...ghItems];
+  const all = [...hnItems, ...arxivItems, ...ghItems, ...krItems];
   console.log(`\n  总计: ${all.length} 条补充资讯\n`);
 
   let md = `# 多源补充简报 — ${today}\n\n`;
-  md += `> HN ${hnItems.length} 条 | arXiv ${arxivItems.length} 篇 | GitHub ${ghItems.length} 个\n\n---\n\n`;
+  md += `> HN ${hnItems.length} 条 | arXiv ${arxivItems.length} 篇 | GitHub ${ghItems.length} 个 | 36Kr ${krItems.length} 条\n\n---\n\n`;
 
   if (hnItems.length > 0) {
     md += `## Hacker News 热门 AI 讨论\n\n`;
@@ -153,6 +188,16 @@ function fetchGitHub() {
   if (ghItems.length > 0) {
     md += `## GitHub AI 热门项目\n\n`;
     for (const item of ghItems.slice(0, 10)) {
+      md += `- **${item.title}**\n`;
+      if (item.summary) md += `  ${item.summary}\n`;
+      md += `  ${item.url}\n`;
+    }
+    md += '\n';
+  }
+
+  if (krItems.length > 0) {
+    md += `## 36Kr AI 相关快讯\n\n`;
+    for (const item of krItems.slice(0, 20)) {
       md += `- **${item.title}**\n`;
       if (item.summary) md += `  ${item.summary}\n`;
       md += `  ${item.url}\n`;

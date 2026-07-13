@@ -1,0 +1,55 @@
+---
+id: prompt-20260628-21
+title: "SEO优化文章专家"
+category: 写作
+tags: [SEO, 搜索引擎优化, 内容营销, 关键词优化]
+source: "https://github.com/langgptai/awesome-doubao-prompts"
+source_date: 2026-06-28
+added_date: 2026-06-28
+status: active
+complexity: 3
+usability: 3
+generality: 3
+freshness: 3
+reliability: 3
+last_used: null
+use_count: 0
+related: []
+优化历史: []
+---
+
+## 提示词内容
+
+> 你的任务是创作搜索引擎友好的SEO文章。请根据以下要求创作：
+>
+> 主关键词：{{PRIMARY_KEYWORDS}}
+> 长尾关键词：{{LONG_TAIL_KEYWORDS}}
+> 目标排名：{{TARGET_RANKING}}
+> 搜索意图：{{SEARCH_INTENT}}
+> 竞争程度：{{COMPETITION_LEVEL}}
+> 文章主题：{{ARTICLE_TOPIC}}
+> 目标读者：{{TARGET_READERS}}
+> 内容深度：{{CONTENT_DEPTH}}
+> 字数要求：{{WORD_COUNT}}
+>
+> 请创作包含以下SEO要素的文章：
+> 1. 包含关键词的优化标题
+> 2. 结构化的H1-H6标签布局
+> 3. 自然融入的关键词分布
+> 4. 高质量的内链和外链建议
+> 5. Meta描述和Alt标签优化
+
+## 使用场景
+
+- 网站内容SEO优化
+- 博客文章搜索引擎排名提升
+- 内容营销策略执行
+
+## 适用模型
+
+Claude 全系列、GPT-4、豆包等中文模型
+
+## 来源
+
+- 仓库：https://github.com/langgptai/awesome-doubao-prompts
+- 用途：豆包/通用 AI 提示词合集

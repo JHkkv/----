@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>罗南杨 — AI内容运营 / AIGC运营专员</title>
+<style>
+/* ===================== BASE ===================== */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;background:#f5f7fa;color:#2c3e50;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#0D9488;text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ===================== LAYOUT ===================== */
+.page{max-width:820px;margin:0 auto;padding:28px 32px 40px;background:#fff;min-height:100vh}
+@media print{.page{padding:16px 24px;box-shadow:none}}
+
+/* ===================== HEADER ===================== */
+.header{display:flex;align-items:center;gap:24px;padding-bottom:18px;border-bottom:2px solid #0D9488;margin-bottom:20px}
+.photo{width:105px;height:135px;border-radius:6px;object-fit:cover;border:2px solid #0D9488;box-shadow:0 2px 8px rgba(13,148,136,.18);flex-shrink:0}
+.header-info{flex:1}
+.header-info h1{font-size:26px;font-weight:700;color:#1a1a2e;letter-spacing:.5px;margin-bottom:6px}
+.header-info .subtitle{font-size:14px;color:#0D9488;font-weight:600;margin-bottom:10px}
+.contact-row{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:#555}
+.contact-row span{display:inline-flex;align-items:center;gap:4px}
+.intent-box{margin-top:8px;padding:6px 12px;background:rgba(13,148,136,.06);border-left:3px solid #0D9488;border-radius:0 4px 4px 0;font-size:12.5px;color:#0D9488;font-weight:600}
+
+/* ===================== TAGLINE ===================== */
+.tagline{background:linear-gradient(135deg,#0a0a1a 0%,#1a1a3e 100%);color:#fff;padding:14px 18px;border-radius:8px;margin-bottom:20px;font-size:14px;font-weight:500;text-align:center;letter-spacing:.3px}
+
+/* ===================== SECTIONS ===================== */
+.section{margin-bottom:18px}
+.section-title{font-size:15px;font-weight:700;color:#0D9488;border-bottom:1.5px solid #e0e0e0;padding-bottom:5px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.section-title::before{content:"";display:inline-block;width:3px;height:16px;background:#0D9488;border-radius:2px}
+
+/* ===================== EXP CARD ===================== */
+.exp-card{margin-bottom:14px;padding:12px 14px;background:#fafbfc;border-radius:6px;border-left:3px solid #0D9488}
+.exp-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;flex-wrap:wrap;gap:4px}
+.exp-header h3{font-size:14px;font-weight:700;color:#1a1a2e}
+.exp-header .company{font-size:13px;color:#0D9488;font-weight:600}
+.exp-header .period{font-size:12px;color:#888;font-weight:400}
+.exp-header .role{font-size:12.5px;color:#555;font-weight:500}
+.exp-subtitle{font-size:11.5px;color:#888;margin-bottom:6px;font-style:italic}
+.exp-card ul{list-style:none;padding-left:0}
+.exp-card li{position:relative;padding-left:14px;font-size:12.5px;color:#444;margin-bottom:3px;line-height:1.6}
+.exp-card li::before{content:"▸";position:absolute;left:0;color:#0D9488;font-weight:700;font-size:11px}
+.exp-card .highlight{color:#0D9488;font-weight:600}
+
+/* ===================== PROJECT ===================== */
+.project-card{margin-bottom:12px;padding:10px 14px;background:#f8fafb;border-radius:6px;border:1px solid #e8e8e8}
+.project-card h4{font-size:13.5px;font-weight:700;color:#1a1a2e;margin-bottom:2px}
+.project-card .tech{font-size:11px;color:#888;margin-bottom:5px}
+.project-card ul{list-style:none;padding-left:0}
+.project-card li{position:relative;padding-left:14px;font-size:12px;color:#444;margin-bottom:2px;line-height:1.55}
+.project-card li::before{content:"•";position:absolute;left:2px;color:#0D9488;font-weight:700}
+
+/* ===================== SKILL TABLE ===================== */
+.skill-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px}
+.skill-table th{text-align:left;padding:6px 8px;background:#f0f7f6;color:#0D9488;font-weight:600;border:1px solid #e0e8e7}
+.skill-table td{padding:5px 8px;border:1px solid #eee;color:#444}
+.skill-table .stars{color:#f59e0b;letter-spacing:1px}
+
+/* ===================== EDUCATION ===================== */
+.edu-row{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px}
+.edu-row h3{font-size:13.5px;font-weight:700;color:#1a1a2e}
+.edu-row .period{font-size:12px;color:#888}
+
+/* ===================== SELF ===================== */
+.self-text{font-size:12.5px;color:#444;line-height:1.75;padding:10px 14px;background:#f8f9fa;border-radius:6px}
+.self-text strong{color:#0D9488}
+
+/* ===================== CAREER ===================== */
+.career-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:5px}
+.career-item .label{background:#0D9488;color:#fff;font-size:11px;padding:2px 8px;border-radius:3px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.career-item span:last-child{font-size:12.5px;color:#444}
+
+/* ===================== FOOTER ===================== */
+.footer-note{margin-top:16px;padding-top:12px;border-top:1px solid #eee;font-size:11px;color:#aaa;text-align:center;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ==================== HEADER ==================== -->
+  <div class="header">
+    <img class="photo" src="data:image/jpeg;base64,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" alt="罗南杨">
+    <div class="header-info">
+      <h1>罗南杨</h1>
+      <div class="subtitle">AI内容运营 / AIGC运营专员</div>
+      <div class="contact-row">
+        <span>📍 深圳/重庆</span>
+        <span>📞 17323779140</span>
+        <span>📧 lny1292647177@163.com</span>
+      </div>
+      <div class="intent-box">🎯 求职意向：AI内容运营 / AIGC运营 · 到岗：2周内</div>
+    </div>
+  </div>
+
+  <!-- ==================== TAGLINE ==================== -->
+  <div class="tagline">
+    🚀 <strong>3段运营实习</strong> × <strong>AI工作流深度使用</strong> × <strong>独立搭建公众号AI自动化系统</strong>（日更至今）
+  </div>
+
+  <!-- ==================== 实习经历 ==================== -->
+  <div class="section">
+    <div class="section-title">💼 实习经历</div>
+
+    <div class="exp-card">
+      <div class="exp-header">
+        <span class="company">杭州简礼电子商务有限公司</span>
+        <span class="period">2024.03 - 2025.06</span>
+      </div>
+      <div class="exp-header">
+        <span class="role">内容运营实习生</span>
+      </div>
+      <div class="exp-subtitle">淘宝/抖音电商代运营公司（5-15人），服务食品、美妆类目品牌方 · 大四远程实习</div>
+      <p style="font-size:12px;font-weight:600;color:#0D9488;margin-bottom:4px;">AI驱动的内容效率革命</p>
+      <ul>
+        <li>负责5个品牌店铺的商品详情页文案、直播间脚本、达人合作Brief的日常产出，<span class="highlight">日均产出15-20条内容</span></li>
+        <li><span class="highlight">引入AI工具重构内容生产流程</span>：用DeepSeek+Coze搭建"商品信息→自动生成多版本文案→人工审核发布"的自动化管道，文案初稿效率从<span class="highlight">每篇40分钟→5分钟</span>，日均产能8条→20条</li>
+        <li>用AI分析竞品店铺评论区高频词+用户情绪倾向，输出月度内容策略建议报告，被采纳率约60%</li>
+        <li>用Claude辅助拆解爆款文案结构（钩子→痛点→方案→号召），建立可复用文案模板库<span class="highlight">20+套</span>，新人培训周期从2周缩至3天</li>
+      </ul>
+      <p style="font-size:12px;font-weight:600;color:#1a1a2e;margin-top:6px;margin-bottom:3px;">📊 数据成果</p>
+      <ul>
+        <li>品牌店铺内容引导成交额月均约<span class="highlight">15万元</span></li>
+        <li>AI辅助下抖音短视频口播脚本完播率从28%提升至<span class="highlight">41%</span></li>
+        <li>AI内容管道节省每月约<span class="highlight">60小时</span>人工重复写作时间</li>
+      </ul>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-header">
+        <span class="company">声维教育</span>
+        <span class="period">2022.12 - 2023.01</span>
+      </div>
+      <div class="exp-header"><span class="role">用户运营实习生</span></div>
+      <ul>
+        <li>通过结构化访谈精准挖掘学员声乐学习痛点，建立用户需求分层体系</li>
+        <li>针对不同用户画像定制课程价值讲解方案，精准匹配产品功能与用户需求</li>
+        <li>学员转化率<span class="highlight">50%-60%</span>，续课率30%-50%，好评率<span class="highlight">90%+</span></li>
+      </ul>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-header">
+        <span class="company">中国邮政快递揽投部</span>
+        <span class="period">2023.07 - 2023.09</span>
+      </div>
+      <div class="exp-header"><span class="role">运营实习生</span></div>
+      <ul>
+        <li>日均处理近百份商务订单，审核订单信息，处理地址变更与异常情况，准确率<span class="highlight">90%+</span></li>
+        <li>负责镇级区域快递员配送路线规划与车辆资源协调，动态调整调度方案</li>
+        <li>协同揽投部与客服部处理订单异常，建立信息同步机制，降低沟通成本</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ==================== AI项目 ==================== -->
+  <div class="section">
+    <div class="section-title">🚀 AI项目经历（核心差异化竞争力）</div>
+
+    <div class="project-card">
+      <h4>1. AI公众号资讯自动化运营系统 <span style="font-weight:400;font-size:11px;color:#888">| 独立搭建 & 日常运营 | 2026.03 - 至今</span></h4>
+      <div class="tech">Node.js自动化脚本 + AI API + Windows定时任务 + Markdown内容管道</div>
+      <ul>
+        <li>使用 Vibe Coding（Claude Code），独立完成从需求定义到功能上线全流程</li>
+        <li>每日 08:15 自动从 AI HOT / Hacker News / arXiv / GitHub Trending 抓取 AI 资讯，生成结构化每日简报</li>
+        <li>设计"数据采集→分类筛选→智能排序→格式化输出→自动存档"多环节自动化管道，全程无需人工干预</li>
+        <li><strong>成果</strong>：已稳定运行至今，累计产出 <span style="color:#0D9488;font-weight:600">50+期日报、10+期周报</span></li>
+      </ul>
+    </div>
+
+    <div class="project-card">
+      <h4>2. AI提示词库管理系统 <span style="font-weight:400;font-size:11px;color:#888">| 独立搭建 | 2026.06 - 至今</span></h4>
+      <div class="tech">提示词生命周期管理 + 3 Agent自动化 + Obsidian知识图谱</div>
+      <ul>
+        <li>搭建<span style="color:#0D9488;font-weight:600">80+条</span>高质量AI提示词自动化管理系统，按"编程/写作/分析/通用/学习"五大类分类</li>
+        <li>设计3个自动化Agent：搜索Agent（每日定时搜集）、评估Agent（5维评分模型）、运用Agent（智能匹配最佳提示词）</li>
+        <li>建立"相似/互补/升级/组合"四维关系网络，Obsidian Graph View可视化呈现</li>
+      </ul>
+    </div>
+
+    <div class="project-card">
+      <h4>3. 智投 — AI求职招呼语生成器 <span style="font-weight:400;font-size:11px;color:#888">| 独立开发 | 2026.05</span></h4>
+      <div class="tech">HTML/CSS/JS 单文件PWA + DeepSeek API + GitHub Pages</div>
+      <ul>
+        <li>用AI编程工具独立完成的功能完整PWA应用，单文件<span style="color:#0D9488;font-weight:600">3,586行</span>代码</li>
+        <li>设计6种打招呼语"钩子策略"（数字/共鸣/问题/成就/洞察/真诚），每种含完整提示词工程模板</li>
+        <li>简历上传→解析→脱敏→JD关键词提取→多版本招呼语生成的完整AI工作流</li>
+        <li>已部署上线：<a href="https://jhkkv.github.io/----/" target="_blank">jhkkv.github.io/----</a></li>
+      </ul>
+    </div>
+
+    <div class="project-card">
+      <h4>4. 10专家Agent并行头脑风暴 <span style="font-weight:400;font-size:11px;color:#888">| AI工作流设计实战 | 2026.07</span></h4>
+      <div class="tech">第一性原理 × 多Agent协作 × 对抗性审查</div>
+      <ul>
+        <li>设计10位专家Agent并行分析的复杂工作流，产出"AI项目效益第一性公式"及"AI适合度评估框架"</li>
+        <li>对3个本地项目进行AI适合度量化评分，输出100天可执行路线图</li>
+      </ul>
+    </div>
+
+    <div class="project-card">
+      <h4>5. 其他AI辅助项目</h4>
+      <ul>
+        <li><strong>东南亚盲盒市场分析报告</strong>：AI辅助数据收集+10套设计风格模板生成</li>
+        <li><strong>Coze工作流Bot搭建</strong>：完成网页解析Bot完整搭建指南（含LLM提示词+Python备选方案）</li>
+        <li><strong>AI辅助长篇小说创作</strong>：累计完成100+章续写，设计跨session交接的完整AI写作工作流</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ==================== 教育 ==================== -->
+  <div class="section">
+    <div class="section-title">🎓 教育背景</div>
+    <div style="padding:8px 14px;background:#fafbfc;border-radius:6px">
+      <div class="edu-row">
+        <h3>云南大学滇池学院</h3>
+        <span class="period">2021.09 - 2025.06</span>
+      </div>
+      <div style="font-size:12.5px;color:#555;margin-top:2px;">音乐表演 · 本科</div>
+      <div style="font-size:12px;color:#888;margin-top:4px;">自主学习：AI工作流设计、Prompt工程、结构化思维、数据分析、内容策略</div>
+    </div>
+  </div>
+
+  <!-- ==================== 技能 ==================== -->
+  <div class="section">
+    <div class="section-title">🛠 核心技能</div>
+
+    <p style="font-size:12px;font-weight:600;color:#0D9488;margin-bottom:5px;">AI工具能力（深度使用）</p>
+    <table class="skill-table">
+      <tr><th>技能</th><th>水平</th><th>证据</th></tr>
+      <tr><td>Prompt工程 & 工作流设计</td><td><span class="stars">★★★★★</span></td><td>80+条提示词库+6钩子策略+10Agent并行编排</td></tr>
+      <tr><td>AI内容生成与质量把控</td><td><span class="stars">★★★★★</span></td><td>公众号日报系统+小红书AI文案+AI辅助小说写作</td></tr>
+      <tr><td>AI自动化管道搭建</td><td><span class="stars">★★★★☆</span></td><td>资讯自动采集→分类→排版→输出全自动化系统</td></tr>
+      <tr><td>Vibe Coding（AI辅助编程）</td><td><span class="stars">★★★★☆</span></td><td>独立完成PWA应用（3,586行）+Node.js自动化脚本</td></tr>
+      <tr><td>Coze / Agent平台</td><td><span class="stars">★★★★☆</span></td><td>Coze工作流搭建+Agent编排+评估体系设计</td></tr>
+      <tr><td>AI API集成</td><td><span class="stars">★★★☆☆</span></td><td>DeepSeek API + 火山引擎多模态API + AI HOT API</td></tr>
+    </table>
+
+    <p style="font-size:12px;font-weight:600;color:#0D9488;margin-bottom:5px;margin-top:10px;">内容运营能力</p>
+    <table class="skill-table">
+      <tr><th>技能</th><th>水平</th><th>证据</th></tr>
+      <tr><td>内容策略 & 选题规划</td><td><span class="stars">★★★★☆</span></td><td>公众号日更系统+AI资讯内容分类体系</td></tr>
+      <tr><td>文案撰写 & 结构化写作</td><td><span class="stars">★★★★☆</span></td><td>电商20+套模板+小红书SEO内容+AI辅助优化</td></tr>
+      <tr><td>数据分析 & 内容复盘</td><td><span class="stars">★★★★☆</span></td><td>竞品评论分析+月度策略报告+爆款拆解</td></tr>
+      <tr><td>多平台内容运营</td><td><span class="stars">★★★☆☆</span></td><td>公众号+抖音+小红书+闲鱼内容体系</td></tr>
+    </table>
+
+    <p style="font-size:12px;font-weight:600;color:#0D9488;margin-bottom:4px;margin-top:10px;">工具链</p>
+    <div style="font-size:12px;color:#555;line-height:1.7;padding:6px 14px;background:#fafbfc;border-radius:4px;">
+      <strong>AI工具：</strong>Claude / DeepSeek / Coze / ChatGPT — 深度日常使用<br>
+      <strong>办公软件：</strong>Office全套（Word/Excel/PPT）、飞书、Notion<br>
+      <strong>基础开发：</strong>HTML/CSS/JS（理解级）、Node.js（脚本级）、Git版本控制<br>
+      <strong>数据分析：</strong>Excel数据透视表、数据台账搭建
+    </div>
+  </div>
+
+  <!-- ==================== 证书 ==================== -->
+  <div class="section">
+    <div class="section-title">🏆 证书 & 其他</div>
+    <div style="font-size:12.5px;color:#444;padding:6px 14px;background:#fafbfc;border-radius:4px;">
+      ✅ 教师资格证 · ✅ 普通话二级甲等 · 🌐 <a href="https://jhkkv.github.io/----/" target="_blank">GitHub Pages 上有多个可访问的项目链接</a>
+    </div>
+  </div>
+
+  <!-- ==================== 自我评价 ==================== -->
+  <div class="section">
+    <div class="section-title">💬 自我评价</div>
+    <div class="self-text">
+      <strong>我的核心竞争力不是"会用ChatGPT"——2026年每个人都会。我的竞争力是"能用AI把内容生产效率翻4倍，并建立可持续运营的自动化系统"。</strong><br><br>
+      • <strong>AI+内容运营双轨能力</strong>：既懂内容运营逻辑（选题→生产→分发→复盘），又懂如何用AI规模化提效——这个组合在2026年仍属稀缺<br>
+      • <strong>有真实项目可展示</strong>：不是课程作业，而是每天自动运行、每周产出内容、有URL可访问的真实系统<br>
+      • <strong>独立搭建能力</strong>：能用AI独立完成完整Web应用并部署上线——这证明结构化思维、任务拆解和验收判断的元能力<br>
+      • <strong>持续学习动能</strong>：从音乐表演专业到AI内容运营的跨行转型，靠的是自学+实操+迭代
+    </div>
+  </div>
+
+  <!-- ==================== 职业规划 ==================== -->
+  <div class="section">
+    <div class="section-title">🎯 职业规划</div>
+    <div style="font-size:12.5px;color:#444;padding:8px 14px;background:#fafbfc;border-radius:6px;line-height:1.8">
+      <div class="career-item"><span class="label">短期1年</span><span>深入AIGC内容运营，将AI自动化内容生产经验规模化，从一人系统升级为团队可用的内容中台</span></div>
+      <div class="career-item"><span class="label">中期2-3年</span><span>向AI产品运营/Agent运营方向发展，掌握AI产品的运营策略、用户增长和数据分析</span></div>
+      <div class="career-item"><span class="label">长期3-5年</span><span>成为AI Native公司的运营负责人，从0到1搭建AI驱动的内容运营体系</span></div>
+    </div>
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <div class="footer-note">
+    本简历由AI辅助撰写与排版 · 所有项目经历均可提供在线链接或本地文件验证<br>
+    🔗 智投PWA：<a href="https://jhkkv.github.io/----/" target="_blank" style="color:#aaa">jhkkv.github.io/----</a> · GitHub：@jhkkv
+  </div>
+
+</div>
+</body>
+</html>
