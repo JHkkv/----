@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>让AI真正读懂你 · 小红书30天AI陪伴计划</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-cream: #FAF8F5;
+    --card-white: #FFFFFF;
+    --sage: #9DB2A0;
+    --sage-light: #E8EFE9;
+    --sage-dark: #7A9180;
+    --fog-blue: #A8BFCA;
+    --fog-light: #E4EEF2;
+    --warm-apricot: #E8965A;
+    --apricot-light: #FFF1E6;
+    --text-primary: #3A3A3A;
+    --text-secondary: #6B6B6B;
+    --text-muted: #9A9A9A;
+    --code-bg: #F0EFEA;
+    --border-subtle: #E8E5DF;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.05), 0 2px 6px rgba(0,0,0,0.03);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.06), 0 3px 10px rgba(0,0,0,0.04);
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --font-serif: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', serif;
+    --font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+    --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-cream);
+    color: var(--text-primary);
+    line-height: 1.8;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ── Background subtle texture ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(168,191,202,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(157,178,160,0.10) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    padding: 48px 0 36px;
+  }
+
+  .header-badge {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--sage-dark);
+    background: var(--sage-light);
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+  }
+
+  .header .subtitle {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+    font-weight: 400;
+  }
+
+  /* ── Tab Navigation ── */
+  .tab-nav {
+    display: flex;
+    gap: 0;
+    background: var(--card-white);
+    border-radius: var(--radius-md);
+    padding: 5px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 32px;
+    position: relative;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+  }
+
+  .tab-btn.active {
+    color: var(--sage-dark);
+    background: var(--sage-light);
+    font-weight: 600;
+  }
+
+  .tab-btn:hover:not(.active) {
+    color: var(--text-secondary);
+    background: rgba(0,0,0,0.02);
+  }
+
+  /* ── Tab Content ── */
+  .tab-panels {
+    position: relative;
+  }
+
+  .tab-panel {
+    display: none;
+    animation: fadeSlideIn var(--transition-base) ease forwards;
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  @keyframes fadeSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ── Section Card ── */
+  .section-card {
+    background: var(--card-white);
+    border-radius: var(--radius-lg);
+    padding: 32px 36px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-base);
+  }
+
+  .section-card:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  /* ── Intro Block ── */
+  .intro-block {
+    margin-bottom: 28px;
+  }
+
+  .intro-block .icon-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .intro-block .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--sage);
+    flex-shrink: 0;
+  }
+
+  .intro-block .tag-line {
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--sage-dark);
+    letter-spacing: 0.03em;
+  }
+
+  .intro-block p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.85;
+  }
+
+  /* ── Prompt Card ── */
+  .prompt-card {
+    background: var(--code-bg);
+    border-left: 3px solid var(--sage);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 24px 28px;
+    margin: 20px 0 12px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.9;
+    color: var(--text-primary);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    position: relative;
+  }
+
+  .prompt-card .placeholder {
+    color: var(--warm-apricot);
+    background: var(--apricot-light);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .prompt-card .instruction {
+    color: var(--sage-dark);
+    font-weight: 500;
+  }
+
+  /* ── Prompt Label ── */
+  .prompt-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--sage-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  .prompt-label::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--sage);
+  }
+
+  /* ── Copy Button ── */
+  .copy-btn-wrap {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 22px;
+    background: var(--sage);
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    font-family: var(--font-sans);
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: 0 2px 8px rgba(157,178,160,0.25);
+  }
+
+  .copy-btn:hover {
+    background: var(--sage-dark);
+    box-shadow: 0 4px 14px rgba(157,178,160,0.35);
+    transform: translateY(-1px);
+  }
+
+  .copy-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(157,178,160,0.2);
+  }
+
+  .copy-btn.copied {
+    background: var(--warm-apricot);
+    box-shadow: 0 2px 8px rgba(232,150,90,0.25);
+  }
+
+  .copy-btn .copy-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.9;
+  }
+
+  /* ── Tips Section ── */
+  .tips-card {
+    background: var(--fog-light);
+    border-radius: var(--radius-md);
+    padding: 24px 28px;
+    margin-top: 20px;
+  }
+
+  .tips-card .tips-title {
+    font-family: var(--font-serif);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tips-card .tips-title .emoji-bullet {
+    font-size: 1.1rem;
+  }
+
+  .tips-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .tips-list li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .tips-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--fog-blue);
+  }
+
+  .tips-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  .highlight-text {
+    color: var(--warm-apricot);
+    font-weight: 500;
+  }
+
+  /* ── Step Number Badge ── */
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--sage);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+
+  .section-title-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .section-title-row h2 {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 28px 0;
+  }
+
+  .divider::before,
+  .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-subtle);
+  }
+
+  .divider .divider-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--sage);
+    opacity: 0.5;
+  }
+
+  /* ── Model Tags ── */
+  .model-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .model-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--card-white);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    transition: all var(--transition-base);
+  }
+
+  .model-tag:hover {
+    border-color: var(--sage);
+    color: var(--sage-dark);
+    background: var(--sage-light);
+  }
+
+  /* ── Quote block ── */
+  .quote-block {
+    border-left: 2px solid var(--warm-apricot);
+    padding: 4px 0 4px 16px;
+    margin: 16px 0;
+    font-family: var(--font-serif);
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 40px 0 20px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  .footer .series-tag {
+    display: inline-block;
+    padding: 4px 14px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    margin-bottom: 10px;
+    font-family: var(--font-serif);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .container {
+      padding: 24px 16px 40px;
+    }
+
+    .header {
+      padding: 32px 0 24px;
+    }
+
+    .section-card {
+      padding: 24px 20px;
+    }
+
+    .prompt-card {
+      padding: 18px 16px;
+      font-size: 0.78rem;
+    }
+
+    .tab-btn {
+      font-size: 0.82rem;
+      padding: 10px 12px;
+    }
+
+    .tips-card {
+      padding: 18px 16px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .container {
+      max-width: 760px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <div class="header-badge">小红书 · 30天AI陪伴计划</div>
+    <h1>Day 3 · 让AI真正读懂你</h1>
+    <p class="subtitle">先建立人设，再带着人设去解决问题</p>
+  </header>
+
+  <!-- ── Tab Navigation ── -->
+  <nav class="tab-nav" role="tablist">
+    <button class="tab-btn active" role="tab" data-tab="0" aria-selected="true">
+      Step 1 · 建立人设
+    </button>
+    <button class="tab-btn" role="tab" data-tab="1" aria-selected="false">
+      Step 2 · 解决烦恼
+    </button>
+  </nav>
+
+  <!-- ── Tab Panels ── -->
+  <div class="tab-panels">
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- TAB 1: 人设建立 Prompt                   -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="tab-panel active" data-panel="0">
+
+      <!-- Intro Card -->
+      <div class="section-card">
+        <div class="intro-block">
+          <div class="icon-row">
+            <span class="dot"></span>
+            <span class="tag-line">为什么要先建立人设？</span>
+          </div>
+          <p>
+            还记得 Day 1 "让AI认识你"吗？今天我们把它升级成一个系统化的操作。<br>
+            AI 对你的了解越深，给出的建议就越贴合你——而不是泛泛而谈的"多运动、早睡觉"。<br>
+            下面这个 Prompt，会让 AI 像面试官一样"追问"你，帮你梳理出一个清晰的自我画像。
+          </p>
+        </div>
+      </div>
+
+      <!-- Prompt Card -->
+      <div class="section-card">
+        <span class="prompt-label">完整 Prompt 模板</span>
+        <div class="prompt-card" id="prompt-step1">
+<span class="instruction"># 角色设定</span>
+你是一位资深的心理咨询师 + 职业规划顾问，擅长通过结构化提问帮人
+深入了解自己。你的风格是：温和但有洞察力，不问废话，直击本质。
+
+<span class="instruction"># 任务</span>
+请你通过"面试"的方式，对我进行一次深度了解。你要像记者采访一样，
+一步步提问，帮我梳理以下维度的自我画像：
+
+1. <span class="instruction">价值观</span> —— 我最看重什么？做什么事让我觉得"有意义"？
+2. <span class="instruction">优势与特质</span> —— 我擅长什么？朋友眼中的我是什么样？
+3. <span class="instruction">弱点与盲区</span> —— 什么情境下我容易出问题？
+4. <span class="instruction">情绪模式</span> —— 遇到压力我通常怎么反应？
+5. <span class="instruction">向往的生活</span> —— 如果不考虑钱和现实，我想过什么样的日子？
+
+<span class="instruction"># 我的基本信息</span>
+- 年龄：<span class="placeholder">[填写你的年龄]</span>
+- 职业/身份：<span class="placeholder">[如：大二学生 / 互联网运营 3年 / 全职妈妈]</span>
+- 目前最大的困惑：<span class="placeholder">[一句话描述你最近最烦的事]</span>
+- 性格自评：<span class="placeholder">[内向/外向/混合，偏理性/偏感性]</span>
+- 补充信息：<span class="placeholder">[任何你觉得AI需要知道的事]</span>
+
+<span class="instruction"># 对话规则</span>
+- 每次只问我 1～2 个问题，不要一次性抛出一堆
+- 根据我的回答深入追问，不要停留在表面
+- 当我回答完 5 轮以上，整理出一份 <span class="instruction">"用户画像总结"</span>
+
+<span class="instruction"># 输出格式（画像总结）</span>
+请按以下结构输出：
+
+📋 <span class="instruction">核心特质</span>（3个关键词 + 一句话概括）
+💪 <span class="instruction">优势领域</span>
+🔍 <span class="instruction">潜在盲区</span>
+🎯 <span class="instruction">建议探索方向</span>
+💬 <span class="instruction">给这个人的一句话</span>
+        </div>
+
+        <div class="copy-btn-wrap">
+          <button class="copy-btn" onclick="copyPrompt('prompt-step1', this)" aria-label="复制Prompt">
+            <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            复制 Prompt
+          </button>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="tips-card">
+        <div class="tips-title">
+          <span class="emoji-bullet">💡</span> 使用小贴士
+        </div>
+        <ul class="tips-list">
+          <li>把这个 Prompt <span class="highlight-text">分别发给不同的 AI</span>（ChatGPT、Claude、DeepSeek、豆包、Kimi、通义千问等），看看不同模型对你的解读有什么差异——差异本身就是一种"自我认知"。</li>
+          <li>建议在 <span class="highlight-text">安静时段</span>（深夜或清晨）做这件事，认真回答每一个问题，不要敷衍。</li>
+          <li>结束后把 AI 输出的"用户画像总结"<span class="highlight-text">保存下来</span>——这是 Step 2 的关键输入。</li>
+          <li>如果你发现某个模型的解读特别戳中你，<span class="highlight-text">以后就多用它</span>做深度对话。</li>
+        </ul>
+
+        <div class="model-tags">
+          <span class="model-tag">ChatGPT</span>
+          <span class="model-tag">Claude</span>
+          <span class="model-tag">DeepSeek</span>
+          <span class="model-tag">豆包</span>
+          <span class="model-tag">Kimi</span>
+          <span class="model-tag">通义千问</span>
+          <span class="model-tag">Gemini</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- TAB 2: 烦恼解决引导 Prompt              -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="tab-panel" data-panel="1">
+
+      <!-- Intro Card -->
+      <div class="section-card">
+        <div class="intro-block">
+          <div class="icon-row">
+            <span class="dot"></span>
+            <span class="tag-line">当 AI 已经认识你，然后呢？</span>
+          </div>
+          <p>
+            有了 Step 1 的"人设画像"，你就可以带着这份自我认知，让 AI 帮你解决真实烦恼。<br>
+            不再是空洞的建议，而是<span class="highlight-text">基于你的性格、你的处境、你的软肋</span>，给出的个性化思路。<br>
+            记住一句话：
+          </p>
+          <div class="quote-block">
+            AI 的建议不一定对，但比你自己瞎想要靠谱。
+          </div>
+        </div>
+      </div>
+
+      <!-- Prompt Card -->
+      <div class="section-card">
+        <span class="prompt-label">完整 Prompt 模板</span>
+        <div class="prompt-card" id="prompt-step2">
+<span class="instruction"># 角色设定</span>
+你是一位了解我的私人顾问。你已经通过深度访谈对我有了全面认知。
+你给出的建议应该基于"我是什么样的人"，而不是通用的鸡汤模板。
+
+<span class="instruction"># 关于我（从 Step 1 得到的人设总结）</span>
+<span class="placeholder">[把 Step 1 里 AI 输出的"用户画像总结"完整粘贴到这里]</span>
+
+<span class="instruction"># 我目前遇到的烦恼</span>
+<span class="placeholder">[具体描述你的烦恼，越具体越好：什么情况？多久了？你
+试过什么方法？为什么感觉卡住了？]</span>
+
+<span class="instruction"># 指令</span>
+请你基于"我是谁"，针对"我的烦恼"，给出个性化的解决思路。
+
+<span class="instruction"># 输出要求</span>
+1. <span class="instruction">共情确认</span> —— 先让我感觉你理解了我的处境（1～2句话即可）
+2. <span class="instruction">问题重构</span> —— 用你的视角重新描述这个烦恼，
+   帮我看到自己没意识到的层面
+3. <span class="instruction">三条可行路径</span> —— 给出 3 个具体的行动思路，
+   每条都说明"为什么适合你这种人"
+4. <span class="instruction">风险提示</span> —— 每条路径可能踩的坑，
+   结合我的性格弱点提醒我
+5. <span class="instruction">一句话总结</span> —— 给我一个今天就能做的事
+
+<span class="instruction"># 禁止事项</span>
+- ❌ 不要说"相信自己""一切都会好的"之类的空话
+- ❌ 不要给模板化的建议（如"做个计划表"）
+- ❌ 不要回避问题的复杂性
+- ❌ 不要假装你100%确定——不确定的地方请直说
+        </div>
+
+        <div class="copy-btn-wrap">
+          <button class="copy-btn" onclick="copyPrompt('prompt-step2', this)" aria-label="复制Prompt">
+            <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            复制 Prompt
+          </button>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="tips-card">
+        <div class="tips-title">
+          <span class="emoji-bullet">💡</span> 使用小贴士
+        </div>
+        <ul class="tips-list">
+          <li><span class="highlight-text">人设越准，建议越准。</span>如果 Step 1 的画像你觉得不够准确，先回去调优，别急着进 Step 2。</li>
+          <li>同一个烦恼可以<span class="highlight-text">给不同的 AI 模型</span>，看看谁的思路更对你的胃口。</li>
+          <li>AI 的建议是"可能性地图"，不是"标准答案"——<span class="highlight-text">最终的判断在你手里</span>。</li>
+          <li>如果某个建议让你不舒服，别急着否定它，<span class="highlight-text">先想想为什么不舒服</span>——这往往是最有价值的信息。</li>
+          <li>你可以把 AI 输出的"三条路径"拿去和朋友讨论，<span class="highlight-text">真人反馈 + AI 分析</span> = 最佳决策组合。</li>
+        </ul>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="series-tag">30天AI陪伴计划 · Day 3</div>
+    <p>明天继续，让AI陪你走得更深。</p>
+  </footer>
+
+</div>
+
+<script>
+  /* ── Tab Switching ── */
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabPanels = document.querySelectorAll('.tab-panel');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = parseInt(btn.dataset.tab);
+
+      // Update buttons
+      tabBtns.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+
+      // Update panels with animation
+      tabPanels.forEach(panel => {
+        panel.classList.remove('active');
+      });
+
+      const targetPanel = document.querySelector(`[data-panel="${targetTab}"]`);
+      if (targetPanel) {
+        // Re-trigger animation by removing and re-adding
+        targetPanel.style.animation = 'none';
+        targetPanel.offsetHeight; // force reflow
+        targetPanel.style.animation = '';
+        targetPanel.classList.add('active');
+      }
+    });
+  });
+
+  /* ── Copy Prompt ── */
+  function copyPrompt(elementId, buttonEl) {
+    const promptEl = document.getElementById(elementId);
+    if (!promptEl) return;
+
+    // Get text content, preserving line breaks
+    const text = promptEl.innerText;
+
+    navigator.clipboard.writeText(text).then(() => {
+      // Visual feedback
+      const originalHTML = buttonEl.innerHTML;
+      buttonEl.classList.add('copied');
+      buttonEl.innerHTML = `
+        <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        已复制！
+      `;
+
+      setTimeout(() => {
+        buttonEl.classList.remove('copied');
+        buttonEl.innerHTML = originalHTML;
+      }, 2000);
+    }).catch(() => {
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        buttonEl.classList.add('copied');
+        const originalHTML = buttonEl.innerHTML;
+        buttonEl.innerHTML = `
+          <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          已复制！
+        `;
+        setTimeout(() => {
+          buttonEl.classList.remove('copied');
+          buttonEl.innerHTML = originalHTML;
+        }, 2000);
+      } catch (err) {
+        console.error('复制失败:', err);
+      }
+      document.body.removeChild(textarea);
+    });
+  }
+
+  /* ── Keyboard navigation for tabs ── */
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      const activeBtn = document.querySelector('.tab-btn.active');
+      if (!activeBtn) return;
+      const currentTab = parseInt(activeBtn.dataset.tab);
+      const direction = e.key === 'ArrowRight' ? 1 : -1;
+      const nextTab = (currentTab + direction + tabBtns.length) % tabBtns.length;
+      tabBtns[nextTab].click();
+      tabBtns[nextTab].focus();
+    }
+  });
+</script>
+
+</body>
+</html>

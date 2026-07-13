@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30天AI陪伴计划 · Day 3 — 让AI真正读懂你</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FAF8F5;
+  --sage: #9DB2A0;
+  --sage-light: #B8CFBB;
+  --sage-pale: #E8F0E9;
+  --mist: #A8BFCA;
+  --mist-light: #C4D7E0;
+  --mist-pale: #E9F0F4;
+  --apricot: #E8965A;
+  --apricot-light: #F0B88A;
+  --apricot-pale: #FDF0E5;
+  --graphite: #3A3A3A;
+  --graphite-light: #6B6B6B;
+  --graphite-lighter: #999;
+  --white: #FFFFFF;
+  --card-shadow: 0 2px 20px rgba(58,58,58,0.06), 0 8px 40px rgba(58,58,58,0.04);
+  --card-radius: 20px;
+  --slide-w: 720px;
+  --slide-h: 960px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #EDEBE8;
+  font-family: 'Noto Sans SC', sans-serif;
+  color: var(--graphite);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 16px 80px;
+  gap: 48px;
+}
+
+/* ── Screenshot hint bar ── */
+.screenshot-hint {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: linear-gradient(135deg, var(--apricot), #E07B3A);
+  color: #fff;
+  text-align: center;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(232,150,90,0.25);
+}
+
+/* ── Slide base ── */
+.slide {
+  width: var(--slide-w);
+  height: var(--slide-h);
+  background: var(--white);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Slide 1: Cover ── */
+.slide-cover {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 80px 64px;
+}
+.slide-cover .tag {
+  display: inline-block;
+  background: var(--sage-pale);
+  color: var(--sage);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  padding: 8px 22px;
+  border-radius: 24px;
+  margin-bottom: 48px;
+}
+.slide-cover .title-en {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 56px;
+  font-weight: 900;
+  color: var(--graphite);
+  line-height: 1.25;
+  margin-bottom: 24px;
+  letter-spacing: 2px;
+}
+.slide-cover .title-en .accent {
+  color: var(--apricot);
+}
+.slide-cover .subtitle {
+  font-size: 18px;
+  color: var(--graphite-light);
+  font-weight: 400;
+  line-height: 1.8;
+  max-width: 480px;
+}
+.slide-cover .swipe-hint {
+  position: absolute;
+  bottom: 48px;
+  left: 0; right: 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--graphite-lighter);
+  letter-spacing: 1px;
+}
+
+/* decorative accent line */
+.slide-cover::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: var(--apricot);
+  border-radius: 0 0 4px 4px;
+}
+
+/* ── Slide 2: Review ── */
+.slide-review {
+  padding: 72px 60px;
+}
+.slide-review .section-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--graphite);
+  margin-bottom: 48px;
+  letter-spacing: 1px;
+}
+.review-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  flex: 1;
+}
+.review-card {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  background: var(--cream);
+  border-radius: 16px;
+  padding: 32px 36px;
+  border-left: 5px solid var(--sage);
+}
+.review-card.card-day2 {
+  border-left-color: var(--mist);
+}
+.review-card .day-badge {
+  flex-shrink: 0;
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.3;
+}
+.review-card .day-badge.d1 {
+  background: var(--sage-pale);
+  color: var(--sage);
+}
+.review-card .day-badge.d2 {
+  background: var(--mist-pale);
+  color: #7AA0B0;
+}
+.review-card .day-badge .num {
+  font-size: 28px;
+  font-family: 'Noto Serif SC', serif;
+}
+.review-card .card-content h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--graphite);
+  margin-bottom: 6px;
+}
+.review-card .card-content p {
+  font-size: 15px;
+  color: var(--graphite-light);
+}
+.review-bottom {
+  margin-top: 48px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--graphite);
+}
+.review-bottom .emoji {
+  font-size: 22px;
+}
+
+/* ── Slide 3: Step 1 ── */
+.slide-step {
+  padding: 72px 60px;
+}
+.slide-step .step-label {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--sage);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.slide-step .step-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--graphite);
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+.slide-step .step-subtitle {
+  font-size: 17px;
+  color: var(--graphite-light);
+  margin-bottom: 44px;
+}
+.dimension-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 36px;
+}
+.dim-card {
+  background: var(--cream);
+  border-radius: 14px;
+  padding: 28px 24px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+.dim-card .dim-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+.dim-card .dim-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--graphite);
+  margin-bottom: 6px;
+}
+.dim-card .dim-desc {
+  font-size: 13px;
+  color: var(--graphite-light);
+  line-height: 1.5;
+}
+.dim-card:nth-child(1) { border-top: 4px solid var(--sage); }
+.dim-card:nth-child(2) { border-top: 4px solid var(--mist); }
+.dim-card:nth-child(3) { border-top: 4px solid var(--apricot); }
+.dim-card:nth-child(4) { border-top: 4px solid #C4A882; }
+.dim-card.full-width {
+  grid-column: 1 / -1;
+  border-top: 4px solid #B0A0C8;
+}
+.step-note {
+  text-align: center;
+  font-size: 13px;
+  color: var(--graphite-lighter);
+  letter-spacing: 1px;
+}
+
+/* ── Slide 4: Step 2 ── */
+.flow-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 44px;
+  position: relative;
+}
+.flow-step {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.flow-step .flow-num {
+  flex-shrink: 0;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  z-index: 2;
+}
+.flow-step .flow-num.n1 { background: var(--sage); }
+.flow-step .flow-num.n2 { background: var(--mist); }
+.flow-step .flow-num.n3 { background: var(--apricot); }
+.flow-step .flow-num.n4 { background: #6BAF7B; }
+.flow-step .flow-text {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--graphite);
+}
+.flow-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  color: var(--graphite-lighter);
+  font-size: 22px;
+  padding-left: 24px;
+}
+.quote-box {
+  background: var(--apricot-pale);
+  border-radius: 14px;
+  padding: 28px 32px;
+  text-align: center;
+  border-left: 4px solid var(--apricot);
+}
+.quote-box p {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 19px;
+  font-weight: 600;
+  color: #C0703A;
+  line-height: 1.6;
+}
+
+/* ── Slide 5: Multi-AI ── */
+.slide-multi {
+  padding: 72px 60px;
+}
+.model-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 48px;
+  justify-content: center;
+}
+.model-tag {
+  padding: 16px 28px;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.model-tag:nth-child(1) { background: #10A37F; }
+.model-tag:nth-child(2) { background: #D4A574; }
+.model-tag:nth-child(3) { background: #5A67BA; }
+.model-tag:nth-child(4) { background: #E55C5C; }
+.model-tag:nth-child(5) { background: #6B5CE7; }
+.model-tag:nth-child(6) { background: #3B9AE1; }
+.multi-insight {
+  text-align: center;
+  padding: 0 20px;
+}
+.multi-insight p {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--graphite);
+  line-height: 1.7;
+}
+.multi-insight .highlight {
+  display: inline-block;
+  background: linear-gradient(180deg, transparent 60%, rgba(232,150,90,0.25) 60%);
+  padding: 0 4px;
+}
+
+/* ── Slide 6: CTA ── */
+.slide-cta {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 80px 60px;
+}
+.slide-cta .cta-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 48px;
+  font-weight: 900;
+  color: var(--graphite);
+  margin-bottom: 52px;
+  letter-spacing: 2px;
+}
+.action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+  max-width: 520px;
+  margin-bottom: 60px;
+}
+.action-item {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  text-align: left;
+}
+.action-num {
+  flex-shrink: 0;
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 900;
+  font-family: 'Noto Serif SC', serif;
+  color: #fff;
+}
+.action-num.a1 { background: var(--sage); }
+.action-num.a2 { background: var(--mist); }
+.action-num.a3 { background: var(--apricot); }
+.action-text {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--graphite);
+  line-height: 1.6;
+}
+.action-text strong {
+  font-weight: 700;
+}
+.preview-box {
+  background: var(--cream);
+  border-radius: 14px;
+  padding: 20px 32px;
+  font-size: 16px;
+  color: var(--graphite-light);
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+.preview-box span {
+  color: var(--apricot);
+  font-weight: 700;
+}
+
+/* ── Responsive ── */
+@media (max-width: 760px) {
+  .slide {
+    width: calc(100vw - 32px);
+    height: calc((100vw - 32px) * 4 / 3);
+    border-radius: 14px;
+  }
+  .slide-cover { padding: 48px 32px; }
+  .slide-cover .title-en { font-size: clamp(28px, 7vw, 48px); }
+  .slide-cover .subtitle { font-size: 14px; }
+  .slide-review, .slide-step, .slide-multi { padding: 40px 28px; }
+  .slide-review .section-title { font-size: 24px; }
+  .review-card { padding: 20px 24px; gap: 16px; }
+  .review-card .day-badge { width: 52px; height: 52px; }
+  .review-card .day-badge .num { font-size: 22px; }
+  .review-card .card-content h3 { font-size: 17px; }
+  .review-card .card-content p { font-size: 13px; }
+  .slide-step .step-title { font-size: 26px; }
+  .slide-step .step-subtitle { font-size: 14px; }
+  .dimension-grid { gap: 10px; }
+  .dim-card { padding: 18px 14px; }
+  .dim-card .dim-icon { font-size: 24px; }
+  .dim-card .dim-name { font-size: 14px; }
+  .dim-card .dim-desc { font-size: 12px; }
+  .model-tags { gap: 10px; }
+  .model-tag { padding: 12px 20px; font-size: 14px; }
+  .multi-insight p { font-size: 17px; }
+  .slide-cta .cta-title { font-size: 34px; }
+  .action-item { gap: 16px; }
+  .action-num { width: 48px; height: 48px; font-size: 24px; }
+  .action-text { font-size: 14px; }
+  .quote-box p { font-size: 16px; }
+}
+
+/* ── Print / Screenshot optimizations ── */
+@media print {
+  body { background: #fff; padding: 0; gap: 0; }
+  .slide { box-shadow: none; break-inside: avoid; page-break-after: always; border-radius: 0; }
+  .screenshot-hint { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="screenshot-hint">截屏保存，发小红书图文 →</div>
+
+<!-- ═══════════ SLIDE 1: COVER ═══════════ -->
+<div class="slide slide-cover">
+  <div class="tag">30天AI陪伴计划 · Day 3</div>
+  <div class="title-en">让AI真正<br><span class="accent">读懂你</span></div>
+  <p class="subtitle">先建立人设，再带着人设去解决烦恼</p>
+  <div class="swipe-hint">右滑查看教程 👉</div>
+</div>
+
+<!-- ═══════════ SLIDE 2: REVIEW ═══════════ -->
+<div class="slide slide-review">
+  <div class="section-title">前两天我们做了两件事</div>
+  <div class="review-cards">
+    <div class="review-card">
+      <div class="day-badge d1">
+        <span class="num">01</span>
+        <span>Day</span>
+      </div>
+      <div class="card-content">
+        <h3>认识自己</h3>
+        <p>AI面试你，帮你看见自己看不到的盲区</p>
+      </div>
+    </div>
+    <div class="review-card card-day2">
+      <div class="day-badge d2">
+        <span class="num">02</span>
+        <span>Day</span>
+      </div>
+      <div class="card-content">
+        <h3>找到方向</h3>
+        <p>AI引路，把模糊的"我想变好"变成具体路径</p>
+      </div>
+    </div>
+  </div>
+  <div class="review-bottom">
+    今天，把两步合成一套工具 <span class="emoji">🔧</span>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 3: STEP 1 ═══════════ -->
+<div class="slide slide-step">
+  <div class="step-label">Step 1</div>
+  <div class="step-title">建立你的 AI 人设</div>
+  <div class="step-subtitle">让AI面试你，然后记住你</div>
+  <div class="dimension-grid">
+    <div class="dim-card">
+      <div class="dim-icon">🎯</div>
+      <div class="dim-name">价值观</div>
+      <div class="dim-desc">什么对你最重要</div>
+    </div>
+    <div class="dim-card">
+      <div class="dim-icon">🔍</div>
+      <div class="dim-name">优势盲区</div>
+      <div class="dim-desc">你看不见的隐藏天赋</div>
+    </div>
+    <div class="dim-card">
+      <div class="dim-icon">🌊</div>
+      <div class="dim-name">情绪模式</div>
+      <div class="dim-desc">压力下的自动化反应</div>
+    </div>
+    <div class="dim-card">
+      <div class="dim-icon">✨</div>
+      <div class="dim-name">向往生活</div>
+      <div class="dim-desc">你真正想去的地方</div>
+    </div>
+    <div class="dim-card full-width">
+      <div class="dim-icon">🧭</div>
+      <div class="dim-name">综合画像</div>
+      <div class="dim-desc">五维度交叉生成你的专属人设卡</div>
+    </div>
+  </div>
+  <div class="step-note">完整 Prompt 可复制 → 见文案区</div>
+</div>
+
+<!-- ═══════════ SLIDE 4: STEP 2 ═══════════ -->
+<div class="slide slide-step">
+  <div class="step-label">Step 2</div>
+  <div class="step-title">带着人设去解题</div>
+  <div class="step-subtitle">AI认识你之后，给你的建议才是你的</div>
+  <div class="flow-container">
+    <div class="flow-step">
+      <div class="flow-num n1">1</div>
+      <div class="flow-text">粘贴你的 AI 人设画像</div>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step">
+      <div class="flow-num n2">2</div>
+      <div class="flow-text">描述你当下的烦恼或决策</div>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step">
+      <div class="flow-num n3">3</div>
+      <div class="flow-text">AI 基于你的人设深度分析</div>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step">
+      <div class="flow-num n4">4</div>
+      <div class="flow-text">得到真正属于你的方案</div>
+    </div>
+  </div>
+  <div class="quote-box">
+    <p>AI的建议不一定对，<br>但比你自己瞎想要靠谱</p>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 5: MULTI-AI ═══════════ -->
+<div class="slide slide-multi">
+  <div class="step-label">Bonus</div>
+  <div class="step-title" style="margin-bottom:40px;">同一个问题<br>丢给不同 AI</div>
+  <div class="model-tags">
+    <div class="model-tag">ChatGPT</div>
+    <div class="model-tag">Claude</div>
+    <div class="model-tag">DeepSeek</div>
+    <div class="model-tag">豆包</div>
+    <div class="model-tag">Kimi</div>
+    <div class="model-tag">通义千问</div>
+  </div>
+  <div class="multi-insight">
+    <p>同一个人设，在不同AI眼里，<br>是<span class="highlight">完全不同的可能性</span></p>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 6: CTA ═══════════ -->
+<div class="slide slide-cta">
+  <div class="cta-title">今天就用起来</div>
+  <div class="action-list">
+    <div class="action-item">
+      <div class="action-num a1">1</div>
+      <div class="action-text"><strong>复制人设 Prompt</strong><br>填好发给任意 AI</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num a2">2</div>
+      <div class="action-text"><strong>拿到画像</strong><br>存进备忘录，随时可用</div>
+    </div>
+    <div class="action-item">
+      <div class="action-num a3">3</div>
+      <div class="action-text"><strong>遇到烦恼</strong><br>拿出引导 Prompt，让 AI 帮你</div>
+    </div>
+  </div>
+  <div class="preview-box">
+    <span>Day 4 预告：</span>把"我想想"变成"我做出来了" 📋
+  </div>
+</div>
+
+</body>
+</html>
