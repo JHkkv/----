@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0f">
+<title>AI任务收件箱 — 小红书图文</title>
+<style>
+/* ================================================================
+   AI任务收件箱 | 竖屏PPT 9:16 | 暖琥珀深色主题 | 6页
+   ================================================================ */
+
+/* ----- Design Tokens ----- */
+:root {
+  --bg: #0a0a0f;
+  --bg-card: #14110c;
+  --bg-card-raised: #1a1510;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-active: rgba(245, 158, 11, 0.3);
+  --text: #e8e0d8;
+  --text-secondary: #9a8c7c;
+  --text-muted: #5c5044;
+  --accent: #F59E0B;
+  --accent-hover: #f6b02a;
+  --accent-muted: rgba(245, 158, 11, 0.08);
+  --accent-glow: rgba(245, 158, 11, 0.12);
+  --accent-strong: rgba(245, 158, 11, 0.25);
+  --danger: #EF4444;
+  --warning: #F97316;
+  --info: #3B82F6;
+  --pri-urgent: #EF4444;
+  --pri-important: #F97316;
+  --pri-normal: #EAB308;
+  --pri-low: #3B82F6;
+  --radius-card: 14px;
+  --radius-sm: 8px;
+  --font-stack: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  --transition-slide: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  --slide-h: 100dvh;
+}
+
+/* ----- Reset ----- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; overflow: hidden; }
+body {
+  font-family: var(--font-stack);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  height: 100dvh;
+  height: 100vh;
+}
+
+/* ----- Desktop Container (phone simulation) ----- */
+.desktop-wrap {
+  max-width: 600px;
+  margin: 0 auto;
+  height: 100dvh;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 60px rgba(245, 158, 11, 0.05), 0 0 120px rgba(0,0,0,0.5);
+}
+
+/* ----- Slides Track ----- */
+.slides-track {
+  transition: transform var(--transition-slide);
+  will-change: transform;
+}
+
+/* ----- Single Slide ----- */
+.slide {
+  height: 100dvh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ================================================================
+   SLIDE 1 — Cover
+   ================================================================ */
+.slide-1 { justify-content: center; text-align: center; }
+.slide-1 .glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 340px; height: 340px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse, rgba(245, 158, 11, 0.14) 0%, transparent 70%);
+  pointer-events: none;
+}
+.slide-1 .accent-line {
+  width: 48px; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  border-radius: 2px;
+  margin: 28px auto 24px;
+}
+.slide-1 .cover-title {
+  font-size: clamp(2.6rem, 7vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  line-height: 1.2;
+  position: relative;
+  z-index: 1;
+}
+.slide-1 .cover-title span { color: var(--accent); }
+.slide-1 .cover-subtitle {
+  font-size: 1.2rem;
+  color: var(--accent);
+  font-weight: 500;
+  margin-top: 12px;
+  position: relative;
+  z-index: 1;
+}
+.slide-1 .cover-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-top: 16px;
+  max-width: 280px;
+  line-height: 1.7;
+  position: relative;
+  z-index: 1;
+}
+.slide-1 .cover-meta {
+  position: absolute;
+  bottom: 60px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+/* ================================================================
+   SLIDE 2 — Pain Points
+   ================================================================ */
+.slide-2 { justify-content: center; }
+.slide-2 .section-title {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-bottom: 32px;
+  text-align: center;
+  color: var(--text);
+}
+.pain-cards { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 440px; }
+.pain-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: background var(--transition-slide);
+}
+.pain-card .emoji { font-size: 1.6rem; flex-shrink: 0; }
+.pain-card .txt { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; }
+.pain-card .txt strong { color: var(--text); display: block; margin-bottom: 4px; font-size: 0.98rem; }
+.slide-2 .bottom-hint { margin-top: 32px; font-size: 0.9rem; color: var(--text-muted); font-style: italic; }
+
+/* ================================================================
+   SLIDE 3 — Solution Flow
+   ================================================================ */
+.slide-3 { justify-content: center; }
+.slide-3 .section-title { font-size: 1.7rem; font-weight: 700; margin-bottom: 36px; text-align: center; }
+.flow { display: flex; flex-direction: column; align-items: center; gap: 0; width: 100%; max-width: 380px; }
+.flow-step {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 16px 20px;
+  width: 100%;
+  position: relative;
+}
+.flow-step .step-emoji { font-size: 1.5rem; flex-shrink: 0; }
+.flow-step .step-label { font-size: 0.95rem; color: var(--text); font-weight: 500; }
+.flow-arrow {
+  color: var(--accent);
+  font-size: 1.4rem;
+  line-height: 1;
+  padding: 4px 0;
+  opacity: 0.7;
+}
+.slide-3 .bottom-hint { margin-top: 28px; font-size: 0.9rem; color: var(--text-secondary); }
+
+/* ================================================================
+   SLIDE 4 — Feature Grid
+   ================================================================ */
+.slide-4 { justify-content: center; }
+.slide-4 .section-title { font-size: 1.7rem; font-weight: 700; margin-bottom: 28px; text-align: center; }
+.feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 460px; }
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px 16px;
+  text-align: center;
+  transition: border-color var(--transition-slide);
+}
+.feature-card .f-emoji { font-size: 1.8rem; margin-bottom: 8px; }
+.feature-card .f-title { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.feature-card .f-desc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; }
+.feature-card:nth-child(1) { border-top: 2px solid var(--pri-urgent); }
+.feature-card:nth-child(2) { border-top: 2px solid var(--pri-important); }
+.feature-card:nth-child(3) { border-top: 2px solid var(--pri-normal); }
+.feature-card:nth-child(4) { border-top: 2px solid var(--pri-low); }
+
+/* ================================================================
+   SLIDE 5 — Scenarios
+   ================================================================ */
+.slide-5 { justify-content: center; }
+.slide-5 .section-title { font-size: 1.7rem; font-weight: 700; margin-bottom: 28px; text-align: center; }
+.scene-list { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 450px; }
+.scene-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 16px 18px;
+}
+.scene-card .scene-flow {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.85rem; color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+.scene-card .scene-flow .arrow { color: var(--accent); margin: 0 2px; flex-shrink: 0; }
+.scene-card .scene-flow .highlight { color: var(--text); font-weight: 500; }
+.scene-card .scene-icon { margin-right: 6px; }
+
+/* ================================================================
+   SLIDE 6 — CTA
+   ================================================================ */
+.slide-6 { justify-content: center; text-align: center; }
+.slide-6 .cta-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.slide-6 .cta-body {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 320px;
+  margin-bottom: 36px;
+}
+.slide-6 .cta-big {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  padding: 16px 48px;
+  border: 2px solid var(--accent);
+  border-radius: 50px;
+  display: inline-block;
+  margin-bottom: 40px;
+}
+.slide-6 .cta-tags {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+  max-width: 300px;
+}
+.slide-6 .cta-account {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ================================================================
+   Navigation Buttons
+   ================================================================ */
+.nav-btn {
+  position: absolute;
+  right: 8px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(20, 17, 12, 0.85);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  transition: background 0.2s, color 0.2s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-btn:hover, .nav-btn:active { background: var(--bg-card-raised); color: var(--accent); }
+.nav-btn.up { top: 20px; }
+.nav-btn.down { bottom: 80px; }
+
+/* ----- Page Dots ----- */
+.dots {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 20;
+}
+.dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+  -webkit-tap-highlight-color: transparent;
+}
+.dot.active { background: var(--accent); transform: scale(1.4); }
+
+/* ----- Keyboard Hint ----- */
+.kbd-hint {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.12);
+  letter-spacing: 0.05em;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ----- Accessibility ----- */
+@media (prefers-reduced-motion: reduce) {
+  .slides-track { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="desktop-wrap" id="app">
+  <div class="slides-track" id="track">
+
+    <!-- ====== Slide 1: Cover ====== -->
+    <section class="slide slide-1">
+      <div class="glow"></div>
+      <h1 class="cover-title"><span>AI</span>任务收件箱</h1>
+      <div class="accent-line"></div>
+      <p class="cover-subtitle">打工人的第二大脑</p>
+      <p class="cover-desc">把碎片信息变成清清楚楚的待办清单</p>
+      <p class="cover-meta">小红书 Day4 &nbsp;|&nbsp; 2026.07.14</p>
+    </section>
+
+    <!-- ====== Slide 2: Pain Points ====== -->
+    <section class="slide slide-2">
+      <h2 class="section-title">被信息淹没了？</h2>
+      <div class="pain-cards">
+        <div class="pain-card">
+          <span class="emoji">📱</span>
+          <span class="txt"><strong>碎片散落各处</strong>微信、邮件、会议——信息分布在无数角落</span>
+        </div>
+        <div class="pain-card">
+          <span class="emoji">🧠</span>
+          <span class="txt"><strong>脑子记不住</strong>靠记忆力死扛，必然遗漏重要事项</span>
+        </div>
+        <div class="pain-card">
+          <span class="emoji">😫</span>
+          <span class="txt"><strong>越堆越多</strong>看一眼就头疼，干脆不看了——然后更焦虑</span>
+        </div>
+      </div>
+      <p class="bottom-hint">你是不是也这样？</p>
+    </section>
+
+    <!-- ====== Slide 3: Solution Flow ====== -->
+    <section class="slide slide-3">
+      <h2 class="section-title">一个入口，AI 帮你整理</h2>
+      <div class="flow">
+        <div class="flow-step">
+          <span class="step-emoji">📥</span>
+          <span class="step-label">粘贴碎片信息</span>
+        </div>
+        <div class="flow-arrow">&#x2193;</div>
+        <div class="flow-step">
+          <span class="step-emoji">🤖</span>
+          <span class="step-label">AI 智能拆解分类</span>
+        </div>
+        <div class="flow-arrow">&#x2193;</div>
+        <div class="flow-step">
+          <span class="step-emoji">🏷️</span>
+          <span class="step-label">自动标注优先级</span>
+        </div>
+        <div class="flow-arrow">&#x2193;</div>
+        <div class="flow-step">
+          <span class="step-emoji">📊</span>
+          <span class="step-label">加急任务自动排最前</span>
+        </div>
+      </div>
+      <p class="bottom-hint">不用一条条手打，一粘贴就完事。</p>
+    </section>
+
+    <!-- ====== Slide 4: Features ====== -->
+    <section class="slide slide-4">
+      <h2 class="section-title">4 大核心功能</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="f-emoji">🤖</div>
+          <div class="f-title">AI 智能拆解</div>
+          <div class="f-desc">一段文本多个任务，自动拆成独立待办</div>
+        </div>
+        <div class="feature-card">
+          <div class="f-emoji">🏷️</div>
+          <div class="f-title">四级优先级</div>
+          <div class="f-desc"><span style="color:var(--pri-urgent)">加急</span> <span style="color:var(--pri-important)">重要</span> <span style="color:var(--pri-normal)">普通</span> <span style="color:var(--pri-low)">低优</span>，自动标注</div>
+        </div>
+        <div class="feature-card">
+          <div class="f-emoji">📅</div>
+          <div class="f-title">时间戳 + 分类</div>
+          <div class="f-desc">自动记录时间，6大分类随心切换</div>
+        </div>
+        <div class="feature-card">
+          <div class="f-emoji">🔄</div>
+          <div class="f-title">自由拖拽</div>
+          <div class="f-desc">板块可拖拽重排，布局锁定防误触</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== Slide 5: Real Scenarios ====== -->
+    <section class="slide slide-5">
+      <h2 class="section-title">打工人真实用法</h2>
+      <div class="scene-list">
+        <div class="scene-card">
+          <div class="scene-flow">
+            <span class="scene-icon">💬</span>
+            <span>微信被@一堆事</span>
+            <span class="arrow">→</span>
+            <span>复制粘贴</span>
+            <span class="arrow">→</span>
+            <span class="highlight">自动拆待办清单</span>
+          </div>
+        </div>
+        <div class="scene-card">
+          <div class="scene-flow">
+            <span class="scene-icon">📝</span>
+            <span>开会笔记</span>
+            <span class="arrow">→</span>
+            <span>贴进去</span>
+            <span class="arrow">→</span>
+            <span class="highlight">TODO和参考资料自动分开</span>
+          </div>
+        </div>
+        <div class="scene-card">
+          <div class="scene-flow">
+            <span class="scene-icon">💡</span>
+            <span>脑中灵感</span>
+            <span class="arrow">→</span>
+            <span>立刻记</span>
+            <span class="arrow">→</span>
+            <span class="highlight">丢进去不用怕忘</span>
+          </div>
+        </div>
+        <div class="scene-card">
+          <div class="scene-flow">
+            <span class="scene-icon">📧</span>
+            <span>邮件碎片</span>
+            <span class="arrow">→</span>
+            <span>粘贴</span>
+            <span class="arrow">→</span>
+            <span class="highlight">自动分类标好优先级</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== Slide 6: CTA ====== -->
+    <section class="slide slide-6">
+      <h2 class="cta-title">你的工作是什么？</h2>
+      <p class="cta-body">评论区告诉我，在线帮想 AI 还能替你干点啥。</p>
+      <div class="cta-big">一起来试试</div>
+      <p class="cta-tags">#AI提效 &nbsp; #打工人效率工具 &nbsp; #AI任务收件箱</p>
+      <p class="cta-account">@AI任务收件箱</p>
+    </section>
+
+  </div><!-- /slides-track -->
+
+  <!-- Navigation -->
+  <button class="nav-btn up" id="btnPrev" aria-label="上一页">&#x2191;</button>
+  <button class="nav-btn down" id="btnNext" aria-label="下一页">&#x2193;</button>
+
+  <!-- Page Dots -->
+  <div class="dots" id="dots">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="kbd-hint">键盘 ← → 或 ↑ ↓ 翻页</div>
+</div>
+
+<script>
+(function () {
+  var current = 0;
+  var total = 6;
+  var track = document.getElementById('track');
+  var dots = document.querySelectorAll('#dots .dot');
+  var btnPrev = document.getElementById('btnPrev');
+  var btnNext = document.getElementById('btnNext');
+
+  function goTo(index) {
+    current = Math.max(0, Math.min(total - 1, index));
+    track.style.transform = 'translateY(-' + (current * window.innerHeight) + 'px)';
+    for (var i = 0; i < dots.length; i++) {
+      dots[i].className = i === current ? 'dot active' : 'dot';
+    }
+    btnPrev.style.opacity = current === 0 ? '0.3' : '1';
+    btnNext.style.opacity = current === total - 1 ? '0.3' : '1';
+  }
+
+  btnPrev.addEventListener('click', function () { goTo(current - 1); });
+  btnNext.addEventListener('click', function () { goTo(current + 1); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); goTo(current - 1); }
+  });
+
+  for (var d = 0; d < dots.length; d++) {
+    (function (idx) {
+      dots[idx].addEventListener('click', function () { goTo(idx); });
+    })(d);
+  }
+
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () { goTo(current); }, 100);
+  });
+
+  // Touch swipe
+  var touchStartY = 0;
+  track.addEventListener('touchstart', function (e) { touchStartY = e.touches[0].clientY; }, { passive: true });
+  track.addEventListener('touchend', function (e) {
+    var dy = touchStartY - e.changedTouches[0].clientY;
+    if (Math.abs(dy) > 50) { goTo(current + (dy > 0 ? 1 : -1)); }
+  });
+
+  goTo(0);
+})();
+</script>
+
+</body>
+</html>
