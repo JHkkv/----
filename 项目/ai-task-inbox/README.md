@@ -1,6 +1,7 @@
 # AI任务收件箱 — 项目交接文件
 
 > **创建时间**: 2026-07-14
+> **最后更新**: 2026-07-14（清新PPT主题）
 > **当前状态**: ✅ 质检通过，可发布
 > **Git HEAD**: `6753dc5`
 
@@ -66,10 +67,11 @@
 ## 五、技术要点
 
 - **架构**: IIFE `(function() { 'use strict'; ... })()`
-- **主题**: 暖琥珀 `#F59E0B` + 深色背景 `#0a0a0f`
+- **PWA主题**: 暖琥珀 `#F59E0B`（暗色）+ 亮色模式
+- **PPT主题**: 清新天蓝 `#0EA5E9`（浅色底 + 白色卡片）
 - **安全**: API Key → sessionStorage（base64编码，关闭即清除）；CSP头；escapeHtml防XSS
 - **API**: DeepSeek `https://api.deepseek.com/chat/completions`，也支持OpenAI/自定义
-- **存储**: 4个localStorage key — `ai_inbox_tasks` / `ai_inbox_cats` / `ai_inbox_order` / `ai_inbox_theme`
+- **存储**: 4个localStorage key — `aitask_tasks_v1` / `aitask_cats_v1` / `aitask_order_v1` / `aitask_theme_v1`
 - **降级**: AI调用失败→手动模式；离线→本地查看已缓存任务
 
 ---
