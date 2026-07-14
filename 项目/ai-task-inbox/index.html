@@ -760,6 +760,97 @@ input, textarea, select { font-family: inherit; outline: none; border: none; }
   to { opacity: 1; transform: scale(1); }
 }
 
+/* ----- Task Completion ----- */
+.task-checkbox {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-top: 1px;
+  color: transparent;
+  font-size: 0.7rem;
+}
+.task-checkbox:hover { border-color: var(--accent); }
+.task-checkbox.checked {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+.task-card.completed { opacity: 0.5; }
+.task-card.completed .task-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+.pri-border-clickable { cursor: pointer; transition: filter var(--transition-fast); }
+.pri-border-clickable:hover { filter: brightness(1.3); }
+
+/* ----- Empty State ----- */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px 30px;
+  animation: fadeSlideIn 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.empty-state-emoji { font-size: 2.4rem; margin-bottom: 4px; }
+.empty-state-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.empty-state-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 280px;
+}
+
+/* ----- Completed Section ----- */
+.completed-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  animation: fadeSlideIn 0.3s ease both;
+}
+.completed-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  cursor: pointer;
+  user-select: none;
+  background: var(--bg-card);
+  border-bottom: 1px solid transparent;
+  transition: all var(--transition-fast);
+}
+.completed-header:hover { background: var(--bg-card-hover); }
+.completed-header.expanded { border-bottom-color: var(--border); }
+.completed-header .toggle-icon {
+  transition: transform var(--transition-normal);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+.completed-header.expanded .toggle-icon { transform: rotate(90deg); }
+.completed-body { display: none; padding: 6px 8px 8px; flex-direction: column; gap: 6px; }
+.completed-body.visible { display: flex; }
+
+/* ----- Char Counter ----- */
+.char-counter {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+}
+.char-counter.over-limit { color: var(--danger); }
+
 /* ----- Scrollbar ----- */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -802,6 +893,7 @@ input, textarea, select { font-family: inherit; outline: none; border: none; }
         <span class="btn-text">AI 智能分类</span>
       </button>
       <span class="input-hint">Enter 快捷提交 | Shift+Enter 手动添加</span>
+      <span class="char-counter" id="charCounter">0 / 2000</span>
     </div>
   </section>
 
@@ -831,6 +923,23 @@ input, textarea, select { font-family: inherit; outline: none; border: none; }
   <!-- Sortable Task Sections -->
   <div class="sortable-container" id="sortableContainer">
     <!-- Dynamically filled -->
+  </div>
+
+  <!-- Empty State Guide -->
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <div class="empty-state-emoji">&#x2728;</div>
+    <div class="empty-state-title">把碎片信息粘贴进来，AI帮你整理</div>
+    <div class="empty-state-sub">支持粘贴聊天记录、邮件片段、会议笔记、任意想法</div>
+  </div>
+
+  <!-- Completed Tasks Section -->
+  <div class="completed-section" id="completedSection" style="display:none;">
+    <div class="completed-header" id="completedHeader">
+      <span class="toggle-icon">&#x25B6;</span>
+      <span style="font-size:0.82rem;font-weight:600;">已完成</span>
+      <span style="font-size:0.72rem;color:var(--text-muted);" id="completedCount">0 条</span>
+    </div>
+    <div class="completed-body" id="completedBody"></div>
   </div>
 
 </div><!-- /.app-container -->
@@ -990,7 +1099,8 @@ var state = {
   editingTaskId: null,
   editingTabMode: null,     // 'add' | 'rename' | null
   editingTabTarget: null,   // category name for rename
-  contextMenuTab: null
+  contextMenuTab: null,
+  completedExpanded: false
 };
 
 // ============================
@@ -1040,7 +1150,13 @@ var dom = {
   apikeyPromptInput: $('#apikeyPromptInput'),
   btnSaveApikey: $('#btnSaveApikey'),
   btnSkipApikey: $('#btnSkipApikey'),
-  toast: $('#toast')
+  toast: $('#toast'),
+  charCounter: $('#charCounter'),
+  emptyState: $('#emptyState'),
+  completedSection: $('#completedSection'),
+  completedHeader: $('#completedHeader'),
+  completedBody: $('#completedBody'),
+  completedCount: $('#completedCount')
 };
 
 // ============================
@@ -1049,7 +1165,7 @@ var dom = {
 function escapeHtml(str) {
   var div = document.createElement('div');
   div.appendChild(document.createTextNode(str));
-  return div.innerHTML;
+  return div.innerHTML.replace(/"/g, '&quot;');
 }
 
 function uuid() {
@@ -1207,6 +1323,8 @@ function classifyWithAI(inputText) {
   var endpoint = getApiEndpoint();
   var model = state.settings.model || DEFAULT_MODELS[state.settings.apiProvider] || 'deepseek-chat';
   var prompt = buildClassifyPrompt(inputText);
+  var controller = new AbortController();
+  var timeoutId = setTimeout(function () { controller.abort(); }, 10000);
 
   return fetch(endpoint, {
     method: 'POST',
@@ -1224,8 +1342,10 @@ function classifyWithAI(inputText) {
       temperature: 0.3,
       max_tokens: 2000,
       top_p: 0.9
-    })
+    }),
+    signal: controller.signal
   }).then(function (r) {
+    clearTimeout(timeoutId);
     if (!r.ok) {
       return r.text().then(function (body) {
         var msg = 'API 请求失败 (HTTP ' + r.status + ')';
@@ -1252,6 +1372,10 @@ function classifyWithAI(inputText) {
     var results = JSON.parse(jsonStr);
     if (!Array.isArray(results)) throw new Error('AI 返回格式异常');
     return results;
+  }).catch(function (err) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') throw new Error('请求超时（10秒），请检查网络或稍后重试');
+    throw err;
   });
 }
 
@@ -1278,7 +1402,7 @@ function addManualTask(text) {
 // 8. TASK SORTING
 // ============================
 function getTasksByPriority(pri) {
-  var tasks = state.tasks.filter(function (t) { return t.priority === pri; });
+  var tasks = state.tasks.filter(function (t) { return t.priority === pri && !t.isCompleted; });
   if (state.activeCategory) {
     tasks = tasks.filter(function (t) { return t.category === state.activeCategory; });
   }
@@ -1290,15 +1414,24 @@ function getTasksByPriority(pri) {
   return tasks;
 }
 
+function getCompletedTasks() {
+  var tasks = state.tasks.filter(function (t) { return t.isCompleted; });
+  if (state.activeCategory) {
+    tasks = tasks.filter(function (t) { return t.category === state.activeCategory; });
+  }
+  tasks.sort(function (a, b) { return (b.completedAt || 0) - (a.completedAt || 0); });
+  return tasks;
+}
+
 function getCategoryTaskCount(catName) {
-  return state.tasks.filter(function (t) { return t.category === catName; }).length;
+  return state.tasks.filter(function (t) { return t.category === catName && !t.isCompleted; }).length;
 }
 
 // ============================
 // 9. RENDERING
 // ============================
 function renderCategoryTabs() {
-  var allCount = state.tasks.length;
+  var allCount = state.tasks.filter(function (t) { return !t.isCompleted; }).length;
   var html = '<button class="tab-item' + (state.activeCategory === null ? ' active' : '') + '" data-cat="">全部 <span class="tab-count">' + allCount + '</span></button>';
   for (var i = 0; i < state.categories.length; i++) {
     var cat = state.categories[i];
@@ -1401,6 +1534,17 @@ function deleteCategory(name) {
 function renderAll() {
   renderCategoryTabs();
   renderSections();
+  renderCompletedSection();
+  renderEmptyState();
+}
+
+function renderEmptyState() {
+  var hasTasks = state.tasks.length > 0;
+  dom.sortableContainer.style.display = hasTasks ? 'flex' : 'none';
+  dom.emptyState.style.display = hasTasks ? 'none' : 'flex';
+  // Show completed section only if there are completed tasks
+  var completed = getCompletedTasks();
+  dom.completedSection.style.display = completed.length > 0 ? 'block' : 'none';
 }
 
 function renderSections() {
@@ -1437,15 +1581,20 @@ function renderSections() {
 
 function renderTaskCard(task) {
   var color = PRI_COLORS[task.priority];
-  return '<div class="task-card" data-id="' + task.id + '">' +
-    '<div class="pri-border" style="background:' + color + ';"></div>' +
+  var isCompleted = task.isCompleted;
+  var completedCls = isCompleted ? ' completed' : '';
+  var checkedCls = isCompleted ? ' checked' : '';
+  var checkMark = isCompleted ? '&#x2713;' : '';
+  return '<div class="task-card' + completedCls + '" data-id="' + task.id + '">' +
+    '<div class="task-checkbox' + checkedCls + '" data-check="' + task.id + '">' + checkMark + '</div>' +
+    '<div class="pri-border pri-border-clickable" style="background:' + color + ';" data-cycle="' + task.id + '" title="点击切换优先级"></div>' +
     '<div class="task-body">' +
       '<div class="task-title">' + escapeHtml(task.title) + '</div>' +
       (task.summary ? '<div class="task-summary">' + escapeHtml(task.summary) + '</div>' : '') +
       '<div class="task-meta">' +
         '<span class="task-category">' + escapeHtml(task.category) + '</span>' +
         '<span class="task-time">' + formatTime(task.createdAt) + '</span>' +
-        '<span class="task-pin' + (task.isPinned ? ' pinned' : '') + '" data-pin="' + task.id + '">📌</span>' +
+        '<span class="task-pin' + (task.isPinned ? ' pinned' : '') + '" data-pin="' + task.id + '">&#x1F4CC;</span>' +
       '</div>' +
     '</div>' +
     '<div class="task-delete" data-del="' + task.id + '">删除</div>' +
@@ -1460,9 +1609,27 @@ function bindTaskCardEvents() {
 
     // Click to edit
     card.addEventListener('click', function (e) {
-      if (e.target.closest('.task-delete') || e.target.closest('.task-pin')) return;
+      if (e.target.closest('.task-delete') || e.target.closest('.task-pin') || e.target.closest('.task-checkbox') || e.target.closest('.pri-border-clickable')) return;
       openEditModal(this.getAttribute('data-id'));
     });
+
+    // Checkbox toggle
+    var cb = card.querySelector('.task-checkbox');
+    if (cb) {
+      cb.addEventListener('click', function (e) {
+        e.stopPropagation();
+        toggleComplete(this.getAttribute('data-check'));
+      });
+    }
+
+    // Priority cycle via pri-border click
+    var priBorder = card.querySelector('.pri-border-clickable');
+    if (priBorder) {
+      priBorder.addEventListener('click', function (e) {
+        e.stopPropagation();
+        cyclePriority(this.getAttribute('data-cycle'));
+      });
+    }
 
     // Pin toggle
     var pinBtn = card.querySelector('.task-pin');
@@ -1489,6 +1656,71 @@ function bindTaskCardEvents() {
 }
 
 // ============================
+// 11. TASK COMPLETION
+// ============================
+function toggleComplete(id) {
+  var task = findTask(id);
+  if (!task) return;
+  task.isCompleted = !task.isCompleted;
+  task.completedAt = task.isCompleted ? Date.now() : null;
+  saveTasks();
+  renderAll();
+  showToast(task.isCompleted ? '任务已完成' : '已恢复为未完成');
+}
+
+function renderCompletedSection() {
+  var tasks = getCompletedTasks();
+  if (tasks.length === 0) {
+    dom.completedBody.innerHTML = '';
+    dom.completedBody.classList.remove('visible');
+    dom.completedHeader.classList.remove('expanded');
+    return;
+  }
+  dom.completedCount.textContent = tasks.length + ' 条';
+  var html = '';
+  for (var i = 0; i < tasks.length; i++) {
+    html += renderTaskCard(tasks[i]);
+  }
+  dom.completedBody.innerHTML = html;
+  if (state.completedExpanded) {
+    dom.completedBody.classList.add('visible');
+    dom.completedHeader.classList.add('expanded');
+  } else {
+    dom.completedBody.classList.remove('visible');
+    dom.completedHeader.classList.remove('expanded');
+  }
+
+  // Bind events for completed section cards
+  var completedCards = dom.completedBody.querySelectorAll('.task-card');
+  for (var j = 0; j < completedCards.length; j++) {
+    var card = completedCards[j];
+    var cardId = card.getAttribute('data-id');
+
+    card.addEventListener('click', function (e) {
+      if (e.target.closest('.task-delete') || e.target.closest('.task-pin') || e.target.closest('.task-checkbox') || e.target.closest('.pri-border-clickable')) return;
+      openEditModal(this.getAttribute('data-id'));
+    });
+
+    var cb = card.querySelector('.task-checkbox');
+    if (cb) {
+      cb.addEventListener('click', function (e) {
+        e.stopPropagation();
+        toggleComplete(this.getAttribute('data-check'));
+      });
+    }
+
+    var delBtn = card.querySelector('.task-delete');
+    if (delBtn) {
+      delBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        deleteTask(this.getAttribute('data-del'));
+      });
+    }
+
+    // Swipe for completed cards too
+    bindSwipe(card);
+  }
+}
 // 10. TASK CRUD
 // ============================
 function togglePinTask(id) {
@@ -1839,6 +2071,7 @@ function doClassify() {
     if (added > 0) {
       saveTasks();
       dom.inputText.value = '';
+      updateCharCounter();
       renderAll();
       showToast('AI 已分类，新增 ' + added + ' 条任务');
     } else {
@@ -1896,12 +2129,16 @@ function bindEvents() {
         e.preventDefault();
         addManualTask(dom.inputText.value);
         dom.inputText.value = '';
+        updateCharCounter();
       } else {
         e.preventDefault();
         if (!state.isClassifying) doClassify();
       }
     }
   });
+
+  // Input textarea - char counter
+  dom.inputText.addEventListener('input', updateCharCounter);
 
   // Lock toggle
   dom.lockToggle.addEventListener('change', function () {
@@ -1986,6 +2223,13 @@ function bindEvents() {
     dom.installPrompt.classList.remove('visible');
   });
 
+  // Completed section toggle
+  dom.completedHeader.addEventListener('click', function () {
+    state.completedExpanded = !state.completedExpanded;
+    dom.completedBody.classList.toggle('visible', state.completedExpanded);
+    dom.completedHeader.classList.toggle('expanded', state.completedExpanded);
+  });
+
   // Keyboard shortcuts
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
@@ -2020,6 +2264,22 @@ function init() {
   renderAll();
   bindEvents();
   initPWA();
+}
+
+// ============================
+// 21. CHAR COUNTER & INPUT VALIDATION
+// ============================
+var MAX_INPUT_LENGTH = 2000;
+
+function updateCharCounter() {
+  var len = dom.inputText.value.length;
+  dom.charCounter.textContent = len + ' / ' + MAX_INPUT_LENGTH;
+  dom.charCounter.classList.toggle('over-limit', len > MAX_INPUT_LENGTH);
+  if (len > MAX_INPUT_LENGTH) {
+    dom.inputText.value = dom.inputText.value.slice(0, MAX_INPUT_LENGTH);
+    dom.charCounter.textContent = MAX_INPUT_LENGTH + ' / ' + MAX_INPUT_LENGTH;
+    showToast('输入内容已超过' + MAX_INPUT_LENGTH + '字，已自动截断');
+  }
 }
 
 if (document.readyState === 'loading') {
