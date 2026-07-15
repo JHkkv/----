@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day3 — JD镜子法简历诊断</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --warm-white: #FAF8F5;
+  --cream-bg: #F5F0EB;
+  --teal: #0D9488;
+  --teal-dark: #0F766E;
+  --teal-light: #CCFBF1;
+  --teal-pale: #F0FDFA;
+  --ink: #1E293B;
+  --ink-light: #475569;
+  --ink-lighter: #94A3B8;
+  --apricot: #E8965A;
+  --apricot-pale: #FDF0E5;
+  --rose: #E11D48;
+  --amber: #D97706;
+  --amber-pale: #FFFBEB;
+  --card-bg: #FFFFFF;
+  --card-shadow: 0 4px 24px rgba(30,41,59,0.06), 0 2px 8px rgba(30,41,59,0.03);
+  --sw: 720px;
+  --sh: 960px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #E8E5E0;
+  font-family: 'Noto Sans SC', sans-serif;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 64px;
+  gap: 40px;
+}
+
+.screenshot-tip {
+  position: fixed; top: 0; left: 0; right: 0;
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+  color: #fff; text-align: center; padding: 10px 20px;
+  font-size: 13px; font-weight: 500; z-index: 99;
+  letter-spacing: 0.5px;
+}
+
+.slide {
+  width: var(--sw); height: var(--sh); background: var(--card-bg);
+  border-radius: 20px; box-shadow: var(--card-shadow);
+  position: relative; overflow: hidden; flex-shrink: 0;
+  display: flex; flex-direction: column;
+}
+
+.cover-bg {
+  background: linear-gradient(160deg, #F0FDFA 0%, #FAF8F5 40%, #FDF0E5 100%);
+}
+
+.tag {
+  display: inline-block; padding: 6px 16px; border-radius: 20px;
+  font-size: 13px; font-weight: 500; letter-spacing: 0.5px;
+}
+.tag-teal { background: var(--teal-pale); color: var(--teal); }
+.tag-amber { background: var(--amber-pale); color: var(--amber); }
+
+.prompt-block {
+  background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px;
+  padding: 16px 18px; font-size: 12.5px; line-height: 1.7; color: #334155;
+}
+
+.step-num {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--teal);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 16px; flex-shrink: 0;
+}
+
+.golden-q {
+  font-family: 'Noto Serif SC', serif; font-weight: 700; line-height: 1.4;
+}
+
+.divider { width: 48px; height: 3px; border-radius: 2px; background: var(--teal); }
+
+.diag-card {
+  background: #F8FAFC; border-radius: 12px; padding: 16px 18px;
+  border: 1px solid #E2E8F0;
+}
+.diag-card .label { font-size: 11px; color: var(--teal); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<div class="screenshot-tip">📸 右键每张卡片 → 「截图」或浏览器截图插件 → 保存为小红书图文</div>
+
+<!-- ============ SLIDE 1: 封面 ============ -->
+<div class="slide cover-bg" style="justify-content:center;align-items:center;text-align:center;padding:80px 56px;">
+  <div class="tag tag-teal" style="margin-bottom:28px;">AI求职实战 · 诊断篇</div>
+  <h1 style="font-family:'Noto Serif SC',serif;font-weight:900;font-size:34px;line-height:1.25;color:var(--ink);margin-bottom:16px;">
+    简历石沉大海？
+  </h1>
+  <p style="font-size:20px;font-weight:600;color:var(--teal);margin-bottom:32px;">
+    把JD和简历同时发给AI<br>让它告诉你差在哪
+  </p>
+  <div class="divider" style="margin:0 auto 28px;"></div>
+  <p style="font-size:15px;color:var(--ink-light);line-height:1.7;">
+    一套3分钟跑完的<br>🔍 "JD镜子法"
+  </p>
+  <div style="position:absolute;bottom:40px;font-size:12px;color:var(--ink-lighter);">
+    30天AI教我做自媒体 × AI求职特辑 · Day 3
+  </div>
+  <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:var(--teal-pale);opacity:0.6;"></div>
+  <div style="position:absolute;bottom:-40px;left:-40px;width:140px;height:140px;border-radius:50%;background:var(--apricot-pale);opacity:0.5;"></div>
+</div>
+
+<!-- ============ SLIDE 2: 痛点 ============ -->
+<div class="slide" style="padding:60px 52px;justify-content:center;">
+  <div style="margin-bottom:36px;">
+    <p style="font-size:16px;line-height:1.8;color:var(--ink-light);margin-bottom:24px;">
+      改简历改了十几版，自己觉得已经尽力了。<br>
+      排版简洁、工作经历都写了、<br>
+      自我评价也看不出毛病。
+    </p>
+    <p style="font-size:16px;line-height:1.8;color:var(--ink-light);margin-bottom:24px;">
+      投出去，<strong style="color:var(--ink);font-size:20px;">石沉大海。</strong>
+    </p>
+  </div>
+  <div style="text-align:center;margin-bottom:28px;">
+    <p style="font-size:22px;font-weight:700;color:var(--rose);line-height:1.5;">
+      你甚至不知道<br>自己哪里有问题。
+    </p>
+  </div>
+  <div class="divider" style="margin:0 auto 24px;"></div>
+  <p style="font-size:14px;line-height:1.7;color:var(--ink-lighter);text-align:center;">
+    不是写得不够好。<br>
+    是你<strong style="color:var(--teal);">看不到差距</strong>。
+  </p>
+</div>
+
+<!-- ============ SLIDE 3: 方法介绍 ============ -->
+<div class="slide" style="padding:56px 52px;">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:32px;">
+    <span style="font-size:32px;">🔍</span>
+    <div>
+      <h2 style="font-family:'Noto Serif SC',serif;font-size:26px;font-weight:700;margin-bottom:4px;">JD镜子法</h2>
+      <p style="font-size:14px;color:var(--ink-lighter);">让JD变成一面镜子，照出简历里的缺口</p>
+    </div>
+  </div>
+
+  <p style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:20px;">操作很简单，三分钟跑完：</p>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div class="step-num">1</div>
+      <span style="font-size:15px;">复制你想投的那个岗位的完整JD</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div class="step-num">2</div>
+      <span style="font-size:15px;">复制你自己简历的文字版</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div class="step-num">3</div>
+      <span style="font-size:15px;">把两个同时发给AI</span>
+    </div>
+  </div>
+
+  <div style="position:absolute;bottom:60px;left:52px;right:52px;">
+    <p style="font-size:13px;color:var(--ink-lighter);text-align:center;margin-bottom:8px;">👇 用下面这个提示词</p>
+    <div style="text-align:center;">
+      <span style="display:inline-block;animation:bounce 1.5s infinite;font-size:20px;">⬇️</span>
+    </div>
+  </div>
+
+  <style>@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}</style>
+</div>
+
+<!-- ============ SLIDE 4: 提示词卡片 ============ -->
+<div class="slide" style="padding:40px 48px;">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+    <span style="font-size:22px;">📋</span>
+    <h2 style="font-size:18px;font-weight:700;">直接可用的提示词</h2>
+    <span style="font-size:11px;color:var(--teal);background:var(--teal-pale);padding:3px 10px;border-radius:10px;">复制即用</span>
+  </div>
+
+  <div class="prompt-block" style="font-size:11.5px;line-height:1.7;">
+    <p style="font-weight:600;margin-bottom:10px;">你是一位资深的招聘HR。请做一份简历诊断报告：</p>
+    <p style="color:var(--ink-lighter);margin-bottom:4px;">【岗位JD】← 粘贴JD全文</p>
+    <p style="color:var(--ink-lighter);margin-bottom:12px;">【简历】← 粘贴简历全文</p>
+
+    <p style="font-weight:600;margin-bottom:8px;">输出6个维度：</p>
+    <p>❶ <strong>匹配度总评</strong> — 百分比 + 核心差距</p>
+    <p>❷ <strong>缺失关键词</strong> — JD有简历没有的能力</p>
+    <p>❸ <strong>弱势项</strong> — 说了但不够强的项</p>
+    <p>❹ <strong>跑题项</strong> — 写了但JD不关心的内容</p>
+    <p>❺ <strong>优先序建议</strong> — 10秒内该突出什么</p>
+    <p>❻ <strong>5处具体改写</strong> — 原句→改写→解释</p>
+  </div>
+
+  <p style="font-size:11px;color:var(--ink-lighter);margin-top:14px;text-align:center;">
+    💡 直接、诚实。如果匹配度很低，请直说。
+  </p>
+</div>
+
+<!-- ============ SLIDE 5: 诊断案例 ============ -->
+<div class="slide" style="padding:48px 52px;">
+  <h3 style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:20px;">📊 一个真实诊断案例</h3>
+
+  <div style="text-align:center;margin-bottom:20px;">
+    <p style="font-size:12px;color:var(--ink-lighter);margin-bottom:4px;">AI 诊断结果</p>
+    <p style="font-size:48px;font-weight:900;color:var(--rose);line-height:1;">40%</p>
+    <p style="font-size:14px;color:var(--ink-light);">匹配度</p>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px;">
+    <div class="diag-card">
+      <span class="label">🔴 致命问题1</span>
+      <p style="font-size:13px;margin-top:6px;">简历里全是"负责""完成""协助"——动作词。<br>JD要的是"内容策划""数据分析""用户洞察"——能力词。</p>
+    </div>
+    <div class="diag-card">
+      <span class="label">🟡 致命问题2</span>
+      <p style="font-size:13px;margin-top:6px;">最近一份工作写了7行，却是行政岗。<br>相关内容运营的工作反而只写了3行。</p>
+    </div>
+    <div class="diag-card">
+      <span class="label">🟠 致命问题3</span>
+      <p style="font-size:13px;margin-top:6px;">"沟通能力强、抗压能力好、团队合作精神"<br>——HR一天看50份简历，45份都是这句话。</p>
+    </div>
+  </div>
+
+  <p style="font-size:14px;font-weight:600;color:var(--teal-dark);text-align:center;">
+    → 按AI建议改后续投8家，收到3个面试邀请
+  </p>
+</div>
+
+<!-- ============ SLIDE 6: 收束 + 金句 ============ -->
+<div class="slide cover-bg" style="padding:56px 52px;">
+  <h3 style="font-size:18px;font-weight:700;margin-bottom:24px;">💡 为什么比简历专家管用？</h3>
+
+  <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:40px;">
+    <div style="display:flex;gap:12px;align-items:flex-start;">
+      <div class="step-num" style="background:var(--apricot);">①</div>
+      <div style="flex:1;">
+        <p style="font-weight:600;font-size:14px;">针对具体JD，不是通用优化</p>
+        <p style="font-size:13px;color:var(--ink-light);">同一份简历投A岗可能是90分，投B岗是40分</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;align-items:flex-start;">
+      <div class="step-num" style="background:var(--apricot);">②</div>
+      <div style="flex:1;">
+        <p style="font-weight:600;font-size:14px;">AI没有利益冲突</p>
+        <p style="font-size:13px;color:var(--ink-light);">不会为了"改出点什么"把没问题的也改了</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;align-items:flex-start;">
+      <div class="step-num" style="background:var(--apricot);">③</div>
+      <div style="flex:1;">
+        <p style="font-weight:600;font-size:14px;">成本为零，投每个岗都能跑一遍</p>
+        <p style="font-size:13px;color:var(--ink-light);">10份简历 × 10个岗位 = 10次诊断，只需3分钟/次</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;">
+    <p class="golden-q" style="font-size:26px;color:var(--teal-dark);line-height:1.5;">
+      不是你不够好，<br>是你没让HR<br><span style="font-size:32px;">看懂你</span>。
+    </p>
+  </div>
+
+  <div style="position:absolute;bottom:36px;left:0;right:0;text-align:center;">
+    <p style="font-size:13px;color:var(--ink-lighter);">🏷️ #简历优化 #AI求职 #简历诊断 #找工作 #面试技巧</p>
+    <p style="font-size:11px;color:var(--ink-lighter);margin-top:4px;">🤖 由 Claude 辅助创作 · 下期见</p>
+  </div>
+</div>
+
+</body>
+</html>

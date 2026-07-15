@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day2 — AI经历翻译官</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --warm-white: #FAF8F5;
+  --cream-bg: #F5F0EB;
+  --teal: #0D9488;
+  --teal-dark: #0F766E;
+  --teal-light: #CCFBF1;
+  --teal-pale: #F0FDFA;
+  --ink: #1E293B;
+  --ink-light: #475569;
+  --ink-lighter: #94A3B8;
+  --apricot: #E8965A;
+  --apricot-pale: #FDF0E5;
+  --rose: #E11D48;
+  --rose-pale: #FFF1F2;
+  --card-bg: #FFFFFF;
+  --card-shadow: 0 4px 24px rgba(30,41,59,0.06), 0 2px 8px rgba(30,41,59,0.03);
+  --sw: 720px;
+  --sh: 960px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #E8E5E0;
+  font-family: 'Noto Sans SC', sans-serif;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 64px;
+  gap: 40px;
+}
+
+.screenshot-tip {
+  position: fixed; top: 0; left: 0; right: 0;
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+  color: #fff; text-align: center; padding: 10px 20px;
+  font-size: 13px; font-weight: 500; z-index: 99;
+  letter-spacing: 0.5px;
+}
+
+.slide {
+  width: var(--sw); height: var(--sh); background: var(--card-bg);
+  border-radius: 20px; box-shadow: var(--card-shadow);
+  position: relative; overflow: hidden; flex-shrink: 0;
+  display: flex; flex-direction: column;
+}
+
+.cover-bg {
+  background: linear-gradient(160deg, #F0FDFA 0%, #FAF8F5 40%, #FDF0E5 100%);
+}
+
+.tag {
+  display: inline-block; padding: 6px 16px; border-radius: 20px;
+  font-size: 13px; font-weight: 500; letter-spacing: 0.5px;
+}
+.tag-teal { background: var(--teal-pale); color: var(--teal); }
+.tag-rose { background: var(--rose-pale); color: var(--rose); }
+
+.compare-card {
+  border-radius: 12px; padding: 18px 20px; font-size: 14px; line-height: 1.6;
+}
+.compare-before { background: #F1F5F9; border-left: 3px solid #CBD5E1; color: #64748B; }
+.compare-after  { background: var(--teal-pale); border-left: 3px solid var(--teal); color: var(--teal-dark); }
+
+.prompt-block {
+  background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px;
+  padding: 16px 18px; font-size: 13px; line-height: 1.7; color: #334155;
+}
+
+.step-num {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--teal);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 16px; flex-shrink: 0;
+}
+
+.golden-q {
+  font-family: 'Noto Serif SC', serif; font-weight: 700; line-height: 1.4;
+}
+
+.divider { width: 48px; height: 3px; border-radius: 2px; background: var(--teal); }
+
+.quote-mark {
+  font-family: 'Noto Serif SC', serif; font-size: 48px; line-height: 1;
+  color: var(--rose); opacity: 0.4;
+}
+</style>
+</head>
+<body>
+
+<div class="screenshot-tip">📸 右键每张卡片 → 「截图」或浏览器截图插件 → 保存为小红书图文</div>
+
+<!-- ============ SLIDE 1: 封面 ============ -->
+<div class="slide cover-bg" style="justify-content:center;align-items:center;text-align:center;padding:80px 56px;">
+  <div class="tag tag-teal" style="margin-bottom:28px;">AI求职实战 · 转行篇</div>
+  <h1 style="font-family:'Noto Serif SC',serif;font-weight:900;font-size:34px;line-height:1.25;color:var(--ink);margin-bottom:16px;">
+    转行简历总被拒？
+  </h1>
+  <p style="font-size:20px;font-weight:600;color:var(--teal);margin-bottom:32px;">
+    因为你在用"旧话"说"新岗"
+  </p>
+  <div class="divider" style="margin:0 auto 28px;"></div>
+  <p style="font-size:15px;color:var(--ink-light);line-height:1.7;">
+    用AI把老经历<br>翻译成新JD的话术
+  </p>
+  <div style="position:absolute;bottom:40px;font-size:12px;color:var(--ink-lighter);">
+    30天AI教我做自媒体 × AI求职特辑 · Day 2
+  </div>
+  <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:var(--teal-pale);opacity:0.6;"></div>
+  <div style="position:absolute;bottom:-40px;left:-40px;width:140px;height:140px;border-radius:50%;background:var(--apricot-pale);opacity:0.5;"></div>
+</div>
+
+<!-- ============ SLIDE 2: 拒信共鸣 ============ -->
+<div class="slide" style="padding:60px 52px;justify-content:center;">
+  <div style="margin-bottom:36px;">
+    <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:28px;">
+      <span class="quote-mark" style="margin-top:-12px;">"</span>
+      <p style="font-size:22px;font-weight:500;line-height:1.6;color:var(--ink);">
+        很抱歉，<br>您的工作经验与我们岗位<br>不太匹配。
+      </p>
+    </div>
+    <p style="font-size:14px;color:var(--ink-lighter);margin-bottom:8px;">—— 我转行那两个月的日常</p>
+  </div>
+  <div class="divider" style="margin-bottom:28px;"></div>
+  <p style="font-size:15px;line-height:1.8;color:var(--ink-light);">
+    试过电商运营、当过采购、给老板打过杂。<br>
+    简历怎么看都像拼凑的。<br><br>
+    <strong style="color:var(--ink);">后来我做了一件事——</strong><br>
+    <span style="color:var(--teal);font-weight:600;">面试邀约从每周0个变成了3-4个。</span>
+  </p>
+</div>
+
+<!-- ============ SLIDE 3: 核心洞察 ============ -->
+<div class="slide" style="padding:56px 52px;justify-content:center;">
+  <div class="tag tag-rose" style="margin-bottom:20px;">🚫 转行人最常犯的错</div>
+
+  <h2 style="font-family:'Noto Serif SC',serif;font-size:28px;font-weight:700;line-height:1.3;color:var(--ink);margin-bottom:28px;">
+    用老行业的语言<br>去投新行业的岗位
+  </h2>
+
+  <div style="display:flex;gap:16px;margin-bottom:36px;">
+    <div class="compare-card compare-before" style="flex:1;font-size:13px;">
+      <div style="font-size:11px;color:#94A3B8;margin-bottom:6px;">▎你是这么说的（电商）</div>
+      "选品上架、<br>看后台数据调价格、<br>旺季一人管三个平台"
+    </div>
+    <div style="align-self:center;font-size:24px;color:var(--ink-lighter);">?</div>
+    <div class="compare-card" style="flex:1;font-size:13px;background:#FEF2F2;border-left:3px solid #FCA5A5;color:#B91C1C;">
+      <div style="font-size:11px;color:var(--rose);margin-bottom:6px;">▎HR脑子里是</div>
+      "这些跟AI内容运营<br>有什么关系？<br>划走。"
+    </div>
+  </div>
+
+  <p style="font-size:20px;font-weight:700;color:var(--teal-dark);text-align:center;">
+    你不是缺能力，<br>你是缺翻译。
+  </p>
+</div>
+
+<!-- ============ SLIDE 4: 三步翻译法 ============ -->
+<div class="slide" style="padding:48px 52px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:32px;">
+    <span style="font-size:28px;">⚙️</span>
+    <h2 style="font-family:'Noto Serif SC',serif;font-size:24px;font-weight:700;">AI翻译三步法</h2>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:24px;">
+    <div style="display:flex;gap:16px;align-items:flex-start;">
+      <div class="step-num">1</div>
+      <div style="flex:1;">
+        <p style="font-weight:600;font-size:15px;margin-bottom:6px;">把你最拿得出手的经历写下来</p>
+        <div class="compare-card compare-before" style="font-size:12px;">
+          "我负责店铺日常运营，选品上架定价调价一条龙……"
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:16px;align-items:flex-start;">
+      <div class="step-num">2</div>
+      <div style="flex:1;">
+        <p style="font-weight:600;font-size:15px;margin-bottom:6px;">把JD+经历一起喂给AI</p>
+        <div class="prompt-block" style="font-size:12px;">
+          "这段JD是这个岗位的核心能力。请把我这段经历中能对应到这些能力的行为提取出来，用这个岗位的行业语言重新表述。"
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:16px;align-items:flex-start;">
+      <div class="step-num">3</div>
+      <div style="flex:1;">
+        <p style="font-weight:600;font-size:15px;margin-bottom:6px;">AI翻译完后，你审核+微调</p>
+        <p style="font-size:13px;color:var(--ink-lighter);">逐条确认是否真实，不确定的删掉</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SLIDE 5: 翻译对比 + 金句 ============ -->
+<div class="slide" style="padding:48px 52px;">
+  <h3 style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:20px;">📊 感受一下差距</h3>
+
+  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px;">
+    <div style="display:flex;gap:16px;">
+      <div class="compare-card compare-before" style="flex:1;font-size:12px;">
+        <div style="font-size:10px;color:#94A3B8;margin-bottom:4px;">▎旧行业语言</div>
+        选品上架定价调价一条龙
+      </div>
+      <div style="font-size:18px;color:var(--teal);align-self:center;">→</div>
+      <div class="compare-card compare-after" style="flex:1;font-size:12px;">
+        <div style="font-size:10px;color:var(--teal);margin-bottom:4px;">▎AI运营语言</div>
+        独立负责全品类内容选题策划与排期管理
+      </div>
+    </div>
+
+    <div style="display:flex;gap:16px;">
+      <div class="compare-card compare-before" style="flex:1;font-size:12px;">
+        <div style="font-size:10px;color:#94A3B8;margin-bottom:4px;">▎旧行业语言</div>
+        看后台数据判断推哪个品
+      </div>
+      <div style="font-size:18px;color:var(--teal);align-self:center;">→</div>
+      <div class="compare-card compare-after" style="flex:1;font-size:12px;">
+        <div style="font-size:10px;color:var(--teal);margin-bottom:4px;">▎AI运营语言</div>
+        基于数据分析驱动内容策略，提升爆款率
+      </div>
+    </div>
+
+    <div style="display:flex;gap:16px;">
+      <div class="compare-card compare-before" style="flex:1;font-size:12px;">
+        <div style="font-size:10px;color:#94A3B8;margin-bottom:4px;">▎旧行业语言</div>
+        旺季一个人管三个平台
+      </div>
+      <div style="font-size:18px;color:var(--teal);align-self:center;">→</div>
+      <div class="compare-card compare-after" style="flex:1;font-size:12px;">
+        <div style="font-size:10px;color:var(--teal);margin-bottom:4px;">▎AI运营语言</div>
+        多平台内容矩阵同步运营，高峰期独立管理3个渠道
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;">
+    <p class="golden-q" style="font-size:26px;color:var(--teal-dark);line-height:1.5;">
+      HR筛简历是在做<br><span style="font-size:32px;">"关键词匹配"</span><br>
+      不是在做人物传记
+    </p>
+  </div>
+</div>
+
+<!-- ============ SLIDE 6: 提醒 + Checklist ============ -->
+<div class="slide cover-bg" style="padding:56px 52px;">
+  <div style="background:var(--apricot-pale);border-radius:16px;padding:24px 28px;border-left:4px solid var(--apricot);margin-bottom:36px;">
+    <p style="font-size:14px;font-weight:600;color:var(--apricot);margin-bottom:6px;">⚠️ 一句认真的提醒</p>
+    <p style="font-size:15px;line-height:1.7;color:var(--ink);">
+      AI是<strong>翻译官</strong>，不是<strong>魔术师</strong>。<br>
+      基于真实经历做翻译，不帮你编没做过的事。
+    </p>
+  </div>
+
+  <h3 style="font-size:18px;font-weight:700;margin-bottom:20px;">✅ 立马上手 Checklist</h3>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
+    <div style="font-size:14px;color:var(--ink);">① 找一段最骄傲的老工作经历，大白话写下来</div>
+    <div style="font-size:14px;color:var(--ink);">② 找到一个心仪岗位的完整JD</div>
+    <div style="font-size:14px;color:var(--ink);">③ 把我上面的提示词发给AI</div>
+    <div style="font-size:14px;color:var(--ink);">④ 逐条确认："这确实是我做过的事吗？"</div>
+    <div style="font-size:14px;color:var(--ink);">⑤ 不确定的删掉，确认的放进简历</div>
+  </div>
+
+  <div style="position:absolute;bottom:36px;left:0;right:0;text-align:center;">
+    <p style="font-size:13px;color:var(--ink-lighter);">🏷️ #转行 #零经验转行 #AI求职 #跨行求职 #简历怎么写</p>
+    <p style="font-size:11px;color:var(--ink-lighter);margin-top:4px;">🤖 由 Claude 辅助创作 · 下期见</p>
+  </div>
+</div>
+
+</body>
+</html>
