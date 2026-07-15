@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day1 — AI数据化简历</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --warm-white: #FAF8F5;
+  --cream-bg: #F5F0EB;
+  --teal: #0D9488;
+  --teal-dark: #0F766E;
+  --teal-light: #CCFBF1;
+  --teal-pale: #F0FDFA;
+  --ink: #1E293B;
+  --ink-light: #475569;
+  --ink-lighter: #94A3B8;
+  --apricot: #E8965A;
+  --apricot-pale: #FDF0E5;
+  --card-bg: #FFFFFF;
+  --card-shadow: 0 4px 24px rgba(30,41,59,0.06), 0 2px 8px rgba(30,41,59,0.03);
+  --sw: 720px;
+  --sh: 960px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #E8E5E0;
+  font-family: 'Noto Sans SC', sans-serif;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 64px;
+  gap: 40px;
+}
+
+.screenshot-tip {
+  position: fixed; top: 0; left: 0; right: 0;
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+  color: #fff; text-align: center; padding: 10px 20px;
+  font-size: 13px; font-weight: 500; z-index: 99;
+  letter-spacing: 0.5px;
+}
+
+.slide {
+  width: var(--sw); height: var(--sh); background: var(--card-bg);
+  border-radius: 20px; box-shadow: var(--card-shadow);
+  position: relative; overflow: hidden; flex-shrink: 0;
+  display: flex; flex-direction: column;
+}
+
+/* ── 封面（Slide 1）共用的背景样式 ── */
+.cover-bg {
+  background: linear-gradient(160deg, #F0FDFA 0%, #FAF8F5 40%, #FDF0E5 100%);
+}
+
+/* ── 标签 ── */
+.tag {
+  display: inline-block; padding: 6px 16px; border-radius: 20px;
+  font-size: 13px; font-weight: 500; letter-spacing: 0.5px;
+}
+.tag-teal { background: var(--teal-pale); color: var(--teal); }
+.tag-apricot { background: var(--apricot-pale); color: var(--apricot); }
+
+/* ── 对比卡片 ── */
+.compare-card {
+  border-radius: 12px; padding: 20px 24px; font-size: 14px;
+  line-height: 1.6;
+}
+.compare-before { background: #F1F5F9; border-left: 3px solid #CBD5E1; color: #64748B; }
+.compare-after  { background: var(--teal-pale); border-left: 3px solid var(--teal); color: var(--teal-dark); }
+
+/* ── 提示词代码块 ── */
+.prompt-block {
+  background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px;
+  padding: 18px 20px; font-size: 13px; line-height: 1.7; color: #334155;
+  font-family: 'Noto Sans SC', monospace;
+}
+
+/* ── 步骤编号圆圈 ── */
+.step-num {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--teal);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 16px; flex-shrink: 0;
+}
+
+/* ── 诊断卡片 ── */
+.diag-card {
+  background: #F8FAFC; border-radius: 12px; padding: 16px 20px;
+  border: 1px solid #E2E8F0;
+}
+.diag-card .label { font-size: 12px; color: var(--teal); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+/* ── 金句 ── */
+.golden-q {
+  font-family: 'Noto Serif SC', serif; font-weight: 700; line-height: 1.4;
+}
+
+/* ── 分割线 ── */
+.divider { width: 48px; height: 3px; border-radius: 2px; background: var(--teal); }
+</style>
+</head>
+<body>
+
+<div class="screenshot-tip">📸 右键每张卡片 → 「截图」或 浏览器截图插件 → 保存为小红书图文</div>
+
+<!-- ============ SLIDE 1: 封面 ============ -->
+<div class="slide cover-bg" style="justify-content:center;align-items:center;text-align:center;padding:80px 60px;">
+  <div class="tag tag-teal" style="margin-bottom:28px;">AI求职实战 · 简历篇</div>
+  <h1 style="font-family:'Noto Serif SC',serif;font-weight:900;font-size:38px;line-height:1.25;color:var(--ink);margin-bottom:16px;">
+    投了100份<br>没回音？
+  </h1>
+  <p style="font-size:22px;font-weight:600;color:var(--teal);margin-bottom:32px;">
+    因为你简历里缺了数据
+  </p>
+  <div class="divider" style="margin:0 auto 32px;"></div>
+  <p style="font-size:15px;color:var(--ink-light);line-height:1.6;">
+    把你的工作成绩<br>用AI翻译成HR想看的数字
+  </p>
+  <div style="position:absolute;bottom:40px;font-size:12px;color:var(--ink-lighter);">
+    30天AI教我做自媒体 × AI求职特辑 · Day 1
+  </div>
+  <!-- 装饰圆 -->
+  <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:var(--teal-pale);opacity:0.6;"></div>
+  <div style="position:absolute;bottom:-40px;left:-40px;width:140px;height:140px;border-radius:50%;background:var(--apricot-pale);opacity:0.5;"></div>
+</div>
+
+<!-- ============ SLIDE 2: 痛点共情 ============ -->
+<div class="slide" style="padding:60px 52px;justify-content:center;">
+  <div class="tag tag-apricot" style="margin-bottom:20px;">你是不是也这样</div>
+  <p style="font-family:'Noto Serif SC',serif;font-size:28px;font-weight:700;line-height:1.4;color:var(--ink);margin-bottom:28px;">
+    "我知道简历要写数据，<br>但我做的事就是<br>没什么数据啊——"
+  </p>
+  <p style="font-size:15px;color:var(--ink-light);line-height:1.8;margin-bottom:36px;">
+    日常运营、写写文案、回回消息……<br>每天做的事，拆开看全是"打杂"<br>哪来的数字？
+  </p>
+  <div class="divider" style="margin-bottom:28px;"></div>
+  <p style="font-size:14px;color:var(--ink-lighter);">
+    这个问题我太熟了。我也曾经这么想。<br>
+    <span style="color:var(--teal);font-weight:600;">直到我发现了这个方法——</span>
+  </p>
+</div>
+
+<!-- ============ SLIDE 3: 方法两步骤 ============ -->
+<div class="slide" style="padding:52px 52px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:36px;">
+    <span style="font-size:28px;">⚡</span>
+    <h2 style="font-family:'Noto Serif SC',serif;font-size:26px;font-weight:700;">两步，让AI挖出你的数据</h2>
+  </div>
+
+  <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:28px;">
+    <div class="step-num" style="margin-top:2px;">1</div>
+    <div style="flex:1;">
+      <p style="font-weight:600;font-size:16px;margin-bottom:8px;">扔给AI一段大白话</p>
+      <div class="compare-card compare-before" style="font-size:13px;line-height:1.7;">
+        "我每天在群里回答问题，发发公告，<br>有人吵架了就劝一劝，<br>每周整理一下用户反馈给产品"
+      </div>
+      <p style="font-size:12px;color:var(--ink-lighter);margin-top:8px;">↑ 就这样，不需要修饰，像跟朋友吐槽一样</p>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:16px;align-items:flex-start;">
+    <div class="step-num" style="margin-top:2px;">2</div>
+    <div style="flex:1;">
+      <p style="font-weight:600;font-size:16px;margin-bottom:8px;">让AI用三个问题解剖它</p>
+      <div class="prompt-block">
+        1. 这件事影响到多少人/多少次？<br>
+        2. 如果不做，会出现什么后果？<br>
+        3. 跟同行平均水平比，你做的有什么不同？
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SLIDE 4: 转化对比表 ============ -->
+<div class="slide" style="padding:52px 52px;">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px;">
+    <span style="font-size:24px;">📊</span>
+    <h2 style="font-family:'Noto Serif SC',serif;font-size:24px;font-weight:700;">实际转化效果</h2>
+  </div>
+
+  <!-- 对比表 -->
+  <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:28px;">
+    <div style="display:flex;gap:16px;">
+      <div class="compare-card compare-before" style="flex:1;font-size:13px;">
+        <div style="font-size:11px;color:#94A3B8;margin-bottom:6px;">▎你说的</div>
+        每天在群里回答问题
+      </div>
+      <div style="font-size:20px;color:var(--teal);align-self:center;">→</div>
+      <div class="compare-card compare-after" style="flex:1;font-size:13px;">
+        <div style="font-size:11px;color:var(--teal);margin-bottom:6px;">▎AI翻译后</div>
+        日均处理咨询80+条，覆盖500人社群，响应≤15分钟
+      </div>
+    </div>
+
+    <div style="display:flex;gap:16px;">
+      <div class="compare-card compare-before" style="flex:1;font-size:13px;">
+        <div style="font-size:11px;color:#94A3B8;margin-bottom:6px;">▎你说的</div>
+        有人吵架了就劝一劝
+      </div>
+      <div style="font-size:20px;color:var(--teal);align-self:center;">→</div>
+      <div class="compare-card compare-after" style="flex:1;font-size:13px;">
+        <div style="font-size:11px;color:var(--teal);margin-bottom:6px;">▎AI翻译后</div>
+        建立冲突处理SOP，流失率从12%降至3%
+      </div>
+    </div>
+
+    <div style="display:flex;gap:16px;">
+      <div class="compare-card compare-before" style="flex:1;font-size:13px;">
+        <div style="font-size:11px;color:#94A3B8;margin-bottom:6px;">▎你说的</div>
+        每周整理用户反馈给产品
+      </div>
+      <div style="font-size:20px;color:var(--teal);align-self:center;">→</div>
+      <div class="compare-card compare-after" style="flex:1;font-size:13px;">
+        <div style="font-size:11px;color:var(--teal);margin-bottom:6px;">▎AI翻译后</div>
+        输出52期需求报告，推动17项功能迭代
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size:18px;font-weight:700;color:var(--teal-dark);text-align:center;">
+    不是没有数据，是不会"剥"出数据。
+  </p>
+</div>
+
+<!-- ============ SLIDE 5: 为什么有效 + 诚实提醒 ============ -->
+<div class="slide" style="padding:52px 52px;justify-content:center;">
+  <div style="margin-bottom:36px;">
+    <h3 style="font-size:18px;font-weight:700;color:var(--teal);margin-bottom:12px;">💡 为什么有效？</h3>
+    <p style="font-size:15px;line-height:1.8;color:var(--ink-light);">
+      AI把你习以为常的事，放到<strong style="color:var(--ink);">行业基准线</strong>上对比。<br>
+      你说"每天回消息"，AI想的是"日均回复量是什么级别？<br>行业客服日均处理量是多少？"<br>
+      你自己看不出来的，AI看得出来。
+    </p>
+  </div>
+
+  <div style="background:var(--apricot-pale);border-radius:16px;padding:28px 32px;border-left:4px solid var(--apricot);">
+    <p style="font-size:14px;font-weight:600;color:var(--apricot);margin-bottom:8px;">⚠️ 说在前面</p>
+    <p style="font-size:15px;line-height:1.7;color:var(--ink);">
+      AI帮你<strong>挖数据</strong>，不是帮你<strong>编数据</strong>。<br>
+      前提是你确实做了那些事。<br>
+      诚实是第一位的。
+    </p>
+  </div>
+</div>
+
+<!-- ============ SLIDE 6: 实操步骤 + 金句收尾 ============ -->
+<div class="slide cover-bg" style="padding:56px 52px;">
+  <h3 style="font-size:20px;font-weight:700;color:var(--ink);margin-bottom:28px;">🔧 现在就可以试试</h3>
+
+  <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:36px;">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div class="step-num" style="background:var(--apricot);">1</div>
+      <span style="font-size:15px;">把今天做的最日常一件事用大白话写下来</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div class="step-num" style="background:var(--apricot);">2</div>
+      <span style="font-size:15px;">复制提示词，扔给Claude/DeepSeek/ChatGPT</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div class="step-num" style="background:var(--apricot);">3</div>
+      <span style="font-size:15px;">看AI怎么把你的"打杂"变成数据</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div class="step-num" style="background:var(--apricot);">4</div>
+      <span style="font-size:15px;">筛选真实的、有说服力的数字放进简历</span>
+    </div>
+  </div>
+
+  <div style="text-align:center;">
+    <p class="golden-q" style="font-size:26px;color:var(--teal-dark);line-height:1.5;">
+      "你不是没有数据，<br>你只是一直觉得自己的事<br><span style="font-size:30px;">不够厉害</span>。"
+    </p>
+  </div>
+
+  <div style="position:absolute;bottom:36px;left:0;right:0;text-align:center;">
+    <p style="font-size:13px;color:var(--ink-lighter);">🏷️ #简历优化 #AI求职 #数据化简历 #找工作</p>
+    <p style="font-size:11px;color:var(--ink-lighter);margin-top:4px;">🤖 由 Claude 辅助创作 · 下期见</p>
+  </div>
+</div>
+
+</body>
+</html>
