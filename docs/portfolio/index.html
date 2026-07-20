@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#faf8f5">
+<meta name="description" content="罗南杨 · 新媒体内容运营作品集">
+<title>罗南杨 · 新媒体内容运营作品集</title>
+<style>
+/* ================================================================
+   作品集 — 单文件 · 编辑排版风 · Teal品牌色系
+   定位：新媒体内容运营
+   ================================================================ */
+
+:root {
+  --bg: #faf8f5;
+  --bg-card: #ffffff;
+  --bg-muted: #f3f0ec;
+  --text: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-muted: #8a8a8a;
+  --accent: #0D9488;
+  --accent-hover: #0b7d73;
+  --accent-muted: rgba(13,148,136,0.08);
+  --accent-border: rgba(13,148,136,0.2);
+  --border: rgba(0,0,0,0.07);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+  --radius: 10px;
+  --radius-lg: 14px;
+  --font-sans: "PingFang SC","Microsoft YaHei","Helvetica Neue",-apple-system,sans-serif;
+  --font-serif: "Noto Serif SC","Source Han Serif SC","Songti SC",Georgia,serif;
+  --ease: cubic-bezier(0.16,1,0.3,1);
+  --max: 1040px;
+  --nav-h: 56px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px;-webkit-text-size-adjust:100%}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--accent);text-decoration:none;transition:color .2s}
+a:hover{color:var(--accent-hover)}
+
+/* — Nav — */
+.nav{position:sticky;top:0;z-index:100;background:rgba(250,248,245,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);height:var(--nav-h)}
+.nav-inner{max-width:var(--max);margin:0 auto;padding:0 24px;height:100%;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-weight:700;font-size:.95rem;color:var(--text)}
+.nav-links{display:flex;gap:22px;list-style:none}
+.nav-links a{color:var(--text-secondary);font-size:.8rem;font-weight:500}
+.nav-links a:hover{color:var(--accent)}
+.nav-ham{display:none;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text)}
+
+/* — Container & Section — */
+.container{max-width:var(--max);margin:0 auto;padding:0 24px}
+.section{padding:72px 0}
+.section-alt{background:var(--bg-muted)}
+.sec-tag{font-size:.68rem;letter-spacing:4px;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:6px}
+.sec-title{font-size:clamp(1.5rem,4vw,2rem);font-weight:700;letter-spacing:.5px}
+.sec-line{width:36px;height:3px;background:var(--accent);border-radius:1px;margin-top:14px}
+.sec-head{text-align:center;margin-bottom:48px}
+
+/* — Hero — */
+.hero{padding:56px 0 40px}
+.hero-row{display:flex;gap:36px;align-items:center;flex-wrap:wrap}
+.hero-photo{width:110px;height:145px;border-radius:var(--radius);object-fit:cover;box-shadow:var(--shadow-md);border:3px solid #fff;flex-shrink:0}
+.hero-body{flex:1;min-width:260px}
+.hero-name{font-size:clamp(1.8rem,4.5vw,2.4rem);font-weight:700;letter-spacing:1px}
+.hero-name em{font-style:normal;color:var(--accent)}
+.hero-sub{font-size:.95rem;color:var(--text-secondary);margin:4px 0 12px;line-height:1.5}
+.hero-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.hero-tag{background:var(--accent-muted);color:var(--accent);border:1px solid var(--accent-border);border-radius:18px;padding:4px 12px;font-size:.74rem;font-weight:500}
+
+/* Highlight badge */
+.hl-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(13,148,136,.12),rgba(13,148,136,.04));border:1px solid var(--accent-border);border-radius:var(--radius-lg);padding:14px 20px;font-size:.84rem;color:var(--text);line-height:1.6}
+.hl-badge strong{color:var(--accent)}
+
+/* KPI strip */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:36px;padding-top:28px;border-top:1px solid var(--border)}
+.kpi-card{text-align:center;padding:12px}
+.kpi-num{font-size:1.8rem;font-weight:700;color:var(--accent);line-height:1.15}
+.kpi-unit{font-size:.8rem;font-weight:400;color:var(--text-muted)}
+.kpi-label{font-size:.72rem;color:var(--text-muted);margin-top:3px;letter-spacing:.5px}
+
+/* — Experience Cards — */
+.exp-list{display:flex;flex-direction:column;gap:20px}
+.exp-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px 28px 28px 32px;position:relative;box-shadow:var(--shadow-sm)}
+.exp-card::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:3px;background:var(--accent);border-radius:2px}
+.exp-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.exp-role{font-size:1.05rem;font-weight:700}
+.exp-company{font-weight:500;color:var(--text-secondary)}
+.exp-date{font-size:.78rem;color:var(--text-muted);white-space:nowrap}
+.exp-desc{font-size:.84rem;color:var(--text-secondary);margin-bottom:12px;line-height:1.65}
+.exp-highlights{list-style:none;display:flex;flex-direction:column;gap:8px}
+.exp-highlights li{font-size:.84rem;color:var(--text);line-height:1.6;padding-left:18px;position:relative}
+.exp-highlights li::before{content:"▸";position:absolute;left:0;color:var(--accent);font-size:.75rem;line-height:1.6}
+.exp-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.exp-tag{background:var(--bg-muted);border:1px solid var(--border);border-radius:12px;padding:3px 10px;font-size:.7rem;color:var(--text-muted)}
+.exp-kpi{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+.exp-kpi-item{font-size:.8rem;color:var(--text-secondary)}
+.exp-kpi-item strong{color:var(--accent);font-size:.95rem}
+
+/* — Project Cards — */
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.proj-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm);transition:all .3s var(--ease)}
+.proj-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.proj-icon{font-size:1.6rem;margin-bottom:10px}
+.proj-title{font-size:.95rem;font-weight:600;margin-bottom:6px}
+.proj-desc{font-size:.8rem;color:var(--text-secondary);line-height:1.6;margin-bottom:10px}
+.proj-kpi{font-size:.78rem;color:var(--accent);font-weight:600}
+
+/* — Skills Grid — */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.skill-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm);text-align:center}
+.skill-icon{font-size:2rem;margin-bottom:10px}
+.skill-title{font-weight:600;font-size:.92rem;margin-bottom:6px}
+.skill-body{font-size:.8rem;color:var(--text-secondary);line-height:1.6}
+
+/* — Footer — */
+.footer{padding:40px 0;text-align:center;border-top:1px solid var(--border)}
+.footer p{font-size:.74rem;color:var(--text-muted);line-height:1.6}
+
+/* — Animations — */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.reveal.on{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.05s}.d2{transition-delay:.1s}.d3{transition-delay:.15s}.d4{transition-delay:.2s}.d5{transition-delay:.25s}
+
+/* — Responsive — */
+@media(max-width:768px){
+  .nav-links{display:none;position:absolute;top:var(--nav-h);left:0;right:0;background:var(--bg);flex-direction:column;padding:14px 24px;gap:10px;border-bottom:1px solid var(--border);box-shadow:var(--shadow-md)}
+  .nav-links.open{display:flex}
+  .nav-ham{display:block}
+  .hero-row{flex-direction:column;text-align:center}
+  .hero-photo{margin:0 auto}
+  .hero-tags{justify-content:center}
+  .kpi-strip{grid-template-columns:repeat(2,1fr)}
+  .section{padding:52px 0}
+  .exp-kpi{flex-direction:column;gap:8px}
+}
+@media print{
+  .nav,.nav-ham{display:none}
+  .section{padding:20px 0;break-inside:avoid}
+  body{font-size:13px;background:#fff}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Nav ===== -->
+<nav class="nav">
+  <div class="nav-inner">
+    <span class="nav-brand">罗南杨 · 新媒体运营</span>
+    <button class="nav-ham" id="ham" aria-label="菜单">☰</button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#experience">实习经历</a></li>
+      <li><a href="#projects">项目成果</a></li>
+      <li><a href="#skills">核心能力</a></li>
+      <li><a href="#contact">联系</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ===== Hero ===== -->
+<header class="hero section">
+  <div class="container">
+    <div class="hero-row reveal">
+      <img class="hero-photo" src="data:image/jpeg;base64,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" alt="证件照" width="110" height="145" loading="eager">
+      <div class="hero-body">
+        <h1 class="hero-name">罗南杨<em> · </em>新媒体内容运营</h1>
+        <p class="hero-sub">音乐表演本科 · 深圳 / 广州 · 从内容生产到AI自动化，跑通内容运营全链路</p>
+        <div class="hero-tags">
+          <span class="hero-tag">📱 多平台内容运营</span>
+          <span class="hero-tag">✍️ 电商内容策划</span>
+          <span class="hero-tag">🤖 AI内容自动化</span>
+          <span class="hero-tag">📊 数据驱动优化</span>
+          <span class="hero-tag">🎙️ 直播/社群运营</span>
+        </div>
+        <div class="hl-badge reveal d1">
+          <span>💡</span> 3段运营实习 + 电商15万月成交 + 内容效率提升<strong>4×</strong> + 完播率28%→<strong>41%</strong> + 荔枝直播<strong>1.1万</strong>关注 + AI自动化系统<strong>50+</strong>期稳定运行
+        </div>
+      </div>
+    </div>
+    <div class="kpi-strip">
+      <div class="kpi-card reveal d1">
+        <div class="kpi-num">15<span class="kpi-unit">万</span></div>
+        <div class="kpi-label">月均内容引导成交额</div>
+      </div>
+      <div class="kpi-card reveal d2">
+        <div class="kpi-num">41<span class="kpi-unit">%</span></div>
+        <div class="kpi-label">视频完播率（28%→41%）</div>
+      </div>
+      <div class="kpi-card reveal d3">
+        <div class="kpi-num">4<span class="kpi-unit">×</span></div>
+        <div class="kpi-label">内容生产效率提升</div>
+      </div>
+      <div class="kpi-card reveal d4">
+        <div class="kpi-num">1.1<span class="kpi-unit">万</span></div>
+        <div class="kpi-label">荔枝直播累计关注</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== 实习经历（最核心） ===== -->
+<section class="section section-alt" id="experience">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Work Experience</div>
+      <h2 class="sec-title">实习经历</h2>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="exp-list">
+      <!-- 简礼电商 -->
+      <div class="exp-card reveal">
+        <div class="exp-header">
+          <div>
+            <span class="exp-role">内容运营实习生</span>
+            <span class="exp-company"> · 杭州简礼电子商务有限公司</span>
+          </div>
+          <span class="exp-date">2024.03 - 2025.06（远程）</span>
+        </div>
+        <div class="exp-desc">淘宝/抖音电商代运营公司，服务食品、美妆类目品牌方。负责5个品牌店铺的日常内容产出。</div>
+        <ul class="exp-highlights">
+          <li><strong>多平台内容生产：</strong>负责5个品牌店铺的商品详情页文案、直播间脚本、达人合作Brief的日常产出，日均产出15-20条内容，覆盖淘宝+抖音双平台</li>
+          <li><strong>AI驱动效率革命：</strong>用DeepSeek+Coze搭建"商品信息→AI多版本文案→人工审核"自动化内容管道，文案初稿从40分钟/篇压缩至5分钟，日产能从8条提升至20条</li>
+          <li><strong>爆款拆解与模板化：</strong>用AI拆解行业爆款文案结构（开头钩子→痛点场景→产品方案→行动号召），建立可复用的文案模板库20+套，新人培训周期从2周缩至3天</li>
+          <li><strong>数据驱动优化：</strong>用AI分析竞品评论高频词+用户情绪倾向，输出月度内容策略建议报告，被采纳率约60%；抖音口播脚本完播率从28%提升至41%</li>
+        </ul>
+        <div class="exp-kpi">
+          <div class="exp-kpi-item">月均成交额 <strong>15万</strong></div>
+          <div class="exp-kpi-item">完播率 <strong>28%→41%</strong></div>
+          <div class="exp-kpi-item">产能 <strong>8→20条/天</strong></div>
+          <div class="exp-kpi-item">模板库 <strong>20+套</strong></div>
+          <div class="exp-kpi-item">每月节省 <strong>60+小时</strong></div>
+        </div>
+        <div class="exp-tags">
+          <span class="exp-tag">电商内容</span><span class="exp-tag">淘宝</span><span class="exp-tag">抖音</span><span class="exp-tag">直播脚本</span><span class="exp-tag">达人Brief</span><span class="exp-tag">爆款拆解</span><span class="exp-tag">数据分析</span><span class="exp-tag">AI自动化</span>
+        </div>
+      </div>
+
+      <!-- 翼方科技 -->
+      <div class="exp-card reveal d1">
+        <div class="exp-header">
+          <div>
+            <span class="exp-role">内容运营</span>
+            <span class="exp-company"> · 厦门翼方科技有限公司</span>
+          </div>
+          <span class="exp-date">2025.05 - 2026.04</span>
+        </div>
+        <div class="exp-desc">内容运营，负责产品内容策划、数据分析和多平台账号管理。</div>
+        <ul class="exp-highlights">
+          <li><strong>产品内容策划与生产：</strong>独立负责产品拍摄方案策划及落地执行，与摄影/设计团队协同完成产品视觉素材，日均稳定产出5组，效率较传统流程提升50%</li>
+          <li><strong>数据驱动内容优化：</strong>运用Excel进行产品销售数据管理及分析，通过数据反馈持续优化主图点击率和内容效果</li>
+          <li><strong>多平台账号运营：</strong>负责公司对外社交平台账号的内容规划、日常图文产出和发布节奏管理，保障品牌形象一致性</li>
+        </ul>
+        <div class="exp-tags">
+          <span class="exp-tag">内容策划</span><span class="exp-tag">产品主图</span><span class="exp-tag">多平台运营</span><span class="exp-tag">数据分析</span><span class="exp-tag">品牌管理</span>
+        </div>
+      </div>
+
+      <!-- 声维教育 -->
+      <div class="exp-card reveal d2">
+        <div class="exp-header">
+          <div>
+            <span class="exp-role">用户运营实习生</span>
+            <span class="exp-company"> · 声维教育（声乐培训）</span>
+          </div>
+          <span class="exp-date">2022.12 - 2023.01</span>
+        </div>
+        <ul class="exp-highlights">
+          <li>通过结构化访谈挖掘学员声乐学习痛点，建立用户需求分层体系</li>
+          <li>针对不同用户画像定制课程价值讲解方案，精准匹配产品功能与用户需求</li>
+          <li>学员转化率<strong>50%-60%</strong>，续课率<strong>30%-50%</strong>，好评率<strong>90%+</strong></li>
+        </ul>
+        <div class="exp-tags">
+          <span class="exp-tag">用户运营</span><span class="exp-tag">用户画像</span><span class="exp-tag">转化优化</span><span class="exp-tag">用户调研</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 项目成果 ===== -->
+<section class="section" id="projects">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Projects & Results</div>
+      <h2 class="sec-title">项目成果</h2>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="proj-grid">
+      <!-- 项目1：荔枝直播 -->
+      <div class="proj-card reveal">
+        <div class="proj-icon">🎙️</div>
+        <div class="proj-title">荔枝FM语音直播 — 从0到1.1万关注</div>
+        <div class="proj-desc">大学期间以音乐/声音内容为核心，独立操盘语音直播账号。从定位、选题、开播时段测试到内容迭代，全流程自主完成。通过直播节奏设计（开场留人→互动点→高潮内容→引导关注）持续拉高停留与互动，单场平均在线30+。搭建并管理百人粉丝社群，制定群规则、策划互动活动、维护核心粉丝分层，把直播间流量沉淀为可反复触达的私域。</div>
+        <div class="proj-kpi">📈 1.1万关注 · 均30+在线 · 百人社群 · 冷启动→留存闭环</div>
+      </div>
+
+      <!-- 项目2：小红书 -->
+      <div class="proj-card reveal d1">
+        <div class="proj-icon">📕</div>
+        <div class="proj-title">小红书内容矩阵 — 求职类爆款测试</div>
+        <div class="proj-desc">策划并发布AI+求职系列内容，产出7篇"数据化简历""经历翻译官""JD镜子法"等选题文案，每篇配套6张720×960竖版HTML幻灯片。两篇帖子自然曝光近2,000、评论近百条，实操验证平台推荐机制与爆款结构（钩子→痛点→方案→互动引导）。沉淀出"三层圈层矩阵选题法"方法论，可跨赛道复用。</div>
+        <div class="proj-kpi">📈 近2000曝光 · 近百评论 · 7篇系列 · 3套×6张幻灯片</div>
+      </div>
+
+      <!-- 项目3：AI自动化 -->
+      <div class="proj-card reveal d2">
+        <div class="proj-icon">🤖</div>
+        <div class="proj-title">AI资讯自动化运营系统 — 50+期稳定运行</div>
+        <div class="proj-desc">独立从零搭建公众号内容自动化管线：每日08:15自动抓取AI行业资讯→AI分类筛选→生成结构化日报/周报→自动格式转换。9个Node.js脚本构成完整的"采集→分类→生成→排版→发布"自动化管道，全程零人工干预。产出过Anthropic/OpenAI/DeepSeek等行业动态追踪内容。</div>
+        <div class="proj-kpi">📈 50+期日报 · 10+期周报 · 2篇长文 · 9个自动化脚本</div>
+      </div>
+
+      <!-- 项目4：公众号 -->
+      <div class="proj-card reveal d3">
+        <div class="proj-icon">✍️</div>
+        <div class="proj-title">公众号深度内容 — AI+行业评论双线</div>
+        <div class="proj-desc">产出2篇长文：《AI时代写作革命》（约3,000字，从零搭建AI公众号系统的第一人称复盘）和《AI基建4万亿》（约3,500字，英伟达×DeepSeek×GitHub三线叙事的行业深度评论）。设计"30%新闻+20%工具+50%个人经验"的内容结构模型，40分钟完成从选题到发布。</div>
+        <div class="proj-kpi">📈 2篇长文 · 约6,500字 · 40分钟/篇工作流</div>
+      </div>
+
+      <!-- 项目5：提示词库 -->
+      <div class="proj-card reveal d4">
+        <div class="proj-icon">🧩</div>
+        <div class="proj-title">AI提示词库管理系统 — 80+条体系化</div>
+        <div class="proj-desc">搭建含80+条高质量AI提示词的管理系统，按编程/写作/分析/通用/学习五大类分类，建立"搜索→评估→运用"3个自动化Agent和四维关系网络。提示词经过5维评分模型筛选（可用性/复杂度/通用性/新鲜度/可靠度），确保内容质量和可复用性。</div>
+        <div class="proj-kpi">📈 80+条提示词 · 5大类 · 3 Agent自动化 · 5维评分</div>
+      </div>
+
+      <!-- 项目6：盲盒报告 -->
+      <div class="proj-card reveal d5">
+        <div class="proj-icon">📊</div>
+        <div class="proj-title">东南亚盲盒市场数据报告 — 六国深度分析</div>
+        <div class="proj-desc">AI辅助数据收集+结构化分析的完整市场研究报告。覆盖东南亚六国（泰国/印尼/越南/菲律宾/马来西亚/新加坡），含泡泡玛特深度拆解（财务/门店/IP矩阵/Labubu现象分析）。产出10套不同风格的网页设计模板（电商/品牌/社交/数据可视化/极简/潮流/日系/科技/杂志/沉浸式），配套PPT汇报方案。</div>
+        <div class="proj-kpi">📈 六国市场 · 泡泡玛特深度拆解 · 10套设计模板 · PPT方案</div>
+      </div>
+
+      <!-- 项目7：闲鱼 -->
+      <div class="proj-card reveal d5">
+        <div class="proj-icon">🛒</div>
+        <div class="proj-title">闲鱼课程产品化变现 — 电商全流程实操</div>
+        <div class="proj-desc">将技能课程产品化，独立完成商品上架、文案撰写、定价策略、客服沟通全流程，跑通小规模电商变现闭环。实操理解电商平台的商品描述优化、搜索关键词布局和用户评价管理。</div>
+        <div class="proj-kpi">📈 全流程独立操盘 · 从0到变现闭环</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 核心能力 ===== -->
+<section class="section section-alt" id="skills">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Core Competencies</div>
+      <h2 class="sec-title">核心能力</h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card reveal">
+        <div class="skill-icon">📝</div>
+        <div class="skill-title">多平台内容策划与生产</div>
+        <div class="skill-body">日均15-20条内容的稳定产出能力。覆盖淘宝详情页、抖音口播脚本、小红书图文、公众号长文、直播间脚本、达人Brief六大内容类型。20+套爆款文案模板，可快速适配不同平台的内容规范。</div>
+      </div>
+      <div class="skill-card reveal d1">
+        <div class="skill-icon">🤖</div>
+        <div class="skill-title">AI驱动的内容效率系统</div>
+        <div class="skill-body">能用AI工具搭建从采集到发布的自动化内容管道。内容初稿效率从40分钟压缩至5分钟（4×提升），日产能从8条提升至20条。每月节省60+小时重复性内容工作。不是"会用ChatGPT"，而是"能用AI重新设计内容生产流程"。</div>
+      </div>
+      <div class="skill-card reveal d2">
+        <div class="skill-icon">📊</div>
+        <div class="skill-title">数据驱动的内容优化</div>
+        <div class="skill-body">用数据指导内容决策：竞品评论分析→月度策略报告→内容方向调整。抖音口播脚本完播率28%→41%。能搭建Excel数据台账，用数据透视表分析产品销量和内容效果之间的关联。</div>
+      </div>
+      <div class="skill-card reveal d3">
+        <div class="skill-icon">🎙️</div>
+        <div class="skill-title">直播运营与社群增长</div>
+        <div class="skill-body">从0冷启动到1.1万关注的完整直播运营经验。掌握直播节奏设计（留人→互动→高潮→转化）、百人社群管理（规则/分层/活动/留存）、粉丝运营全流程。科班音乐背景为音频内容品质提供专业判断力。</div>
+      </div>
+      <div class="skill-card reveal d4">
+        <div class="skill-icon">🔧</div>
+        <div class="skill-title">SOP建设与团队赋能</div>
+        <div class="skill-body">擅长将个人经验转化为可复制的标准流程：爆款拆解模板库→新人培训2周缩至3天；选题矩阵方法论→跨赛道一键复用；AI内容生产管道→为团队释放重复性工作的人力。不是自己干活快，是能让团队干活快。</div>
+      </div>
+      <div class="skill-card reveal d5">
+        <div class="skill-icon">🛠</div>
+        <div class="skill-title">全栈工具链</div>
+        <div class="skill-body">AI：Claude / DeepSeek / Coze / 豆包 · 电商：淘宝千牛 / 抖音百应 · 设计：Canva / 醒图 · 视频：剪映 · 数据：Excel透视表 / 数据台账 · 协作：飞书 / Notion · 开发：HTML/CSS（可独立PWA） · Git版本控制</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 联系 ===== -->
+<section class="section" id="contact">
+  <div class="container" style="text-align:center">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Contact</div>
+      <h2 class="sec-title">了解更多</h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="reveal d1" style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <a href="https://github.com/LuooonY" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 26px;font-size:.84rem;font-weight:500;color:var(--text-secondary);box-shadow:var(--shadow-sm);transition:all .3s">🐙 GitHub</a>
+      <a href="https://luooony.com" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 26px;font-size:.84rem;font-weight:500;color:var(--text-secondary);box-shadow:var(--shadow-sm);transition:all .3s">🌐 luooony.com</a>
+      <a href="https://tool.luooony.com" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 26px;font-size:.84rem;font-weight:500;color:var(--text-secondary);box-shadow:var(--shadow-sm);transition:all .3s">🛠 tool.luooony.com</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p>罗南杨 · 音乐表演本科 · 云南大学滇池学院 · 深圳/广州<br>
+    新媒体内容运营方向 · 所有经历均为真实经历，有可验证的项目文件和在线链接</p>
+  </div>
+</footer>
+
+<script>
+'use strict';
+(function(){
+  var ham=document.getElementById('ham'),nl=document.getElementById('navLinks');
+  ham.onclick=function(){nl.classList.toggle('open');ham.textContent=nl.classList.contains('open')?'✕':'☰'};
+  nl.querySelectorAll('a').forEach(function(a){a.onclick=function(){nl.classList.remove('open');ham.textContent='☰'}});
+  var ob=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('on');ob.unobserve(e.target)}})},{threshold:.12,rootMargin:'0px 0px -30px 0px'});
+  document.querySelectorAll('.reveal').forEach(function(el){ob.observe(el)});
+})();
+</script>
+</body>
+</html>
