@@ -6,7 +6,7 @@ const CONFIG = require('./config');
 const { log } = require('./lib/curl-helper');
 const { filterAndRank, countByRegion } = require('./lib/filter-engine');
 const { dedupByURL, dedupByTitle, crossRoundDedup, updateHistory } = require('./lib/dedup');
-const { resolveAll } = require('./lib/conflict-resolver');
+const { resolveAll, detectConflicts } = require('./lib/conflict-resolver');
 
 const now = new Date();
 const beijing = new Date(now.getTime() + 8 * 60 * 60 * 1000);
@@ -57,6 +57,7 @@ function pad(n) { return String(n).padStart(2, '0'); }
     path.join(dataDir, `${prefix}-domestic.json`),
     path.join(dataDir, `${prefix}-international.json`),
     path.join(dataDir, `${prefix}-indicators.json`),
+    path.join(dataDir, `${prefix}-websearch.json`),
   ];
 
   let allItems = [];
@@ -128,124 +129,152 @@ function pad(n) { return String(n).padStart(2, '0'); }
   }
 
   // 高热度检测: 同一事件多来源报道
-  const { detectConflicts } = require('./lib/conflict-resolver');
-  const detected = detectConflicts(ranked);
-  const hotEvents = detected.filter((g) => g.items.length >= 3);
+  const { detectConflicts: detectConflictsLocal } = require('./lib/conflict-resolver');
+  const detected2 = detectConflictsLocal(ranked);
+  const hotEvents = detected2.filter((g) => g.items.length >= 3);
 
-  // 9. 生成 Markdown
-  let md = `# AI+经济情报简报 — 第${round}轮 (${today})\n\n`;
-  md += `> 📅 采集时间: ${nowStr}（北京时间）\n`;
-  md += `> 📊 本轮: ${finalItems.length} 条 | 国内 ${domestic.length} / 国际 ${international.length} | 去重剔除 ${urlDups.length + titleDups.length + seenItems.length} 条\n`;
-  md += `> 📡 数据来源: 36Kr / 东方财富 / 新浪财经 / 巨潮资讯 / HN / arXiv / GitHub / AI HOT\n`;
-  md += `> 📍 状态: 第 ${round}/${CONFIG.MAX_ROUNDS} 轮 | 剩余 ${Math.max(0, 10 - round)} 轮 | 截止 ${CONFIG.END_DATE}\n`;
-  md += `> 🏷️ 标注: ${CONFIG.MARKERS.NEW}=新事件 ${CONFIG.MARKERS.HOT}=高热度 ${CONFIG.MARKERS.RISK}=风险 ${CONFIG.MARKERS.UP}=上升 ${CONFIG.MARKERS.DOWN}=下降 ${CONFIG.MARKERS.CONFLICT}=来源冲突\n\n`;
-  md += `---\n\n`;
+  // 9. 卡片式 Markdown 生成
+  const domPct = ranked.length > 0 ? (domestic.length / ranked.length * 100).toFixed(1) : '0';
+  const dedupTotal = urlDups.length + titleDups.length + seenItems.length;
 
-  // 9.1 宏观政策与AI
-  md += `## 一、宏观经济与AI政策\n\n`;
-  const macroItems = ranked.filter((i) => {
-    const t = (i.title + i.summary).toLowerCase();
-    return /政策|央行|利率|GDP|CPI|PMI|监管|国务院|工信部|LPR|货币|财政/i.test(t);
-  });
-  if (macroItems.length > 0) {
-    md += `| # | 标注 | 标题 | 数据要点 | 来源 | 时间 |\n`;
-    md += `|---|------|------|----------|------|------|\n`;
-    macroItems.slice(0, 10).forEach((item, idx) => {
-      const marker = getMarker(item);
-      const dataStr = item.dataPoint
-        ? Object.entries(item.dataPoint).filter(([, v]) => v !== null).map(([k, v]) => `${k}: ${v}`).join(' | ')
-        : item.summary?.slice(0, 60) || '';
-      md += `| ${idx + 1} | ${marker} | ${item.title.slice(0, 60)} | ${dataStr.slice(0, 80)} | [${item.source}](${item.sourceUrl || item.url}) | ${(item.publishedAt || '').slice(0, 10)} |\n`;
-    });
-    md += `\n`;
-  } else {
-    md += `> 本轮无宏观经济相关政策/数据更新。\n\n`;
+  let md = '';
+  // ---- 顶部标签栏 ----
+  md += `# 🤖 AI+经济情报 · 第${round}轮\n\n`;
+  md += `\`\`\`\n`;
+  md += `📅 ${today}  ⏰ ${nowStr.slice(-8)}  📡 36Kr/新浪/HN/arXiv/GitHub/AIHOT/WebSearch\n`;
+  md += `📊 ${ranked.length}条精选  🇨🇳${domestic.length}条 / 🌍${international.length}条  (原始${allItems.length}条 → 去重${dedupTotal}条)  🔄${round}/${CONFIG.MAX_ROUNDS}轮\n`;
+  md += `🆕新  🔥热  ⚠️风险  📈↑  📉↓  ⚡冲突\n`;
+  md += `\`\`\`\n\n`;
+
+  // ---- 辅助函数 ----
+  function shortDate(d) { return (d || '').slice(0, 10).replace(/^2026-/, ''); }
+  function shortSrc(item) {
+    const s = (item.source || '').replace(/WebSearch|AI HOT \(|公众号：|X：|IT之家|TechCrunch|Hacker News/g, '');
+    return s.length > 15 ? s.slice(0, 14) + '…' : s;
   }
-
-  // 9.2 AI产业与资本市场
-  md += `## 二、AI产业与资本市场\n\n`;
-  const capItems = ranked.filter((i) => {
-    const t = (i.title + i.summary).toLowerCase();
-    return /融资|投资|估值|IPO|上市|收购|并购|财报|营收/i.test(t);
-  });
-  if (capItems.length > 0) {
-    for (const item of capItems.slice(0, 15)) {
-      const marker = getMarker(item);
-      md += `- ${marker} **${item.title}**\n`;
-      if (item.summary) md += `  ${item.summary.slice(0, 150)}\n`;
-      md += `  📎 [${item.source}](${item.url}) — ${(item.publishedAt || '').slice(0, 10)}\n\n`;
+  function shortDomain(item) {
+    try { return (new URL(item.url || '')).hostname.replace('www.', ''); } catch (_) { return ''; }
+  }
+  // 大变化检测: 金额+政策+管制类自动标注
+  function getMarker(item) {
+    const t = (item.title + (item.summary || '')).toLowerCase();
+    if (/管制|制裁|出口限制|ban|curb|restrict|第三轮|收紧|警告/i.test(t)) return '🔴';
+    if (/融资|投资|估值|ipo|上市|收购|并购|募资|亿|billion|million.*dollar|raised|series/i.test(t)) return '🟡';
+    if (/政策|措施|方案|规划|国务院|工信部|发改委|regulation|act\s*2/i.test(t)) return '🟢';
+    if (/财报|营收|利润|亏损|增速|增长|revenue|profit|earning/i.test(t)) return '🔵';
+    if (/风险|泡沫|警告|跌|下滑|裁员|layoff/i.test(t)) return '🔴';
+    return '';
+  }
+  // 提取数值亮点
+  function extractMetric(item) {
+    const t = item.title + ' ' + (item.summary || '');
+    const patterns = [
+      /(\d+[\d,.]*\s*亿[美中]?元?)/,
+      /(\d+[\d,.]*\s*亿)/,
+      /(\d+[\d,.]*\s*万亿)/,
+      /(\$\d+[\d,.]*\s*[BMK]i?l?l?i?o?n?)/i,
+      /(\d+[\d,.]*%\s*(?:增长|增速|上涨|下跌)?)/,
+      /((?:增长|增速|同比|环比)\s*\d+[\d,.]*%)/,
+    ];
+    for (const p of patterns) {
+      const m = t.match(p);
+      if (m) return m[1];
     }
-  } else {
-    md += `> 本轮无AI产业/资本市场重要事件。\n\n`;
+    return '';
   }
 
-  // 9.3 AI概念板块行情
-  md += `## 三、AI概念板块行情\n\n`;
-  const stockItems = ranked.filter((i) => i.category === 'concept-stocks' || i.dataPoint?.price !== undefined);
-  if (stockItems.length > 0) {
-    md += `| 标题 | 数据 | 来源 |\n`;
-    md += `|------|------|------|\n`;
-    stockItems.slice(0, 15).forEach((item) => {
+  // ---- 第一步: 构建分类归组 ----
+  // 分组定义: { label, emoji, keywords, items }
+  const GROUPS = [
+    { label: '宏观政策', emoji: '📋', kws: /政策|措施|方案|法规|监管|管制|export.curb|restrict|sanction|国务院|工信部|发改委|商务部|芯片.*出口|半导体.*禁/i },
+    { label: '资本市场', emoji: '💰', kws: /融资|投资|估值|IPO|上市|收购|并购|财报|营收|利润|revenue|earning|funding|investment|valuation|raised|series|billion|million.*dollar|季报|Q[1234]\b/i },
+    { label: '行情数据', emoji: '📈', kws: /行情|涨跌|指数|板块|股价|市值|价\b.*\d|%|概念股|纳斯达克|道琼斯|标普|恒生|日经|DAX/i },
+    { label: '全球动态', emoji: '🌍', kws: /AI.*economy|芯片.*战|贸易|关税|Chips Act|华尔街|银行.*AI|央行|LPR|利率|通胀/i },
+    { label: '学术开源', emoji: '🔬', kws: /arXiv|GitHub|论文|research|paper|开源|paper|模型.*开源|⭐\s*\d/i },
+  ];
+
+  function matchGroup(item) {
+    const t = item.title + ' ' + (item.summary || '');
+    for (const g of GROUPS) {
+      if (g.kws.test(t)) return g;
+    }
+    // 默认: 国内→宏观政策, 国外→全球动态
+    if ((item.region || '') === 'domestic') return GROUPS[0];
+    return GROUPS[3];
+  }
+
+  // 分组归类 (去重: 同一条目只出现在第一个匹配组)
+  const assigned = new Set();
+  const groupBuckets = {};
+  for (const g of GROUPS) groupBuckets[g.label] = [];
+
+  for (const item of ranked) {
+    const g = matchGroup(item);
+    groupBuckets[g.label].push(item);
+  }
+
+  // 合并"行情数据"太少时并入"资本市场"
+  if (groupBuckets['行情数据'].length < 3) {
+    groupBuckets['资本市场'] = [...groupBuckets['资本市场'], ...groupBuckets['行情数据']];
+    groupBuckets['行情数据'] = [];
+  }
+
+  // 实际输出的组
+  const activeGroups = GROUPS.filter(g => groupBuckets[g.label].length > 0);
+
+  // ---- 第二步: 逐组渲染 ----
+  for (const g of activeGroups) {
+    const items = groupBuckets[g.label].slice(0, 15);
+    md += `---\n`;
+    md += `## ${g.emoji} ${g.label} · ${items.length}条\n\n`;
+
+    for (const item of items) {
       const marker = getMarker(item);
-      const dataStr = item.dataPoint
-        ? `${item.dataPoint.price ?? '-'} (${item.dataPoint.changePercent ?? '-'}%)`
-        : '';
-      md += `| ${marker} ${item.title.slice(0, 50)} | ${dataStr} | [${item.source}](${item.url}) |\n`;
-    });
-    md += `\n`;
-  } else {
-    md += `> 本轮无AI板块行情数据。\n\n`;
-  }
+      const metric = extractMetric(item);
+      const dateStr = shortDate(item.publishedAt);
+      const domain = shortDomain(item);
 
-  // 9.4 全球AI经济动态
-  md += `## 四、全球AI经济动态\n\n`;
-  const globalItems = international.slice(0, 15);
-  if (globalItems.length > 0) {
-    for (const item of globalItems) {
-      md += `- **${item.title}**\n`;
-      if (item.summary) md += `  ${item.summary.slice(0, 150)}\n`;
-      md += `  📎 [${item.source}](${item.url}) — ${(item.publishedAt || '').slice(0, 10)}\n\n`;
+      // 标题行: 标记 + 粗体标题 + 数值亮点
+      md += `**${marker} ${item.title}**`;
+      if (metric) md += `  \`${metric}\``;
+      md += `\n`;
+
+      // 摘要行(截断80字)
+      const summary = (item.summary || '').replace(/\s+/g, ' ').trim();
+      if (summary.length > 5) {
+        md += `> ${summary.slice(0, 100)}${summary.length > 100 ? '…' : ''}\n`;
+      }
+
+      // 来源行
+      md += `→ ${item.source} · [${domain}](${item.url})`;
+      if (dateStr) md += ` · ${dateStr}`;
+      md += `\n\n`;
     }
-  } else {
-    md += `> 本轮无全球AI经济动态。\n\n`;
   }
 
-  // 9.5 学术与趋势
-  md += `## 五、AI学术与产业趋势\n\n`;
-  const acadItems = ranked.filter((i) => i.source?.includes('arXiv') || i.source?.includes('GitHub'));
-  if (acadItems.length > 0) {
-    for (const item of acadItems.slice(0, 10)) {
-      md += `- **${item.title}**\n`;
-      if (item.summary) md += `  ${item.summary.slice(0, 150)}\n`;
-      md += `  📎 [${item.source}](${item.url})\n\n`;
-    }
-  } else {
-    md += `> 本轮无相关学术/开源动态。\n\n`;
-  }
-
-  // 9.6 跨来源冲突
-  md += `## 六、跨来源冲突记录\n\n`;
+  // ---- 第三步: 冲突记录 ----
   if (conflicts.length > 0) {
-    md += `| 事件 | 采用来源 | 替代来源 | 说明 |\n`;
-    md += `|------|----------|----------|------|\n`;
+    md += `---\n`;
+    md += `## ⚡ 来源冲突 · ${conflicts.length}组\n\n`;
     for (const c of conflicts) {
-      md += `| ${CONFIG.MARKERS.CONFLICT} ${c.event.slice(0, 30)} | ${c.winner?.source || '-'} | ${c.losers.map((l) => l.source).join(', ')} | ${c.note} |\n`;
-    }
-    md += `\n`;
-  } else {
-    md += `> 本轮未检测到跨来源冲突。\n\n`;
-  }
-
-  // 9.7 高热度事件
-  if (hotEvents.length > 0) {
-    md += `## 🔥 本轮高热度事件\n\n`;
-    for (const h of hotEvents.slice(0, 5)) {
-      md += `- **${h.event}** — ${h.items.length} 个来源同时报道\n`;
+      md += `- **${c.event.slice(0, 40)}** → 采用 ${c.winner?.source || '-'}，替代 ${c.losers.map(l => l.source).join('、')}\n`;
     }
     md += `\n`;
   }
 
-  // 9.8 统计
+  // ---- 第四步: 热门事件 ----
+  const detected3 = detectConflicts(ranked);
+  const hotEvents3 = detected3.filter((g) => g.items.length >= 3);
+  if (hotEvents3.length > 0) {
+    md += `---\n`;
+    md += `## 🔥 高热度事件 · ≥3来源\n\n`;
+    for (const h of hotEvents3.slice(0, 5)) {
+      md += `- **${h.event.slice(0, 50)}** — ${h.items.length}个来源同时报道\n`;
+    }
+    md += `\n`;
+  }
+
+  // ---- 第五步: 统计面板 ----
   const regions = countByRegion(ranked);
   const sourceCounts = {};
   for (const item of ranked) {
@@ -253,27 +282,20 @@ function pad(n) { return String(n).padStart(2, '0'); }
     sourceCounts[s] = (sourceCounts[s] || 0) + 1;
   }
 
-  md += `## 七、本轮统计\n\n`;
-  md += `| 维度 | 数据 |\n`;
-  md += `|------|------|\n`;
-  md += `| 总条目 | ${ranked.length} 条 |\n`;
-  md += `| 国内/国际 | ${regions.domestic} / ${regions.international} |\n`;
-  md += `| 国内占比 | ${(regions.domestic / Math.max(1, ranked.length) * 100).toFixed(1)}% |\n`;
-  md += `| 原始条目(去重前) | ${allItems.length} 条 |\n`;
-  md += `| 去重剔除 | ${urlDups.length + titleDups.length + seenItems.length} 条 |\n`;
-  md += `| 来源数 | ${Object.keys(sourceCounts).length} 个 |\n`;
-  md += `| 冲突事件 | ${conflicts.length} 组 |\n`;
-  md += `\n`;
-
-  md += `**来源分布:**\n`;
-  for (const [src, cnt] of Object.entries(sourceCounts).sort((a, b) => b[1] - a[1])) {
-    md += `- ${src}: ${cnt} 条\n`;
-  }
-  md += `\n`;
+  md += `---\n`;
+  md += `## 📊 统计面板\n\n`;
+  md += `\`\`\`\n`;
+  md += `总条目 ${ranked.length}    国内 ${regions.domestic} (${(regions.domestic/Math.max(1,ranked.length)*100).toFixed(1)}%)    国际 ${regions.international}\n`;
+  md += `原始 ${allItems.length}  →  URL去重${urlDups.length}  +  标题去重${titleDups.length}  +  跨轮去重${seenItems.length}  =  精选${ranked.length}\n`;
+  md += `来源 ${Object.keys(sourceCounts).length}个  ·  冲突 ${conflicts.length}组  ·  高热度 ${hotEvents.length}个\n`;
+  md += `\`\`\`\n\n`;
+  md += `**来源分布:** `;
+  md += Object.entries(sourceCounts).sort((a,b) => b[1]-a[1]).map(([s,c]) => `${s}×${c}`).join(' · ');
+  md += `\n\n`;
 
   md += `---\n`;
-  md += `> ⚠️ 以上所有信息均可追溯到原始来源URL。信息不可编造，数据冲突已按权威优先级裁决。\n`;
-  md += `> 📌 本项目为30天暂行项目（${CONFIG.START_DATE} 至 ${CONFIG.END_DATE}），第 ${round}/${CONFIG.MAX_ROUNDS} 轮。\n`;
+  md += `> ⚠️ 全部信息可追溯原始URL。数据冲突按权威优先级裁决。不可编造。\n`;
+  md += `> 📌 ${CONFIG.START_DATE} → ${CONFIG.END_DATE} · ${round}/${CONFIG.MAX_ROUNDS}轮 · 到期自动停止\n`;
 
   // 10. 写汇报文件
   const reportFile = path.join(CONFIG.REPORTS_DIR, `轮次${pad(round)}-${today}.md`);
