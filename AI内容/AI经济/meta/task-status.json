@@ -1,0 +1,10 @@
+{
+  "currentRound": 0,
+  "rounds": [],
+  "status": "active",
+  "startDate": "2026-07-25",
+  "endDate": "2026-08-24",
+  "maxRounds": 10,
+  "createdAt": "2026-07-24T23:50:00+08:00",
+  "lastRun": null
+}

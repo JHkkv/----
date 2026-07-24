@@ -1,0 +1,23 @@
+{
+  "domestic": [
+    {"rank": 0, "name": "国家统计局", "domain": "data.stats.gov.cn", "type": "国家级官方统计"},
+    {"rank": 1, "name": "中国人民银行", "domain": "chinamoney.com.cn", "type": "中央银行"},
+    {"rank": 2, "name": "巨潮资讯", "domain": "cninfo.com.cn", "type": "深交所指定信息披露"},
+    {"rank": 3, "name": "东方财富", "domain": "eastmoney.com", "type": "一线财经数据平台"},
+    {"rank": 4, "name": "36Kr", "domain": "36kr.com", "type": "一线科技财经媒体"},
+    {"rank": 5, "name": "新浪财经", "domain": "finance.sina.com.cn", "type": "门户财经频道"},
+    {"rank": 6, "name": "证券时报", "domain": "stcn.com", "type": "证监会指定披露媒体"},
+    {"rank": 7, "name": "财联社", "domain": "cls.cn", "type": "财经快讯平台"}
+  ],
+  "international": [
+    {"rank": 0, "name": "arXiv", "domain": "export.arxiv.org", "type": "学术预印本"},
+    {"rank": 1, "name": "Reuters", "domain": "reuters.com", "type": "国际通讯社"},
+    {"rank": 2, "name": "Bloomberg", "domain": "bloomberg.com", "type": "国际财经通讯社"},
+    {"rank": 3, "name": "Financial Times", "domain": "ft.com", "type": "国际财经媒体"},
+    {"rank": 4, "name": "AI HOT", "domain": "aihot.virxact.com", "type": "AI新闻聚合"},
+    {"rank": 5, "name": "Hacker News", "domain": "news.ycombinator.com", "type": "科技社区"},
+    {"rank": 6, "name": "GitHub", "domain": "github.com", "type": "开源平台"},
+    {"rank": 7, "name": "TechCrunch", "domain": "techcrunch.com", "type": "科技媒体"}
+  ],
+  "conflictRule": "当同一事件被多个来源报道且信息不一致时，按权威排名取最高等级来源。rank 数字越小越权威。"
+}
