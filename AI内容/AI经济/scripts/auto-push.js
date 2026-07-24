@@ -6,7 +6,8 @@ const path = require('path');
 const CONFIG = require('./config');
 const { log } = require('./lib/curl-helper');
 
-const REPO_PATH = CONFIG.BASE_DIR.split('/AI内容')[0].replace(/\\/g, '/');
+// REPO_PATH = f:/测试工具
+const REPO_PATH = 'f:/测试工具';
 const AI_ECON_PATH = 'AI内容/AI经济';
 
 function getCurrentRound() {

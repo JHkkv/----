@@ -1,0 +1,86 @@
+[
+  {
+    "title": "NDX: 25190.2 | 涨跌 0.21%",
+    "url": "https://quote.eastmoney.com/",
+    "summary": "NDX 指数: 25190.2, 涨跌幅: 0.21%",
+    "source": "东方财富全球",
+    "sourceUrl": "https://push2.eastmoney.com/api/qt/ulist.np/get",
+    "publishedAt": "2026-07-25",
+    "region": "international",
+    "category": "global-dynamics",
+    "dataPoint": {
+      "value": 25190.2,
+      "changePercent": 0.21
+    }
+  },
+  {
+    "title": "DJIA: 52099.31 | 涨跌 0.75%",
+    "url": "https://quote.eastmoney.com/",
+    "summary": "DJIA 指数: 52099.31, 涨跌幅: 0.75%",
+    "source": "东方财富全球",
+    "sourceUrl": "https://push2.eastmoney.com/api/qt/ulist.np/get",
+    "publishedAt": "2026-07-25",
+    "region": "international",
+    "category": "global-dynamics",
+    "dataPoint": {
+      "value": 52099.31,
+      "changePercent": 0.75
+    }
+  },
+  {
+    "title": "SPX: 7455.75 | 涨跌 0.64%",
+    "url": "https://quote.eastmoney.com/",
+    "summary": "SPX 指数: 7455.75, 涨跌幅: 0.64%",
+    "source": "东方财富全球",
+    "sourceUrl": "https://push2.eastmoney.com/api/qt/ulist.np/get",
+    "publishedAt": "2026-07-25",
+    "region": "international",
+    "category": "global-dynamics",
+    "dataPoint": {
+      "value": 7455.75,
+      "changePercent": 0.64
+    }
+  },
+  {
+    "title": "HSI: 24963.23 | 涨跌 -0.98%",
+    "url": "https://quote.eastmoney.com/",
+    "summary": "HSI 指数: 24963.23, 涨跌幅: -0.98%",
+    "source": "东方财富全球",
+    "sourceUrl": "https://push2.eastmoney.com/api/qt/ulist.np/get",
+    "publishedAt": "2026-07-25",
+    "region": "international",
+    "category": "global-dynamics",
+    "dataPoint": {
+      "value": 24963.23,
+      "changePercent": -0.98
+    }
+  },
+  {
+    "title": "📉N225: 64611.15 | 涨跌 -2.73%",
+    "url": "https://quote.eastmoney.com/",
+    "summary": "N225 指数: 64611.15, 涨跌幅: -2.73%",
+    "source": "东方财富全球",
+    "sourceUrl": "https://push2.eastmoney.com/api/qt/ulist.np/get",
+    "publishedAt": "2026-07-25",
+    "region": "international",
+    "category": "global-dynamics",
+    "dataPoint": {
+      "value": 64611.15,
+      "changePercent": -2.73
+    }
+  },
+  {
+    "title": "GDAXI: 25099 | 涨跌 1.36%",
+    "url": "https://quote.eastmoney.com/",
+    "summary": "GDAXI 指数: 25099, 涨跌幅: 1.36%",
+    "source": "东方财富全球",
+    "sourceUrl": "https://push2.eastmoney.com/api/qt/ulist.np/get",
+    "publishedAt": "2026-07-25",
+    "region": "international",
+    "category": "global-dynamics",
+    "dataPoint": {
+      "value": 25099,
+      "changePercent": 1.36
+    }
+  }
+]

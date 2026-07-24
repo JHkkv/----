@@ -1,10 +1,21 @@
 {
-  "currentRound": 0,
-  "rounds": [],
+  "currentRound": 1,
+  "rounds": [
+    {
+      "round": 1,
+      "date": "2026-07-25",
+      "rawCount": 62,
+      "finalCount": 44,
+      "domestic": 19,
+      "international": 25,
+      "conflicts": 0,
+      "sources": 11
+    }
+  ],
   "status": "active",
   "startDate": "2026-07-25",
   "endDate": "2026-08-24",
   "maxRounds": 10,
   "createdAt": "2026-07-24T23:50:00+08:00",
-  "lastRun": null
+  "lastRun": "2026-07-24T16:28:18.636Z"
 }
