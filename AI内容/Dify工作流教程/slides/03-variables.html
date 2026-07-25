@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dify 工作流教程 — 变量篇</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ========== RESET & BASE ========== */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0e1a;
+  --surface:#111827;
+  --card-bg:rgba(0,240,255,.04);
+  --cyan:#00f0ff;
+  --magenta:#ff00e5;
+  --text:#e2e8f0;
+  --text-dim:#94a3b8;
+  --code-bg:#0d1117;
+  --border:rgba(0,240,255,.25);
+  --glow-cyan:0 0 20px rgba(0,240,255,.15);
+  --glow-magenta:0 0 20px rgba(255,0,229,.15);
+  --font-code:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+  --font-body:system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+}
+html{scroll-behavior:smooth;scroll-snap-type:y mandatory}
+body{
+  background:var(--bg);
+  font-family:var(--font-body);
+  color:var(--text);
+  line-height:1.6;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Grid background */
+body::before{
+  content:'';
+  position:fixed;inset:0;z-index:-1;
+  background-image:
+    linear-gradient(rgba(0,240,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,240,255,.03) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,#000,transparent);
+  pointer-events:none;
+}
+
+/* ========== SLIDES ========== */
+.slide{
+  min-height:100vh;scroll-snap-align:start;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(24px,4vh,60px) clamp(20px,6vw,100px);
+  position:relative;
+}
+.slide-content{width:100%;max-width:1100px;margin:0 auto}
+.slide-title{
+  font-size:clamp(20px,3.2vw,36px);
+  font-weight:700;
+  color:var(--cyan);
+  margin-bottom:clamp(16px,3vh,36px);
+  text-shadow:0 0 30px rgba(0,240,255,.4);
+}
+.slide-subtitle{
+  font-size:clamp(14px,1.8vw,20px);
+  color:var(--magenta);
+  margin-bottom:clamp(12px,2vh,24px);
+}
+
+/* Title slide */
+.title-slide{text-align:center;align-items:center}
+.title-slide .main-title{
+  font-size:clamp(28px,5vw,56px);
+  font-weight:800;
+  background:linear-gradient(135deg,var(--cyan),var(--magenta));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-bottom:clamp(8px,1.5vh,16px);
+}
+.title-slide .series-tag{
+  font-size:clamp(14px,2vw,20px);
+  color:var(--text-dim);
+  letter-spacing:2px;
+  margin-bottom:clamp(12px,2vh,20px);
+}
+.title-slide .subhead{
+  font-size:clamp(16px,2.2vw,24px);
+  color:var(--cyan);
+  margin-top:clamp(8px,2vh,16px);
+}
+.title-slide .section-number{
+  font-size:clamp(40px,8vw,96px);
+  font-weight:900;
+  background:linear-gradient(135deg,var(--cyan),var(--magenta));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  line-height:1;
+  margin-bottom:4px;
+}
+
+/* ========== CARDS ========== */
+.card{
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:clamp(14px,2.5vh,28px) clamp(16px,3vw,32px);
+  box-shadow:var(--glow-cyan);
+  margin-bottom:clamp(10px,2vh,20px);
+}
+.card.magenta{border-color:rgba(255,0,229,.25);box-shadow:var(--glow-magenta)}
+
+/* ========== CODE BLOCKS ========== */
+code{
+  font-family:var(--font-code);
+  font-size:clamp(11px,1.5vw,14px);
+  background:var(--code-bg);
+  border:1px solid rgba(0,240,255,.15);
+  border-radius:8px;
+  display:block;
+  padding:clamp(10px,1.8vh,18px) clamp(12px,2vw,20px);
+  margin:clamp(6px,1.2vh,14px) 0;
+  color:#c9d1d9;
+  white-space:pre;
+  overflow-x:auto;
+  line-height:1.65;
+}
+code .kw{color:#ff7b72}
+code .str{color:#a5d6ff}
+code .cmt{color:#8b949e}
+code .fn{color:#d2a8ff}
+code .num{color:#79c0ff}
+code .op{color:#ff00e5}
+.inline-code{
+  display:inline;
+  padding:2px 8px;
+  font-size:.9em;
+  background:rgba(0,240,255,.08);
+  border-radius:4px;
+  margin:0 2px;
+}
+
+/* ========== TABLES ========== */
+table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  font-size:clamp(11px,1.4vw,14px);
+  margin:clamp(8px,1.5vh,16px) 0;
+}
+thead{background:rgba(0,240,255,.08)}
+th{
+  padding:clamp(6px,1.2vh,12px) clamp(8px,1.5vw,16px);
+  text-align:left;font-weight:700;
+  color:var(--cyan);
+  border-bottom:1px solid var(--border);
+}
+td{
+  padding:clamp(5px,1vh,10px) clamp(8px,1.5vw,16px);
+  border-bottom:1px solid rgba(0,240,255,.06);
+  color:var(--text-dim);
+}
+tr:last-child td{border-bottom:none}
+td:first-child,td:nth-child(2){color:var(--cyan);font-family:var(--font-code);font-size:clamp(10px,1.3vw,13px)}
+
+/* ========== FLOW DIAGRAMS ========== */
+.flow{
+  display:flex;align-items:center;justify-content:center;
+  gap:clamp(4px,1vw,12px);
+  margin:clamp(10px,2vh,20px) 0;
+  flex-wrap:wrap;
+}
+.flow-box{
+  background:var(--code-bg);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:clamp(6px,1.2vh,12px) clamp(10px,1.8vw,16px);
+  font-family:var(--font-code);
+  font-size:clamp(10px,1.3vw,13px);
+  color:var(--cyan);
+  text-align:center;
+  white-space:nowrap;
+}
+.flow-box.magenta{color:var(--magenta);border-color:rgba(255,0,229,.25)}
+.flow-box.end{color:var(--text-dim)}
+.flow-arrow{color:var(--cyan);font-size:clamp(14px,2vw,20px);flex-shrink:0}
+
+/* ========== STAGE CARDS ========== */
+.stages{
+  display:flex;gap:clamp(10px,2vw,24px);
+  justify-content:center;flex-wrap:wrap;
+}
+.stage-card{
+  flex:1;min-width:200px;
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:clamp(14px,2.5vh,28px);
+  text-align:center;
+  box-shadow:var(--glow-cyan);
+}
+.stage-card h3{color:var(--cyan);font-size:clamp(14px,1.8vw,18px);margin-bottom:clamp(6px,1.2vh,12px)}
+.stage-card p{color:var(--text-dim);font-size:clamp(11px,1.3vw,14px)}
+.stage-number{
+  font-size:clamp(28px,4vw,48px);
+  font-weight:900;
+  color:var(--cyan);
+  opacity:.3;
+  margin-bottom:4px;
+}
+
+/* ========== ANNOTATIONS ========== */
+.annotated-block{
+  position:relative;
+  margin:clamp(8px,1.5vh,16px) 0;
+  padding-left:clamp(14px,2vw,24px);
+  border-left:3px solid var(--cyan);
+}
+.annotated-block.magenta{border-left-color:var(--magenta)}
+.annotated-block .label{
+  font-size:clamp(10px,1.1vw,12px);
+  color:var(--cyan);
+  margin-bottom:4px;
+  font-weight:600;
+}
+.annotated-block.magenta .label{color:var(--magenta)}
+
+/* ========== NAVIGATION ========== */
+nav{
+  position:fixed;bottom:0;left:0;right:0;
+  z-index:100;
+  display:flex;justify-content:center;align-items:center;
+  gap:8px;padding:clamp(8px,1.5vh,16px);
+  background:linear-gradient(transparent,rgba(10,14,26,.95) 40%);
+}
+nav .dot{
+  width:clamp(8px,1.2vw,12px);height:clamp(8px,1.2vw,12px);
+  border-radius:50%;
+  background:var(--text-dim);
+  cursor:pointer;transition:all .3s;
+  border:1px solid transparent;
+}
+nav .dot.active{background:var(--cyan);box-shadow:0 0 10px var(--cyan);border-color:var(--cyan)}
+nav .dot.visited{background:rgba(0,240,255,.4)}
+.slide-counter{
+  position:fixed;top:clamp(12px,2vh,24px);right:clamp(16px,3vw,40px);
+  font-family:var(--font-code);
+  font-size:clamp(11px,1.4vw,14px);
+  color:var(--text-dim);
+  z-index:100;
+}
+.slide-counter .current{color:var(--cyan);font-weight:700}
+
+/* ========== ANIMATION ========== */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ========== RESPONSIVE ========== */
+@media(max-width:700px){
+  .flow{flex-direction:column;align-items:stretch}
+  .flow-arrow{transform:rotate(90deg)}
+  .stages{flex-direction:column}
+  .stage-card{min-width:unset}
+  .slide{padding:clamp(14px,3vh,24px) clamp(12px,3vw,20px)}
+}
+@media(max-width:500px){
+  code{font-size:10px;padding:8px 10px}
+  table{font-size:10px}
+}
+
+/* ========== REDUCED MOTION ========== */
+@media(prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  .slide{transition:none}
+}
+
+/* ========== CHECK/X MARK ========== */
+.good{color:#3fb950;font-weight:600}
+.bad{color:#f85149;font-weight:600}
+
+/* ========== GRID LAYOUTS ========== */
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:clamp(12px,2vw,20px)}
+.cols3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:clamp(10px,1.8vw,16px)}
+
+/* ========== KEY-VALUE PAIRS ========== */
+.kv-row{display:flex;gap:8px;margin-bottom:6px;font-size:clamp(13px,1.6vw,16px)}
+.kv-key{color:var(--cyan);font-family:var(--font-code);min-width:180px}
+.kv-val{color:var(--text-dim)}
+.kv-val code{display:inline;padding:2px 6px;margin:0;font-size:.85em}
+
+/* ========== SECTION DIVIDER ========== */
+.section-label{
+  display:inline-block;
+  padding:4px 16px;
+  background:rgba(0,240,255,.1);
+  border:1px solid var(--border);
+  border-radius:20px;
+  font-size:clamp(11px,1.2vw,13px);
+  color:var(--cyan);
+  margin-bottom:clamp(10px,2vh,16px);
+  font-family:var(--font-code);
+}
+
+/* ========== SCOPE BOX ========== */
+.scope-outer{
+  border:2px solid var(--border);
+  border-radius:16px;
+  padding:clamp(14px,2.5vh,28px);
+  background:rgba(0,240,255,.03);
+  text-align:center;
+}
+.scope-inner{
+  border:2px dashed rgba(255,0,229,.4);
+  border-radius:12px;
+  padding:clamp(10px,2vh,20px);
+  margin-top:clamp(8px,1.5vh,14px);
+  background:rgba(255,0,229,.04);
+}
+.scope-label{font-size:clamp(11px,1.3vw,13px);color:var(--text-dim)}
+</style>
+</head>
+<body>
+
+<!-- Slide Counter -->
+<div class="slide-counter"><span class="current" id="current-num">1</span> / 20</div>
+
+<!-- Navigation -->
+<nav id="nav-dots"></nav>
+
+<!-- ===== SLIDE 1: TITLE ===== -->
+<section class="slide title-slide reveal">
+<div class="slide-content">
+<div class="section-number">03</div>
+<h1 class="main-title">Dify 工作流搭建完全教程</h1>
+<div class="series-tag">CHENLEI · DIFY TUTORIALS</div>
+<h2 class="subhead">第三篇：变量篇</h2>
+<div class="subhead" style="color:var(--text-dim);font-size:clamp(15px,2vw,22px);margin-top:8px">变量系统与数据传递 — 工作流的血液</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 2: VARIABLEPOOL ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">VariablePool 本质</h2>
+<p style="color:var(--text-dim);margin-bottom:clamp(12px,2vh,20px);font-size:clamp(13px,1.6vw,16px)">
+  变量池是 <span style="color:var(--cyan)">KV 存储</span>，key = <code class="inline-code">(node_id, field_name)</code> 元组
+</p>
+<div class="card">
+<div class="section-label">3 个具体示例</div>
+<div class="kv-row"><span class="kv-key">("17200001", "text")</span><span class="kv-val">→ LLM 节点输出文本</span></div>
+<div class="kv-row"><span class="kv-key">("sys", "query")</span><span class="kv-val">→ 系统变量：用户输入</span></div>
+<div class="kv-row"><span class="kv-key">("17200003", "result")</span><span class="kv-val">→ 知识检索节点结果</span></div>
+</div>
+<code><span class="cmt"># api/core/workflow/variable_pool_initializer.py</span>
+<span class="kw">def</span> <span class="fn">add_variables_to_pool</span>(variable_pool, variables):
+    <span class="kw">for</span> variable <span class="kw">in</span> variables:
+        variable_pool.add(variable.selector, variable)
+
+<span class="kw">def</span> <span class="fn">add_node_inputs_to_pool</span>(variable_pool, *, node_id, inputs):
+    <span class="kw">for</span> current_node_id <span class="kw">in</span> [node_id] + <span class="fn">list</span>(aliases):
+        <span class="kw">for</span> key, value <span class="kw">in</span> inputs.items():
+            variable_pool.add((current_node_id, key), value)</code>
+</div>
+</section>
+
+<!-- ===== SLIDE 3: LIFECYCLE ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">变量生命周期</h2>
+<div class="stages">
+<div class="stage-card">
+  <div class="stage-number">1</div>
+  <h3>工作流启动</h3>
+  <p>注入系统变量 (sys.*)<br>初始化变量池</p>
+</div>
+<div class="flow-arrow" style="display:flex;align-items:center;font-size:28px">→</div>
+<div class="stage-card">
+  <div class="stage-number">2</div>
+  <h3>节点依次执行</h3>
+  <p>每个节点执行完毕后<br>输出立即写入变量池</p>
+</div>
+<div class="flow-arrow" style="display:flex;align-items:center;font-size:28px">→</div>
+<div class="stage-card">
+  <div class="stage-number">3</div>
+  <h3>工作流结束</h3>
+  <p>变量池销毁<br>内存释放</p>
+</div>
+</div>
+<div class="annotated-block" style="margin-top:clamp(16px,3vh,28px)">
+  <div class="label">关键特性：即时可见</div>
+  <p style="color:var(--text-dim);font-size:clamp(12px,1.4vw,15px)">
+    每个节点的输出在<strong style="color:var(--cyan)">该节点执行完成时</strong>立即写入变量池，后续节点可以引用。不需要"等待工作流结束后才可用"。
+  </p>
+</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 4: FOUR TYPES ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">四类变量与前缀</h2>
+<p style="color:var(--text-dim);margin-bottom:clamp(10px,2vh,16px);font-size:clamp(13px,1.6vw,16px)">
+  Dify 用不同的 <code class="inline-code">node_id</code> 前缀区分变量来源
+</p>
+<code><span class="cmt"># api/core/workflow/variable_prefixes.py</span>
+<span class="kw">SYSTEM_VARIABLE_NODE_ID</span>       = <span class="str">"sys"</span>            <span class="cmt"># sys.xxx</span>
+<span class="kw">ENVIRONMENT_VARIABLE_NODE_ID</span>  = <span class="str">"env"</span>            <span class="cmt"># env.xxx</span>
+<span class="kw">CONVERSATION_VARIABLE_NODE_ID</span> = <span class="str">"conversation"</span>  <span class="cmt"># conversation.xxx</span>
+<span class="kw">RAG_PIPELINE_VARIABLE_NODE_ID</span> = <span class="str">"rag_pipeline"</span>  <span class="cmt"># rag_pipeline.xxx</span></code>
+<div class="card" style="margin-top:clamp(10px,2vh,16px)">
+<table style="border:none;margin:0">
+<tr><td style="color:var(--cyan);font-family:var(--font-code)">sys.*</td><td style="color:var(--text-dim);font-family:var(--font-body)">系统变量 — 自动注入，无需手动定义</td></tr>
+<tr><td style="color:var(--magenta);font-family:var(--font-code)">env.*</td><td style="color:var(--text-dim);font-family:var(--font-body)">环境变量 — 应用设置中配置，存 API Key / 配置项</td></tr>
+<tr><td style="color:var(--cyan);font-family:var(--font-code)">conversation.*</td><td style="color:var(--text-dim);font-family:var(--font-body)">对话变量 — 仅 Chat 模式，跨轮次持久化</td></tr>
+<tr><td style="color:var(--magenta);font-family:var(--font-code)">rag_pipeline.*</td><td style="color:var(--text-dim);font-family:var(--font-body)">RAG 管线变量 — RAG Pipeline 内部变量</td></tr>
+</table>
+</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 5: SYSTEM VARIABLES ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">系统变量详解 (sys.*)</h2>
+<p style="color:var(--text-dim);margin-bottom:clamp(8px,1.5vh,12px);font-size:clamp(12px,1.4vw,14px)">
+  自动注入，无需手动定义。编辑器中直接写 <code class="inline-code">sys.query</code> 即可引用
+</p>
+<table>
+<thead><tr><th>变量</th><th>说明</th><th>模式</th></tr></thead>
+<tbody>
+<tr><td>sys.query</td><td>用户输入文本</td><td>All</td></tr>
+<tr><td>sys.files</td><td>用户上传的文件列表</td><td>All</td></tr>
+<tr><td>sys.user_id</td><td>当前用户唯一标识</td><td>All</td></tr>
+<tr><td>sys.app_id</td><td>当前应用 ID</td><td>All</td></tr>
+<tr><td>sys.workflow_id</td><td>当前工作流 ID</td><td>All</td></tr>
+<tr><td>sys.workflow_run_id</td><td>本次运行唯一 ID</td><td>All</td></tr>
+<tr><td>sys.conversation_id</td><td>对话 ID</td><td>Chat</td></tr>
+<tr><td>sys.dialogue_count</td><td>对话轮次计数</td><td>Chat</td></tr>
+<tr><td>sys.timestamp</td><td>触发时间戳</td><td>Workflow</td></tr>
+</tbody>
+</table>
+<code style="margin-top:clamp(8px,1.5vh,12px)"><span class="cmt"># api/core/workflow/system_variables.py</span>
+<span class="kw">class</span> <span class="fn">SystemVariableKey</span>(<span class="fn">StrEnum</span>):
+    <span class="kw">QUERY</span>            = <span class="str">"query"</span>            <span class="cmt"># 用户输入</span>
+    <span class="kw">FILES</span>            = <span class="str">"files"</span>            <span class="cmt"># 上传文件</span>
+    <span class="kw">USER_ID</span>          = <span class="str">"user_id"</span>          <span class="cmt"># 用户 ID</span>
+    <span class="kw">APP_ID</span>           = <span class="str">"app_id"</span>           <span class="cmt"># 应用 ID</span>
+    <span class="kw">WORKFLOW_ID</span>      = <span class="str">"workflow_id"</span>      <span class="cmt"># 工作流 ID</span>
+    <span class="kw">WORKFLOW_RUN_ID</span>  = <span class="str">"workflow_run_id"</span>  <span class="cmt"># 运行 ID</span>
+    <span class="kw">CONVERSATION_ID</span>  = <span class="str">"conversation_id"</span>  <span class="cmt"># 对话 ID</span>
+    <span class="kw">DIALOGUE_COUNT</span>   = <span class="str">"dialogue_count"</span>   <span class="cmt"># 对话轮次</span>
+    <span class="kw">TIMESTAMP</span>        = <span class="str">"timestamp"</span>        <span class="cmt"># 时间戳</span></code>
+</div>
+</section>
+
+<!-- ===== SLIDE 6: ENV + CONVERSATION VARIABLES ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">环境变量 + 对话变量</h2>
+<div class="cols2">
+<div class="card magenta">
+<div class="section-label" style="color:var(--magenta);background:rgba(255,0,229,.1);border-color:rgba(255,0,229,.25)">env.* — 环境变量</div>
+<p style="color:var(--text-dim);font-size:clamp(12px,1.4vw,14px);margin:clamp(6px,1vh,10px) 0">
+  在 Dify 应用设置 → 环境变量中配置。适合存储 API Key、配置项等不硬编码的值。
+</p>
+<code><span class="cmt"># 使用方式</span>
+<span class="kw">env.API_KEY</span>
+<span class="kw">env.BASE_URL</span>
+<span class="kw">env.MODEL_NAME</span></code>
+<p style="color:var(--text-dim);font-size:clamp(11px,1.2vw,13px);margin-top:8px">
+  <span class="good">优势</span>：密钥不暴露在工作流 YAML 中，环境切换只需改配置
+</p>
+</div>
+<div class="card">
+<div class="section-label">conversation.* — 对话变量</div>
+<p style="color:var(--text-dim);font-size:clamp(12px,1.4vw,14px);margin:clamp(6px,1vh,10px) 0">
+  仅在 <strong style="color:var(--cyan)">Chat 模式</strong>中使用，跨对话轮次持久化。
+</p>
+<code><span class="cmt"># 适合存储</span>
+<span class="kw">conversation.user_preference</span>   <span class="cmt"># 用户偏好</span>
+<span class="kw">conversation.last_topic</span>        <span class="cmt"># 上一轮话题</span>
+<span class="kw">conversation.collected_info</span>    <span class="cmt"># 收集的信息</span></code>
+<p style="color:var(--text-dim);font-size:clamp(11px,1.2vw,13px);margin-top:8px">
+  <span class="good">典型场景</span>：多轮表单填写、偏好学习、上下文追踪
+</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 7: NODE OUTPUTS 1 ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">核心节点输出结构速查</h2>
+<div class="cols2">
+<div class="card">
+<div class="section-label">LLM</div>
+<code>{ <span class="str">text</span>: <span class="str">"..."</span>,
+  <span class="str">reasoning_content</span>: <span class="str">"..."</span>,
+  <span class="str">usage</span>: {
+    <span class="str">prompt_tokens</span>: <span class="num">150</span>,
+    <span class="str">completion_tokens</span>: <span class="num">80</span>,
+    <span class="str">total_tokens</span>: <span class="num">230</span>
+  }
+}</code>
+</div>
+<div class="card magenta">
+<div class="section-label" style="color:var(--magenta);background:rgba(255,0,229,.1);border-color:rgba(255,0,229,.25)">知识检索</div>
+<code>{ <span class="str">result</span>: [{
+    <span class="str">content</span>: <span class="str">"检索到的文本片段..."</span>,
+    <span class="str">title</span>: <span class="str">"文档标题"</span>,
+    <span class="str">url</span>: <span class="str">"https://..."</span>,
+    <span class="str">metadata</span>: {
+      <span class="str">score</span>: <span class="num">0.92</span>,
+      <span class="str">document_id</span>: <span class="str">"..."</span>,
+      <span class="str">dataset_id</span>: <span class="str">"..."</span>
+    }
+  }]
+}</code>
+</div>
+</div>
+<div class="annotated-block" style="margin-top:clamp(10px,1.8vh,16px)">
+  <div class="label">引用示例</div>
+  <p style="font-size:clamp(12px,1.4vw,14px)"><code class="inline-code">{{llm.text}}</code> 获取 LLM 输出文本 &nbsp;&nbsp; <code class="inline-code">{{retrieval.result[0].content}}</code> 获取第一篇检索结果</p>
+</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 8: NODE OUTPUTS 2 ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">核心节点输出结构速查（续）</h2>
+<div class="cols2">
+<div class="card">
+<div class="section-label">HTTP 请求</div>
+<code>{ <span class="str">body</span>: <span class="str">"{\"data\":...}"</span>,
+  <span class="str">status_code</span>: <span class="num">200</span>,
+  <span class="str">headers</span>: {<span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>},
+  <span class="str">files</span>: [<span class="kw">File</span>]
+}</code>
+</div>
+<div class="card">
+<div class="section-label">Code 节点</div>
+<code><span class="cmt"># 由 main() 返回值决定</span>
+<span class="kw">def</span> <span class="fn">main</span>(arg1: <span class="kw">str</span>):
+    <span class="kw">return</span> {
+        <span class="str">"result"</span>: arg1.upper(),
+        <span class="str">"length"</span>: <span class="fn">len</span>(arg1)
+    }
+<span class="cmt"># 输出: result, length</span></code>
+</div>
+</div>
+<div class="cols2" style="margin-top:clamp(10px,1.8vh,14px)">
+<div class="card magenta">
+<div class="section-label" style="color:var(--magenta);background:rgba(255,0,229,.1);border-color:rgba(255,0,229,.25)">Agent</div>
+<code>{ <span class="str">text</span>: <span class="str">"Agent 输出文本"</span>,
+  <span class="str">files</span>: [<span class="kw">File</span>],
+  <span class="str">json</span>: {<span class="str">"key"</span>: <span class="str">"value"</span>}
+}</code>
+</div>
+<div class="card">
+<div class="section-label">问题分类器</div>
+<code>{ <span class="str">class_name</span>: <span class="str">"退款"</span>,
+  <span class="str">class_label</span>: <span class="str">"refund"</span>,
+  <span class="str">usage</span>: {<span class="str">total_tokens</span>: <span class="num">45</span>}
+}</code>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 9: READING VARIABLES ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">读变量：模板中引用</h2>
+<p style="color:var(--text-dim);margin-bottom:clamp(10px,2vh,16px);font-size:clamp(13px,1.6vw,16px)">
+  在 LLM 提示词、HTTP URL、模板转换等处通过选择器读取
+</p>
+<div class="card">
+<div class="section-label">4 种引用方式</div>
+<table style="border:none;margin:0">
+<tr><td style="color:var(--cyan);font-family:var(--font-code)">sys.query</td><td style="color:var(--text-dim);font-family:var(--font-body)">系统变量 — 直接写，不需要 {{}}</td></tr>
+<tr><td style="color:var(--cyan);font-family:var(--font-code)">{{节点ID.字段名}}</td><td style="color:var(--text-dim);font-family:var(--font-body)">节点输出 — 如 {{llm.text}}</td></tr>
+<tr><td style="color:var(--magenta);font-family:var(--font-code)">env.API_KEY</td><td style="color:var(--text-dim);font-family:var(--font-body)">环境变量 — 直接写变量名</td></tr>
+<tr><td style="color:var(--magenta);font-family:var(--font-code)">conversation.xxx</td><td style="color:var(--text-dim);font-family:var(--font-body)">对话变量 — 直接写变量名</td></tr>
+</table>
+</div>
+<div class="card" style="margin-top:clamp(10px,1.8vh,14px)">
+<div class="section-label">具体示例</div>
+<code><span class="cmt"># LLM 提示词中</span>
+请分析以下文本：{{llm_node.text}}
+
+<span class="cmt"># HTTP URL 中</span>
+https://api.example.com/users/{{sys.user_id}}
+
+<span class="cmt"># 模板转换中</span>
+上下文：{% for item in retrieval.result %}{{item.content}}{% endfor %}</code>
+</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 10: WRITING VARIABLES ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">写变量：VariableAssigner</h2>
+<div class="cols2">
+<div class="card">
+<div class="section-label">基本用法</div>
+<p style="color:var(--text-dim);font-size:clamp(12px,1.4vw,14px);margin:clamp(6px,1vh,10px) 0">
+  相当于代码中的 <code class="inline-code">=</code> 赋值操作
+</p>
+<code><span class="cmt"># YAML 配置</span>
+<span class="kw">变量</span>: <span class="str">processed_text</span>
+<span class="kw">值</span>: {{llm_node.text}}
+<span class="kw">类型</span>: <span class="str">string</span></code>
+</div>
+<div class="card magenta">
+<div class="section-label" style="color:var(--magenta);background:rgba(255,0,229,.1);border-color:rgba(255,0,229,.25)">覆盖语义</div>
+<p style="color:var(--text-dim);font-size:clamp(12px,1.4vw,14px);margin:clamp(6px,1vh,10px) 0">
+  如果变量已存在，赋值节点会<strong style="color:var(--magenta)">覆盖</strong>它。后续节点看到的是最新值。
+</p>
+<code><span class="cmt"># 第一次：写入 score = 85</span>
+<span class="kw">变量</span>: <span class="str">score</span>  →  <span class="str">score = 85</span>
+<span class="cmt"># 第二次：覆盖为 score = 92</span>
+<span class="kw">变量</span>: <span class="str">score</span>  →  <span class="str">score = 92</span></code>
+</div>
+</div>
+<div class="card" style="margin-top:clamp(10px,1.8vh,14px)">
+<div class="section-label" style="color:var(--magenta)">常见错误</div>
+<div class="annotated-block magenta">
+  <p style="font-size:clamp(11px,1.3vw,13px);color:var(--bad)">
+    <strong>变量名冲突</strong> — 两个 VariableAssigner 写入同一变量名，后执行覆盖前一个
+  </p>
+</div>
+<div class="annotated-block magenta">
+  <p style="font-size:clamp(11px,1.3vw,13px);color:var(--bad)">
+    <strong>迭代内部写入</strong> — 在迭代内写入的变量无法被外部引用（作用域隔离）
+  </p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 11: VARIABLE AGGREGATOR ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">变量聚合器 (VariableAggregator)</h2>
+<p style="color:var(--text-dim);margin-bottom:clamp(10px,2vh,16px);font-size:clamp(13px,1.6vw,16px)">
+  将多个上游输出<strong style="color:var(--cyan)">收拢成数组</strong>，本质是收集分支结果
+</p>
+<div class="flow" style="margin-bottom:clamp(14px,2.5vh,22px)">
+<div class="flow-box">分支A<br>GPT 分析</div>
+<div class="flow-arrow">→</div>
+<div class="flow-box magenta" style="font-size:clamp(14px,1.8vw,18px);padding:clamp(10px,2vh,20px) clamp(16px,3vw,28px)">聚合器<br><span style="font-size:clamp(10px,1.2vw,12px)">all_results</span></div>
+<div class="flow-arrow">←</div>
+<div class="flow-box">分支B<br>Claude 分析</div>
+<div style="display:none">branch C</div>
+<div class="flow-arrow" style="position:relative;left:-8px">←</div>
+<div class="flow-box">分支C<br>规则处理</div>
+</div>
+<code><span class="cmt"># YAML 配置</span>
+<span class="kw">聚合变量</span>: <span class="str">all_results</span>
+<span class="kw">输出</span>:
+  - {{branch_a.result}}
+  - {{branch_b.result}}
+  - {{branch_c.result}}
+
+<span class="cmt"># 结果数组</span>
+all_results = [
+  branch_a.result,
+  branch_b.result,
+  branch_c.result
+]</code>
+</div>
+</section>
+
+<!-- ===== SLIDE 12: SCOPE ISOLATION ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">变量作用域：迭代和循环隔离</h2>
+<div class="scope-outer">
+  <div class="scope-label" style="color:var(--cyan)">主工作流作用域</div>
+  <p style="font-size:clamp(12px,1.4vw,14px);color:var(--text-dim);margin:clamp(6px,1vh,10px) 0">
+    变量：sys.*, env.*, conversation.*, 各节点输出
+  </p>
+  <div class="scope-inner">
+    <div class="scope-label" style="color:var(--magenta)">迭代 / 循环子作用域</div>
+    <p style="font-size:clamp(11px,1.3vw,13px);color:var(--text-dim)">内部变量对外部不可见</p>
+    <p style="font-size:clamp(11px,1.3vw,13px);color:var(--text-dim);margin-top:4px">外部变量对内部只读</p>
+  </div>
+</div>
+<div class="card" style="margin-top:clamp(12px,2vh,16px)">
+  <span class="bad" style="font-size:clamp(12px,1.4vw,14px)">错误示范</span>
+<code><span class="cmt"># 迭代内赋值 → 外部引用为空</span>
+[Start] → [Iteration]
+            └─ [VariableAssigner: score = 100]
+         → [LLM: 引用 {{score}}]  ←  <span class="bad">score 在迭代内部！</span></code>
+  <span class="good" style="font-size:clamp(12px,1.4vw,14px);margin-top:12px;display:block">正确做法</span>
+  <p style="font-size:clamp(11px,1.3vw,13px);color:var(--text-dim);margin-top:4px">迭代/循环的<strong style="color:var(--cyan)">输出字段</strong>是唯一对外暴露的数据通道。走输出，不走赋值器。</p>
+</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 13: ITERATION/LOOP VARIABLES ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">迭代/循环的特殊变量</h2>
+<div class="cols2">
+<div class="card">
+<div class="section-label">迭代 (Iteration)</div>
+<table style="border:none;margin:0">
+<tr><td style="color:var(--cyan);font-family:var(--font-code)">{{迭代节点.item}}</td><td style="color:var(--text-dim)">当前迭代元素</td></tr>
+<tr><td style="color:var(--cyan);font-family:var(--font-code)">{{迭代节点.index}}</td><td style="color:var(--text-dim)">当前索引（从 0 开始）</td></tr>
+<tr><td style="color:var(--cyan);font-family:var(--font-code)">{{迭代节点.output}}</td><td style="color:var(--text-dim)">迭代结束后输出数组</td></tr>
+</table>
+</div>
+<div class="card magenta">
+<div class="section-label" style="color:var(--magenta);background:rgba(255,0,229,.1);border-color:rgba(255,0,229,.25)">循环 (Loop)</div>
+<table style="border:none;margin:0">
+<tr><td style="color:var(--magenta);font-family:var(--font-code)">{{循环节点.index}}</td><td style="color:var(--text-dim)">当前循环索引</td></tr>
+<tr><td style="color:var(--magenta);font-family:var(--font-code)">{{循环节点.item}}</td><td style="color:var(--text-dim)">当前循环元素</td></tr>
+<tr><td style="color:var(--magenta);font-family:var(--font-code)">{{循环节点.output}}</td><td style="color:var(--text-dim)">循环结束后输出数组</td></tr>
+</table>
+</div>
+</div>
+<div class="card" style="margin-top:clamp(12px,2vh,16px)">
+<div class="section-label">典型用法</div>
+<code><span class="cmt"># 迭代：批量处理文本列表</span>
+{% <span class="kw">for</span> item <span class="kw">in</span> texts %}
+  处理 {{loop_node.item}} <span class="cmt"># 每次循环拿当前元素</span>
+{% <span class="kw">endfor</span> %}
+
+<span class="cmt"># 循环出口：收集所有结果</span>
+{{loop_node.output}}  <span class="cmt"># → [result1, result2, result3, ...]</span></code>
+</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 14: TYPE SYSTEM ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">变量类型系统</h2>
+<table>
+<thead><tr><th>类型</th><th>说明</th><th>示例</th></tr></thead>
+<tbody>
+<tr><td>string</td><td>文本</td><td>"hello"</td></tr>
+<tr><td>number</td><td>数值</td><td>42, 3.14</td></tr>
+<tr><td>boolean</td><td>布尔</td><td>true</td></tr>
+<tr><td>object</td><td>JSON 对象</td><td>{"key":"value"}</td></tr>
+<tr><td>array[string]</td><td>字符串数组</td><td>["a","b"]</td></tr>
+<tr><td>array[number]</td><td>数值数组</td><td>[1,2,3]</td></tr>
+<tr><td>array[object]</td><td>对象数组</td><td>[{},{},{}]</td></tr>
+<tr><td>array[file]</td><td>文件数组</td><td>上传的文件列表</td></tr>
+</tbody>
+</table>
+<div class="annotated-block" style="margin-top:clamp(10px,1.8vh,14px)">
+  <div class="label">类型检查位置</div>
+  <p style="font-size:clamp(11px,1.3vw,13px);color:var(--text-dim)">
+    类型在节点连接时由前端校验，运行时如果类型不匹配可能导致节点执行失败或结果异常。
+  </p>
+</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 15: FILE SUB-PROPERTIES ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">文件变量子属性</h2>
+<p style="color:var(--text-dim);margin-bottom:clamp(10px,2vh,16px);font-size:clamp(13px,1.6vw,16px)">
+  文件类型变量有 7 个子属性，通过 <code class="inline-code">.子属性</code> 访问
+</p>
+<div class="card">
+<table>
+<thead><tr><th>子属性</th><th>说明</th><th>示例</th></tr></thead>
+<tbody>
+<tr><td>file.type</td><td>文件类型</td><td>image, document, audio, video</td></tr>
+<tr><td>file.size</td><td>文件大小（字节）</td><td>102400</td></tr>
+<tr><td>file.name</td><td>文件名</td><td>"report.pdf"</td></tr>
+<tr><td>file.url</td><td>文件 URL</td><td>"https://..."</td></tr>
+<tr><td>file.extension</td><td>文件扩展名</td><td>"pdf", "jpg", "mp3"</td></tr>
+<tr><td>file.mime_type</td><td>MIME 类型</td><td>"application/pdf"</td></tr>
+<tr><td>file.transfer_method</td><td>传输方式</td><td>local_file, remote_url</td></tr>
+</tbody>
+</table>
+</div>
+<code style="margin-top:clamp(10px,1.8vh,14px)"><span class="cmt">// web/app/components/workflow/nodes/constants.ts</span>
+<span class="kw">export const</span> FILE_SUB_VARIABLES = [
+  { key: <span class="str">'type'</span>,           name: <span class="str">'类型'</span> },
+  { key: <span class="str">'size'</span>,           name: <span class="str">'大小'</span> },
+  { key: <span class="str">'name'</span>,           name: <span class="str">'文件名'</span> },
+  { key: <span class="str">'url'</span>,            name: <span class="str">'URL'</span> },
+  { key: <span class="str">'extension'</span>,      name: <span class="str">'扩展名'</span> },
+  { key: <span class="str">'mime_type'</span>,      name: <span class="str">'MIME 类型'</span> },
+  { key: <span class="str">'transfer_method'</span>, name: <span class="str">'传输方式'</span> },
+]</code>
+</div>
+</section>
+
+<!-- ===== SLIDE 16: TYPE MISMATCH ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">类型不匹配问题</h2>
+<div class="cols2">
+<div class="card">
+<div class="section-label">正确匹配</div>
+<code><span class="cmt"># IF 条件：sys.query is "退款"</span>
+sys.query   <span class="cmt">→ string  "我要退款"</span>
+"退款"      <span class="cmt">→ string</span>
+
+<span class="good">string vs string → 匹配</span></code>
+</div>
+<div class="card magenta">
+<div class="section-label" style="color:var(--magenta);background:rgba(255,0,229,.1);border-color:rgba(255,0,229,.25)">类型不匹配</div>
+<code><span class="cmt"># IF 条件：llm.usage > 50</span>
+llm.usage   <span class="cmt">→ object {prompt_tokens,...}</span>
+50          <span class="cmt">→ number</span>
+
+<span class="bad">object vs number → 不匹配</span></code>
+</div>
+</div>
+<div class="card" style="margin-top:clamp(12px,2vh,16px)">
+<div class="section-label">解决方案：Code 节点提取字段</div>
+<code><span class="cmt"># BEFORE（类型不匹配）</span>
+IF 条件: llm.usage > 50              <span class="bad">❌ object vs number</span>
+
+<span class="cmt"># AFTER（Code 节点桥接）</span>
+[LLM] → [Code: 提取 total_tokens] → [IF: total_tokens > 50]
+<span class="kw">def</span> <span class="fn">main</span>(usage: <span class="kw">object</span>):
+    <span class="kw">return</span> {<span class="str">"total_tokens"</span>: usage[<span class="str">"total_tokens"</span>]}  <span class="good">✓ number</span></code>
+</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 17: PATTERNS 1+2 ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">常见变量传递模式 (1+2)</h2>
+<div class="card">
+<div class="section-label">模式 1：直线串联 — 最简单最可靠</div>
+<div class="flow">
+<div class="flow-box">Start</div><div class="flow-arrow">→</div>
+<div class="flow-box">LLM<br>分析</div><div class="flow-arrow">→</div>
+<div class="flow-box">Code<br>格式化</div><div class="flow-arrow">→</div>
+<div class="flow-box end">End</div>
+</div>
+<p style="font-size:clamp(11px,1.3vw,13px);color:var(--text-dim);margin-top:6px">
+  每个节点引用紧邻上游的输出：Code 节点引用 <code class="inline-code">{{llm.text}}</code>
+</p>
+</div>
+<div class="card" style="margin-top:clamp(10px,1.8vh,14px)">
+<div class="section-label" style="color:var(--magenta);background:rgba(255,0,229,.1);border-color:rgba(255,0,229,.25)">模式 2：知识增强 — 检索 + LLM</div>
+<div class="flow">
+<div class="flow-box">Start</div><div class="flow-arrow">→</div>
+<div class="flow-box">知识<br>检索</div><div class="flow-arrow">→</div>
+<div class="flow-box magenta">模板<br>转换</div><div class="flow-arrow">→</div>
+<div class="flow-box">LLM<br>生成</div><div class="flow-arrow">→</div>
+<div class="flow-box end">End</div>
+</div>
+<p style="font-size:clamp(11px,1.3vw,13px);color:var(--text-dim);margin-top:6px">
+  模板转换节点拼接检索结果为 LLM 上下文：
+</p>
+<code style="font-size:clamp(10px,1.2vw,12px)"><span class="cmt"># 模板中注入检索结果</span>
+基于以下资料回答问题：
+{% for item in retrieval.result %}
+  {{ item.content }}
+{% endfor %}
+用户问题：{{ sys.query }}</code>
+</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 18: PATTERNS 3+4 ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">常见变量传递模式 (3+4)</h2>
+<div class="card">
+<div class="section-label">模式 3：分支聚合 — 多路并行 + 收集</div>
+<div style="text-align:center;margin:clamp(8px,1.5vh,12px) 0;font-size:clamp(12px,1.4vw,14px)">
+<div class="flow" style="flex-wrap:wrap">
+<div class="flow-box">Start</div><div class="flow-arrow">→</div>
+<div class="flow-box magenta">IF</div>
+</div>
+<div style="display:flex;justify-content:center;gap:clamp(4px,1vw,10px);flex-wrap:wrap;margin-top:4px">
+<div class="flow-box" style="font-size:clamp(9px,1vw,11px)">分支A<br>LLM-GPT</div>
+<div class="flow-box" style="font-size:clamp(9px,1vw,11px)">分支B<br>LLM-Claude</div>
+<div class="flow-box" style="font-size:clamp(9px,1vw,11px)">分支C<br>规则处理</div>
+</div>
+<div class="flow" style="flex-wrap:wrap;margin-top:4px">
+<div class="flow-arrow" style="font-size:clamp(16px,2.2vw,24px)">↘↙</div>
+<div class="flow-box" style="font-size:clamp(9px,1vw,11px)">聚合器<br>all_results</div>
+<div class="flow-arrow">→</div>
+<div class="flow-box end">End</div>
+</div>
+</div>
+<p style="font-size:clamp(11px,1.3vw,13px);color:var(--text-dim)">聚合器收集多路输出为数组：all_results = [A.result, B.result, C.result]</p>
+</div>
+<div class="card" style="margin-top:clamp(10px,1.8vh,14px)">
+<div class="section-label" style="color:var(--magenta);background:rgba(255,0,229,.1);border-color:rgba(255,0,229,.25)">模式 4：数据管线 — 拉→洗→析→格式→回</div>
+<div class="flow" style="flex-wrap:wrap">
+<div class="flow-box" style="font-size:clamp(9px,1vw,11px)">触发</div><div class="flow-arrow">→</div>
+<div class="flow-box" style="font-size:clamp(9px,1vw,11px)">HTTP<br>拉数据</div><div class="flow-arrow">→</div>
+<div class="flow-box" style="font-size:clamp(9px,1vw,11px)">Code<br>清洗</div><div class="flow-arrow">→</div>
+<div class="flow-box" style="font-size:clamp(9px,1vw,11px)">LLM<br>分析</div><div class="flow-arrow">→</div>
+<div class="flow-box" style="font-size:clamp(9px,1vw,11px)">Code<br>格式化</div><div class="flow-arrow">→</div>
+<div class="flow-box" style="font-size:clamp(9px,1vw,11px)">HTTP<br>写回</div><div class="flow-arrow">→</div>
+<div class="flow-box end">End</div>
+</div>
+<p style="font-size:clamp(11px,1.3vw,13px);color:var(--text-dim);margin-top:6px">每个节点处理上一个的输出，形成数据管道。步步有输入、步步有输出。</p>
+</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 19: TROUBLESHOOTING ===== -->
+<section class="slide reveal">
+<div class="slide-content">
+<h2 class="slide-title">变量问题排查 4 问</h2>
+<div class="card">
+<div class="section-label">问题 1：变量选择器找不到上游节点</div>
+<p style="font-size:clamp(11px,1.3vw,13px);color:var(--text-dim);margin:clamp(4px,.8vh,8px) 0">
+  <span class="bad">原因</span>：没有边连接 — 没有边 = 引擎认为它们没有依赖关系<br>
+  <span class="good">修复</span>：确保两个节点之间有箭头（边）连接
+</p>
+</div>
+<div class="card" style="margin-top:clamp(8px,1.5vh,12px)">
+<div class="section-label" style="color:var(--magenta);background:rgba(255,0,229,.1);border-color:rgba(255,0,229,.25)">问题 2：引用值为空 — 4 项检查</div>
+<p style="font-size:clamp(11px,1.3vw,13px);color:var(--text-dim)">
+  1. 上游节点是否执行了？（看运行日志）<br>
+  2. 引用的字段名是否正确？（区分大小写）<br>
+  3. 是否在迭代/循环内部定义的变量？（作用域隔离）<br>
+  4. 上游节点是否设置了"失败时继续"但实际失败了？
+</p>
+</div>
+<div class="card" style="margin-top:clamp(8px,1.5vh,12px)">
+<div class="section-label">问题 3：模板渲染不对</div>
+<p style="font-size:clamp(11px,1.3vw,13px);color:var(--bad)">
+  {{检索.result}} — array[object] 直接拼接
+</p>
+<p style="font-size:clamp(11px,1.3vw,13px);color:var(--good);margin-top:4px">
+  {% for item in 检索.result %}{{ item.content }}{% endfor %} — 遍历数组取字段
+</p>
+</div>
+<div class="card" style="margin-top:clamp(8px,1.5vh,12px)">
+<div class="section-label" style="color:var(--magenta);background:rgba(255,0,229,.1);border-color:rgba(255,0,229,.25)">问题 4：赋值器写入后仍为空 — 3 项检查</div>
+<p style="font-size:clamp(11px,1.3vw,13px);color:var(--text-dim)">
+  1. 赋值器执行顺序 — 是否在引用它的节点之前执行？<br>
+  2. 是否被 IF-ELSE 跳过？（赋值器在某个分支中但走了另一个分支）<br>
+  3. 变量名没有冲突
+</p>
+</div>
+</div>
+</section>
+
+<!-- ===== SLIDE 20: END ===== -->
+<section class="slide title-slide reveal">
+<div class="slide-content">
+<div class="section-number" style="font-size:clamp(32px,6vw,64px)">04</div>
+<div class="series-tag" style="margin-top:clamp(8px,1.5vh,12px)">UP NEXT</div>
+<h2 class="subhead" style="font-size:clamp(22px,3.5vw,40px);color:var(--cyan);margin-top:clamp(8px,1.5vh,12px)">下一篇：实战篇</h2>
+<div style="font-size:clamp(16px,2.2vw,26px);color:var(--text-dim);margin-top:clamp(10px,2vh,20px)">
+  5 个真实场景完整搭建
+</div>
+<div style="font-size:clamp(13px,1.6vw,18px);color:var(--magenta);margin-top:clamp(12px,2.5vh,24px);opacity:.7">
+  智能客服 · 数据分析 · 内容生成 · 自动化 · 知识问答
+</div>
+<div style="font-size:clamp(11px,1.3vw,14px);color:var(--text-dim);margin-top:clamp(16px,3vh,32px);opacity:.5">
+  CHENLEI · DIFY TUTORIALS · 2026
+</div>
+</div>
+</section>
+
+<script>
+(function(){
+  const slides = document.querySelectorAll('.slide');
+  const dotsContainer = document.getElementById('nav-dots');
+  const currentNum = document.getElementById('current-num');
+  const total = slides.length;
+  let current = 0;
+  let isScrolling = false;
+
+  // Build dots
+  for(let i=0;i<total;i++){
+    const dot = document.createElement('span');
+    dot.className = 'dot' + (i===0?' active':'');
+    dot.addEventListener('click',()=>goTo(i));
+    dotsContainer.appendChild(dot);
+  }
+
+  function updateNav(idx){
+    current = idx;
+    currentNum.textContent = idx + 1;
+    const dots = dotsContainer.querySelectorAll('.dot');
+    dots.forEach((d,i)=>{
+      d.className = 'dot';
+      if(i===idx) d.classList.add('active');
+      else if(i<idx) d.classList.add('visited');
+    });
+  }
+
+  function goTo(idx){
+    if(idx<0||idx>=total) return;
+    slides[idx].scrollIntoView({behavior:'smooth'});
+    updateNav(idx);
+  }
+
+  // Scroll snap detection
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting && entry.intersectionRatio > 0.5){
+        const idx = Array.from(slides).indexOf(entry.target);
+        if(idx>=0) updateNav(idx);
+      }
+    });
+    // Also detect scrolling stopped
+    isScrolling = false;
+  },{threshold:0.5});
+
+  slides.forEach(s=>observer.observe(s));
+
+  // Debounced scroll handler
+  let scrollTimer;
+  window.addEventListener('scroll',()=>{
+    isScrolling = true;
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(()=>{isScrolling=false;},150);
+  },{passive:true});
+
+  // Keyboard navigation
+  window.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'||e.key==='ArrowRight'){
+      e.preventDefault();
+      if(current<total-1) goTo(current+1);
+    }else if(e.key==='ArrowUp'||e.key==='ArrowLeft'){
+      e.preventDefault();
+      if(current>0) goTo(current-1);
+    }else if(e.key==='Home'){
+      e.preventDefault();goTo(0);
+    }else if(e.key==='End'){
+      e.preventDefault();goTo(total-1);
+    }
+  });
+
+  // Wheel navigation
+  let wheelAccum = 0;
+  window.addEventListener('wheel',e=>{
+    e.preventDefault();
+    wheelAccum += e.deltaY;
+    if(Math.abs(wheelAccum) > 50){
+      if(wheelAccum>0 && current<total-1) goTo(current+1);
+      else if(wheelAccum<0 && current>0) goTo(current-1);
+      wheelAccum = 0;
+    }
+  },{passive:false});
+
+  // Touch navigation
+  let touchStartY = 0;
+  window.addEventListener('touchstart',e=>{touchStartY = e.touches[0].clientY},{passive:true});
+  window.addEventListener('touchend',e=>{
+    const dy = touchStartY - e.changedTouches[0].clientY;
+    if(Math.abs(dy) > 40){
+      if(dy>0 && current<total-1) goTo(current+1);
+      else if(dy<0 && current>0) goTo(current-1);
+    }
+  },{passive:true});
+
+  // Fade-up reveal via Intersection Observer
+  const revealObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+      }
+    });
+  },{threshold:0.2});
+
+  document.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
+
+  // Initial trigger
+  updateNav(0);
+})();
+</script>
+</body>
+</html>

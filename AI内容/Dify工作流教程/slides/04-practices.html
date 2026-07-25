@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dify 工作流教程 — 第四篇：实战篇</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════
+   NEON CYBER DARK THEME — Dify Practices
+   ═══════════════════════════════════════════════════════ */
+
+:root {
+  --bg-deep: #0a0e1a;
+  --bg-card: rgba(12, 20, 40, 0.85);
+  --bg-code: #0d1117;
+  --cyan: #00f0ff;
+  --magenta: #ff00e5;
+  --green: #00ff88;
+  --yellow: #ffd700;
+  --white: #e0e6f0;
+  --gray: #8892a4;
+  --dark-border: rgba(0, 240, 255, 0.25);
+  --glow-cyan: 0 0 20px rgba(0, 240, 255, 0.15);
+  --glow-magenta: 0 0 20px rgba(255, 0, 229, 0.15);
+
+  --title-size: clamp(1.5rem, 5vw, 4rem);
+  --h2-size: clamp(1.25rem, 3.5vw, 2.5rem);
+  --h3-size: clamp(1rem, 2.5vw, 1.75rem);
+  --body-size: clamp(0.75rem, 1.5vw, 1.125rem);
+  --small-size: clamp(0.65rem, 1vw, 0.875rem);
+  --slide-padding: clamp(1rem, 4vw, 4rem);
+  --content-gap: clamp(0.5rem, 2vw, 2rem);
+}
+
+@media (max-height: 700px) {
+  :root {
+    --slide-padding: clamp(0.75rem, 3vw, 2rem);
+    --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+    --h2-size: clamp(1rem, 3vw, 1.75rem);
+  }
+}
+@media (max-height: 500px) {
+  :root {
+    --slide-padding: clamp(0.4rem, 2vw, 1rem);
+    --title-size: clamp(1rem, 3.5vw, 1.5rem);
+    --body-size: clamp(0.65rem, 1vw, 0.85rem);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after { animation-duration: 0.01ms !important; }
+  html { scroll-behavior: auto; }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { height: 100%; overflow-x: hidden; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-deep);
+  font-family: 'Noto Sans SC', 'Segoe UI', system-ui, sans-serif;
+  color: var(--white);
+}
+
+/* Grid overlay */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.slide {
+  width: 100vw; height: 100vh; height: 100dvh;
+  overflow: hidden;
+  scroll-snap-align: start;
+  display: flex; flex-direction: column;
+  position: relative;
+}
+
+.slide-content {
+  flex: 1; display: flex; flex-direction: column;
+  justify-content: center;
+  max-height: 100%; overflow: hidden;
+  padding: var(--slide-padding);
+  position: relative; z-index: 1;
+}
+
+/* Progress dots */
+.progress-dots {
+  position: fixed; right: clamp(8px, 2vw, 20px); top: 50%;
+  transform: translateY(-50%); z-index: 100;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.progress-dots a {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: rgba(0, 240, 255, 0.3);
+  transition: background 0.3s, transform 0.3s;
+}
+.progress-dots a.active { background: var(--cyan); transform: scale(1.4); }
+
+/* Slide counter */
+.slide-counter {
+  position: absolute; bottom: clamp(8px, 2vw, 20px); right: clamp(12px, 3vw, 32px);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--small-size); color: var(--cyan); z-index: 2;
+}
+
+/* Typography */
+h1 {
+  font-size: var(--title-size); font-weight: 900;
+  background: linear-gradient(135deg, var(--cyan) 30%, var(--magenta) 70%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+h2 {
+  font-size: var(--h2-size); font-weight: 700; color: var(--cyan);
+  border-left: 4px solid var(--magenta);
+  padding-left: clamp(0.5rem, 1.5vw, 1rem);
+}
+h3 {
+  font-size: var(--h3-size); font-weight: 600; color: var(--cyan);
+}
+p, li { font-size: var(--body-size); line-height: 1.65; color: var(--gray); }
+
+/* 🔴 highlight */
+.hi { color: var(--magenta); font-weight: 700; }
+.ci { color: var(--cyan); font-weight: 600; }
+
+/* Neon card */
+.neon-card {
+  background: var(--bg-card);
+  border: 1px solid var(--dark-border);
+  border-radius: clamp(8px, 1.5vw, 16px);
+  padding: clamp(10px, 2vw, 24px);
+  box-shadow: var(--glow-cyan);
+}
+
+/* Code block */
+.code-block {
+  background: var(--bg-code);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 8px;
+  padding: clamp(8px, 1.5vw, 16px);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--small-size);
+  line-height: 1.55;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.code-block .kw { color: var(--magenta); }
+.code-block .fn { color: var(--cyan); }
+.code-block .str { color: var(--green); }
+.code-block .cm { color: var(--yellow); }
+
+/* Inline flow diagram boxes */
+.flow-row {
+  display: flex; align-items: center; gap: clamp(4px, 1vw, 12px);
+  flex-wrap: wrap; justify-content: center;
+}
+.flow-box {
+  background: var(--bg-card);
+  border: 1.5px solid var(--dark-border);
+  border-radius: 8px;
+  padding: clamp(6px, 1vw, 14px) clamp(8px, 1.5vw, 20px);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--small-size); text-align: center;
+  white-space: nowrap;
+}
+.flow-box.cyan { border-color: var(--cyan); color: var(--cyan); }
+.flow-box.magenta { border-color: var(--magenta); color: var(--magenta); }
+.flow-box.green { border-color: var(--green); color: var(--green); }
+.flow-box.yellow { border-color: var(--yellow); color: var(--yellow); }
+
+.flow-arrow {
+  color: var(--cyan); font-size: var(--h3-size); flex-shrink: 0;
+}
+
+/* Flow tree (vertical branching) */
+.flow-tree {
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(4px, 0.8vw, 10px);
+}
+.flow-tree .branch-row {
+  display: flex; align-items: center; gap: clamp(4px, 1vw, 10px);
+  flex-wrap: wrap; justify-content: center;
+}
+.flow-tree .vline {
+  color: var(--cyan); font-size: var(--body-size);
+}
+
+/* Grid layouts */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--content-gap); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--content-gap); }
+.grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--content-gap); }
+.grid-5 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--content-gap); }
+
+/* Case card grid */
+.case-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--content-gap);
+}
+.case-card {
+  border: 1.5px solid var(--dark-border); border-radius: 12px;
+  padding: clamp(12px, 2vw, 24px);
+  text-align: center;
+  background: var(--bg-card);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.case-card:hover { transform: translateY(-2px); box-shadow: var(--glow-cyan); }
+.case-card .icon { font-size: clamp(1.5rem, 3vw, 2.5rem); margin-bottom: 0.5rem; }
+.case-card h4 { font-size: var(--body-size); color: var(--white); margin: 0.3rem 0; }
+.case-card p { font-size: var(--small-size); }
+.case-card.l1 { border-color: #00ff88; }
+.case-card.l2 { border-color: #4488ff; }
+.case-card.l3 { border-color: #ffd700; }
+.case-card.l4 { border-color: #ff4466; }
+.case-card.l5 { border-color: #bb44ff; }
+
+/* Technique tip */
+.tip {
+  background: rgba(0, 240, 255, 0.06);
+  border-left: 3px solid var(--cyan);
+  padding: clamp(6px, 1vw, 14px) clamp(8px, 1.5vw, 18px);
+  border-radius: 0 8px 8px 0;
+  font-size: var(--small-size); color: var(--gray);
+}
+
+/* Table style */
+.tbl {
+  width: 100%; border-collapse: collapse;
+  font-size: var(--small-size);
+}
+.tbl th {
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--cyan); padding: 8px 12px; text-align: left;
+  border: 1px solid var(--dark-border);
+}
+.tbl td {
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  padding: 8px 12px; color: var(--gray);
+}
+
+/* Subtle divider */
+.divider {
+  width: 60px; height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--magenta));
+  margin: var(--content-gap) 0;
+}
+
+/* Badge */
+.badge {
+  display: inline-block; padding: 2px 10px; border-radius: 12px;
+  font-size: var(--small-size); font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+.badge-cyan { background: rgba(0, 240, 255, 0.15); color: var(--cyan); }
+.badge-magenta { background: rgba(255, 0, 229, 0.15); color: var(--magenta); }
+.badge-green { background: rgba(0, 255, 136, 0.15); color: var(--green); }
+.badge-yellow { background: rgba(255, 215, 0, 0.15); color: var(--yellow); }
+
+/* Reveal animation */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-s1 { transition-delay: 0s; }
+.reveal-s2 { transition-delay: 0.1s; }
+.reveal-s3 { transition-delay: 0.2s; }
+.reveal-s4 { transition-delay: 0.3s; }
+.reveal-s5 { transition-delay: 0.4s; }
+
+/* Full-width diagram area */
+.diagram-area {
+  display: flex; flex-direction: column; align-items: center;
+  gap: var(--content-gap);
+  background: var(--bg-card);
+  border: 1px solid var(--dark-border);
+  border-radius: 12px;
+  padding: var(--content-gap);
+}
+
+/* Section number */
+.sec-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--h3-size); color: var(--cyan);
+}
+
+.subtitle {
+  font-size: var(--body-size); color: var(--gray); margin-top: 0.5rem;
+}
+</style>
+</head>
+<body>
+
+<!-- Progress Dots -->
+<div class="progress-dots" id="dots"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 1 — Title
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s1">
+  <div class="slide-content reveal" style="align-items:center; text-align:center; gap:var(--content-gap);">
+    <div class="badge badge-magenta">第四篇</div>
+    <h1>Dify 工作流搭建完全教程</h1>
+    <h2 style="border-left:none; font-size:var(--h2-size);">实战篇：5 个真实场景完整搭建</h2>
+    <p class="subtitle" style="font-size:var(--body-size); max-width:600px;">从入门到高级 — 智能客服、RAG 问答、API 聚合、AI Agent、定时报表</p>
+    <div style="margin-top:var(--content-gap); font-size:var(--small-size); color:var(--gray);">
+      罗南杨 &nbsp;|&nbsp; 2026-07-22
+    </div>
+  </div>
+  <div class="slide-counter">01 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 2 — 五个案例概览
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="slide-content reveal">
+    <h2>五个案例概览</h2>
+    <div class="divider"></div>
+    <div class="case-grid" style="margin-top:var(--content-gap);">
+      <div class="case-card l1"><div class="icon">&#x1F7E2;</div><h4>案例 1</h4><p>智能客服机器人<br><span class="ci">入门级</span></p><p style="font-size:var(--small-size);">问题分类 + 多分支 LLM + 知识库</p></div>
+      <div class="case-card l2"><div class="icon">&#x1F535;</div><h4>案例 2</h4><p>RAG 文档问答<br><span class="ci">中级</span></p><p style="font-size:var(--small-size);">文件提取 + Code 处理 + 防幻觉</p></div>
+      <div class="case-card l3"><div class="icon">&#x1F7E1;</div><h4>案例 3</h4><p>API 数据聚合管线<br><span class="ci">中级</span></p><p style="font-size:var(--small-size);">并行 HTTP + Code 合并 + LLM 输出</p></div>
+      <div class="case-card l4"><div class="icon">&#x1F534;</div><h4>案例 4</h4><p>AI Agent 邮件处理<br><span class="ci">高级</span></p><p style="font-size:var(--small-size);">Agent v2 + 多工具绑定 + 错误处理</p></div>
+      <div class="case-card l5"><div class="icon">&#x1F7E3;</div><h4>案例 5</h4><p>定时数据分析报表<br><span class="ci">高级</span></p><p style="font-size:var(--small-size);">Cron 触发 + 数据清洗 + 企微推送</p></div>
+    </div>
+    <p style="margin-top:var(--content-gap); text-align:center; font-size:var(--small-size);">
+      每个案例均有 <span class="ci">完整工作流结构图</span> + <span class="hi">逐步搭建说明</span> + <span class="ci">关键技巧总结</span>
+    </p>
+  </div>
+  <div class="slide-counter">02 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 3 — 案例1: 场景描述 + 流程图
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="slide-content reveal">
+    <h2>案例 1：智能客服机器人 <span class="badge badge-green">入门</span></h2>
+    <div class="divider"></div>
+    <p><span class="ci">场景：</span>用户输入问题后，自动分类到订单/产品/通用三类，分别调用不同的 LLM 或知识库处理。</p>
+    <div class="diagram-area" style="margin-top:var(--content-gap);">
+      <p style="font-size:var(--small-size); color:var(--cyan); margin-bottom:0.3rem;">工作流结构</p>
+      <!-- Top row -->
+      <div class="flow-row">
+        <div class="flow-box cyan">Start<br>query</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box yellow">问题分类器<br>Classify</div>
+        <div class="flow-arrow">&rarr;</div>
+      </div>
+      <!-- Branch indicators -->
+      <div style="font-size:var(--small-size); color:var(--gray); margin:4px 0;">&#x252C; 三路分支</div>
+      <!-- Branch 1 -->
+      <div class="flow-row" style="margin-top:2px;">
+        <div class="flow-box magenta" style="font-size:0.7rem;">order &rarr; LLM:订单客服 &rarr; Answer</div>
+      </div>
+      <!-- Branch 2 -->
+      <div class="flow-row">
+        <div class="flow-box green" style="font-size:0.7rem;">product &rarr; 知识检索 &rarr; 模板转换 &rarr; LLM:产品顾问 &rarr; Answer</div>
+      </div>
+      <!-- Branch 3 -->
+      <div class="flow-row">
+        <div class="flow-box yellow" style="font-size:0.7rem;">general &rarr; LLM:通用问答 &rarr; Answer</div>
+      </div>
+    </div>
+    <p style="margin-top:var(--content-gap); font-size:var(--small-size);">
+      <span class="hi">核心知识点：</span>问题分类器节点、条件分支路由(IF-ELSE)、知识库检索、模板转换
+    </p>
+  </div>
+  <div class="slide-counter">03 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 4 — 案例1: Step 1-2
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s4">
+  <div class="slide-content reveal">
+    <h2>案例 1 — Step 1-2：Start 节点 + 问题分类器</h2>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div class="neon-card">
+        <h3>Step 1: Start 节点</h3>
+        <p style="margin-top:0.5rem;">定义输入变量：</p>
+        <div class="code-block" style="margin-top:0.3rem;">
+<span class="cm"># 输入字段（文本类型）</span>
+<span class="kw">query</span> = <span class="str">"用户输入的问题"</span>
+        </div>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">添加一个 <span class="ci">Text</span> 类型的输入字段，名称为 <span class="ci">query</span>。</p>
+      </div>
+      <div class="neon-card">
+        <h3>Step 2: 问题分类器</h3>
+        <p style="margin-top:0.5rem;">添加 <span class="hi">问题分类器(Classify)</span> 节点，配置三个类别：</p>
+        <table class="tbl" style="margin-top:0.5rem;">
+          <tr><th>类别名</th><th>关键词/触发条件</th></tr>
+          <tr><td><span class="ci">order</span></td><td>订单、退货、退款、物流、发货</td></tr>
+          <tr><td><span class="ci">product</span></td><td>产品参数、功能、规格、价格、对比</td></tr>
+          <tr><td><span class="ci">general</span></td><td>其他（兜底分类）</td></tr>
+        </table>
+        <p style="font-size:var(--small-size); margin-top:0.4rem;">输入变量：选择 <span class="ci">{{START.query}}</span></p>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:var(--content-gap);">
+      <span class="ci">提示：</span>问题分类器依赖 LLM 判断，建议在 Instructions 中写清楚每个类的定义边界。general 作为兜底，确保所有输入都能被路由。
+    </div>
+  </div>
+  <div class="slide-counter">04 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 5 — 案例1: Step 3-4
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s5">
+  <div class="slide-content reveal">
+    <h2>案例 1 — Step 3-4：知识库检索 + 模板转换</h2>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div class="neon-card">
+        <h3>Step 3: 知识库检索</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">添加 <span class="ci">知识检索(Knowledge Retrieval)</span> 节点：</p>
+        <table class="tbl" style="margin-top:0.3rem;">
+          <tr><td>检索模式</td><td><span class="ci">混合检索</span> (向量 + 关键词)</td></tr>
+          <tr><td>TopK</td><td><span class="ci">3</span></td></tr>
+          <tr><td>Score 阈值</td><td><span class="ci">0.5</span></td></tr>
+          <tr><td>查询内容</td><td><span class="ci">{{CLASSIFY.output}}</span></td></tr>
+        </table>
+      </div>
+      <div class="neon-card">
+        <h3>Step 4: 模板转换</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">添加 <span class="hi">模板转换(Template)</span> 节点，用 Jinja2 将检索结果格式化为 LLM 上下文：</p>
+        <div class="code-block" style="margin-top:0.3rem;">
+<span class="cm">{# 将知识库片段拼接为 Prompt #}</span>
+<span class="kw">用户问题：</span>{{ query }}
+
+<span class="kw">相关知识：</span>
+{% <span class="kw">for</span> chunk <span class="kw">in</span> knowledge_chunks %}
+---
+<span class="kw">标题：</span>{{ chunk.title }}
+<span class="kw">内容：</span>{{ chunk.content }}
+{% <span class="kw">endfor</span> %}
+
+<span class="kw">请基于以上知识回答用户问题。</span>
+<span class="kw">如果知识库中没有相关信息，请诚实说明。</span>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top:var(--content-gap); font-size:var(--small-size);">
+      <span class="hi">注意：</span>Score 阈值 0.5 过滤低相关度片段；若 TopK=3 且全部低于阈值则返回空，此时 LLM 应诚实回复"暂无相关信息"。
+    </p>
+  </div>
+  <div class="slide-counter">05 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 6 — 案例1: Step 5
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s6">
+  <div class="slide-content reveal">
+    <h2>案例 1 — Step 5：三个 LLM 分支配置</h2>
+    <div class="divider"></div>
+    <table class="tbl" style="width:100%;">
+      <tr>
+        <th style="width:12%;">分支</th>
+        <th style="width:12%;">模型</th>
+        <th style="width:38%;">System Prompt</th>
+        <th style="width:38%;">User Prompt</th>
+      </tr>
+      <tr>
+        <td><span class="badge badge-magenta">order</span></td>
+        <td>GPT-4o-mini</td>
+        <td>
+          <div class="code-block" style="font-size:0.65rem; padding:6px;">
+你是电商订单客服。只能回答订单相关问题。
+规则：
+1. 查询订单需要手机号后4位验证
+2. 不透露商业敏感信息
+3. 语气专业、礼貌、简洁
+          </div>
+        </td>
+        <td>
+          <div class="code-block" style="font-size:0.65rem; padding:6px;">
+用户问题：{{ query }}
+请根据以上规则回答。
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-green">product</span></td>
+        <td>GPT-4o</td>
+        <td>
+          <div class="code-block" style="font-size:0.65rem; padding:6px;">
+你是产品顾问。使用提供的知识库信息回答产品问题。
+规则：
+1. 知识库中没有的信息请诚实说明
+2. 不要编造产品参数
+3. 可以引导用户查阅官网或说明书
+          </div>
+        </td>
+        <td>
+          <div class="code-block" style="font-size:0.65rem; padding:6px;">
+{{ template_output }}
+用户问题：{{ query }}
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-yellow">general</span></td>
+        <td>GPT-4o-mini</td>
+        <td>
+          <div class="code-block" style="font-size:0.65rem; padding:6px;">
+你是友好的通用客服助手。处理与订单、产品无关的咨询。
+可以问候、感谢、引导用户到正确的服务入口。
+          </div>
+        </td>
+        <td>
+          <div class="code-block" style="font-size:0.65rem; padding:6px;">
+用户问题：{{ query }}
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div class="tip" style="margin-top:var(--content-gap);">
+      <span class="ci">策略：</span>订单/通用用便宜模型(gpt-4o-mini)，产品顾问用强模型(gpt-4o)保证准确度 — 按场景选模型，节省成本。
+    </div>
+  </div>
+  <div class="slide-counter">06 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 7 — 案例1: Step 6-7
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s7">
+  <div class="slide-content reveal">
+    <h2>案例 1 — Step 6-7：IF-ELSE 路由 + End 汇聚</h2>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div class="neon-card">
+        <h3>Step 6: IF-ELSE 条件路由</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">添加 <span class="hi">IF-ELSE</span> 节点，根据问题分类器的输出路由到对应的 LLM：</p>
+        <div class="code-block" style="margin-top:0.5rem;">
+<span class="cm"># 条件配置（选择 问题分类器.class_name）</span>
+
+<span class="kw">IF</span>   分类结果 == <span class="str">"order"</span>   &rarr; <span class="fn">LLM:订单客服</span>
+<span class="kw">ELIF</span> 分类结果 == <span class="str">"product"</span> &rarr; <span class="fn">知识检索</span>
+<span class="kw">ELSE</span>                          &rarr; <span class="fn">LLM:通用问答</span>
+        </div>
+        <p style="font-size:var(--small-size); margin-top:0.5rem;">
+          注意：product 分支 <span class="hi">先走知识检索 + 模板转换</span>，再进 LLM 节点。其余分支直接进 LLM。
+        </p>
+      </div>
+      <div class="neon-card">
+        <h3>Step 7: Answer / End 汇聚</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">所有三条 LLM 分支最终汇聚到一个 <span class="ci">Answer</span> 节点：</p>
+        <div class="diagram-area" style="margin-top:0.5rem; padding:10px;">
+          <div class="flow-row" style="gap:6px;">
+            <div class="flow-box magenta" style="font-size:0.65rem; padding:6px 10px;">LLM:订单客服</div>
+            <div class="flow-arrow" style="font-size:0.8rem;">&#x2198;</div>
+          </div>
+          <div class="flow-row" style="gap:6px;">
+            <div class="flow-box green" style="font-size:0.65rem; padding:6px 10px;">LLM:产品顾问</div>
+            <div class="flow-arrow" style="font-size:0.8rem;">&rarr;</div>
+            <div class="flow-box cyan" style="font-size:0.65rem; padding:6px 10px;">Answer</div>
+            <div class="flow-arrow" style="font-size:0.8rem;">&rarr;</div>
+            <div class="flow-box" style="font-size:0.65rem; padding:6px 10px;">End</div>
+          </div>
+          <div class="flow-row" style="gap:6px;">
+            <div class="flow-box yellow" style="font-size:0.65rem; padding:6px 10px;">LLM:通用问答</div>
+            <div class="flow-arrow" style="font-size:0.8rem;">&#x2197;</div>
+          </div>
+        </div>
+        <p style="font-size:var(--small-size); margin-top:0.4rem;">
+          Answer 节点输出变量：选 <span class="ci">IF-ELSE 的最终分支 LLM 输出文本</span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-counter">07 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 8 — 案例1: 关键技巧
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s8">
+  <div class="slide-content reveal">
+    <h2>案例 1 — 关键技巧总结</h2>
+    <div class="divider"></div>
+    <div class="grid-3" style="margin-top:var(--content-gap);">
+      <div class="neon-card">
+        <h3>&#x2776; 分类器做入口分流</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">问题分类器比 LLM 做意图识别 <span class="hi">更快更稳定</span>（确定性路由 vs 概率输出）。分类后用 IF-ELSE 实现确定性分支，避免 LLM 幻觉导致错误路由。</p>
+      </div>
+      <div class="neon-card">
+        <h3>&#x2777; 检索阈值是安全阀</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">Score 阈值 <span class="ci">0.5</span> 过滤低相关度片段。TopK=3 + 阈值过滤后若为空，LLM 通过 System Prompt 规则诚实告知 <span class="hi">"暂无相关信息"</span>，避免编造。</p>
+      </div>
+      <div class="neon-card">
+        <h3>&#x2778; 按分支选模型节省成本</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">订单/通用分支用 <span class="ci">gpt-4o-mini</span>（便宜快速），产品顾问用 <span class="ci">gpt-4o</span>（精准可靠）。按场景需求选模型，可将成本降低 <span class="hi">60%+</span>。</p>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:var(--content-gap);">
+      <span class="ci">延伸思考：</span>如果用户连续多轮对话，需要加入 <span class="hi">会话变量</span> 存储上下文，并在 System Prompt 中携带历史记录。
+    </div>
+  </div>
+  <div class="slide-counter">08 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 9 — 案例2: 工作流结构 + Step 1-2
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s9">
+  <div class="slide-content reveal">
+    <h2>案例 2：RAG 文档问答 <span class="badge badge-cyan">中级</span></h2>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div class="neon-card">
+        <h3>工作流结构</h3>
+        <div class="diagram-area" style="margin-top:0.5rem; padding:10px;">
+          <div class="flow-row">
+            <div class="flow-box cyan">Start<br>file + question</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-box yellow">文档提取器<br>Doc Extractor</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-box green">Code<br>格式化+截断</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-box magenta">LLM<br>RAG 问答</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-box cyan">Answer<br>End</div>
+          </div>
+        </div>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">
+          <span class="ci">场景：</span>用户上传 PDF/Word 文档并提出问题，系统基于文档内容精准回答。
+        </p>
+      </div>
+      <div class="neon-card">
+        <h3>Step 1-2: Start + 文档提取器</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);"><span class="badge badge-cyan">Step 1</span> Start 节点定义两个输入字段：</p>
+        <div class="code-block" style="margin-top:0.3rem;">
+<span class="kw">file</span>      <span class="cm"># File 类型，用户上传的文档</span>
+<span class="kw">question</span>  <span class="cm"># Text 类型，用户的问题</span>
+        </div>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);"><span class="badge badge-cyan">Step 2</span> 添加 <span class="ci">文档提取器(Doc Extractor)</span> 节点：</p>
+        <p style="font-size:var(--small-size);">输入文件：<span class="ci">{{START.file}}</span><br>输出：纯文本内容（自动解析 PDF/Word/TXT）</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-counter">09 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 10 — 案例2: Step 3 Code 节点
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s10">
+  <div class="slide-content reveal">
+    <h2>案例 2 — Step 3：Code 节点完整实现</h2>
+    <div class="divider"></div>
+    <div class="neon-card" style="flex:1; display:flex; flex-direction:column;">
+      <h3>Python 代码 — 文档内容格式化 + 截断</h3>
+      <div class="code-block" style="margin-top:0.5rem; flex:1; overflow-y:auto;">
+<span class="kw">def</span> <span class="fn">main</span>(<span class="fn">doc_text</span>: <span class="kw">str</span>, <span class="fn">question</span>: <span class="kw">str</span>) <span class="kw">-></span> <span class="kw">dict</span>:
+    <span class="cm">"""格式化文档内容并截断到 8000 字，构造 Prompt 上下文"""</span>
+
+    <span class="cm"># 1. 基本清洗：去除多余空白</span>
+    <span class="fn">cleaned</span> = <span class="str">"\n"</span>.<span class="fn">join</span>(
+        <span class="fn">line</span>.<span class="fn">strip</span>()
+        <span class="kw">for</span> <span class="fn">line</span> <span class="kw">in</span> <span class="fn">doc_text</span>.<span class="fn">split</span>(<span class="str">"\n"</span>)
+        <span class="kw">if</span> <span class="fn">line</span>.<span class="fn">strip</span>()
+    )
+
+    <span class="cm"># 2. 截断：保留前 8000 个字符</span>
+    <span class="fn">MAX_CHARS</span> = <span class="str">8000</span>
+    <span class="kw">if</span> <span class="fn">len</span>(<span class="fn">cleaned</span>) > <span class="fn">MAX_CHARS</span>:
+        <span class="fn">cleaned</span> = <span class="fn">cleaned</span>[:<span class="fn">MAX_CHARS</span>] + <span class="str">"\n\n[... 文档过长，已截断 ...]"</span>
+
+    <span class="cm"># 3. 统计信息</span>
+    <span class="fn">total_chars</span> = <span class="fn">len</span>(<span class="fn">doc_text</span>)
+    <span class="fn">used_chars</span> = <span class="fn">len</span>(<span class="fn">cleaned</span>)
+
+    <span class="kw">return</span> {
+        <span class="str">"formatted_text"</span>: <span class="fn">cleaned</span>,
+        <span class="str">"total_chars"</span>: <span class="fn">total_chars</span>,
+        <span class="str">"used_chars"</span>: <span class="fn">used_chars</span>,
+        <span class="str">"question"</span>: <span class="fn">question</span>,
+        <span class="str">"truncated"</span>: <span class="fn">total_chars</span> > <span class="fn">MAX_CHARS</span>,
+    }
+      </div>
+      <p style="margin-top:0.5rem; font-size:var(--small-size);">
+        <span class="hi">为什么截断 8000 字？</span> 大多数 LLM 上下文窗口 ~4K-8K tokens，8000 中文字 &asymp; 12000 tokens，留足余量给 System Prompt 和回答空间。
+      </p>
+    </div>
+  </div>
+  <div class="slide-counter">10 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 11 — 案例2: Step 4-5
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s11">
+  <div class="slide-content reveal">
+    <h2>案例 2 — Step 4-5：LLM 防幻觉 + End 输出</h2>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div class="neon-card">
+        <h3>Step 4: LLM 节点配置</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">模型：<span class="ci">GPT-4o / Claude 3.5 Sonnet</span></p>
+        <p style="font-size:var(--small-size); margin-top:0.3rem;">System Prompt（防幻觉规则）：</p>
+        <div class="code-block" style="margin-top:0.3rem;">
+<span class="kw">你是一个基于文档的问答助手。</span>
+
+<span class="kw">核心规则：</span>
+1. <span class="hi">只能回答</span>文档中明确包含的信息
+2. 如果答案不在文档中，请回复：
+   <span class="str">"文档中未包含相关信息"</span>
+3. <span class="kw">绝对禁止</span>编造或推测任何信息
+4. 回答时引用文档中的具体段落
+
+<span class="kw">文档统计：</span>
+- 原始字符数：{{ total_chars }}
+- 已用字符数：{{ used_chars }}
+- 是否截断：{{ truncated }}
+        </div>
+        <p style="font-size:var(--small-size); margin-top:0.3rem;">User Prompt：<span class="ci">{{question}}</span> + <span class="ci">{{formatted_text}}</span></p>
+      </div>
+      <div class="neon-card">
+        <h3>Step 5: End 输出配置</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">Answer 节点输出变量：</p>
+        <table class="tbl" style="margin-top:0.3rem;">
+          <tr><th>输出变量</th><th>来源</th></tr>
+          <tr><td><span class="ci">answer</span></td><td>{{LLM.text}}</td></tr>
+          <tr><td><span class="ci">usage_stats</span></td><td>{{CODE.truncated}} / {{CODE.total_chars}}</td></tr>
+        </table>
+        <div class="tip" style="margin-top:0.8rem;">
+          <span class="ci">增强建议：</span>可在 LLM 前加 <span class="hi">问题重写</span> 步骤（另一个 LLM 节点），将用户的模糊问题改写为更精准的检索式问法，提升回答质量。
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-counter">11 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 12 — 案例2: 完整流程回顾
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s12">
+  <div class="slide-content reveal">
+    <h2>案例 2 — 完整流程回顾</h2>
+    <div class="divider"></div>
+    <div class="diagram-area" style="flex:1; justify-content:center;">
+      <p style="font-size:var(--small-size); color:var(--cyan); margin-bottom:var(--content-gap);">RAG 文档问答 — 端到端数据流</p>
+
+      <div class="flow-row" style="margin-bottom:6px;">
+        <div class="flow-box cyan" style="padding:10px 16px;">Start<br><span style="font-size:0.65rem;">file (PDF/Word) + question</span></div>
+      </div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-row">
+        <div class="flow-box yellow" style="padding:10px 16px;">&#x2776; 文档提取器<br><span style="font-size:0.65rem;">提取纯文本内容</span></div>
+      </div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-row">
+        <div class="flow-box green" style="padding:10px 16px;">&#x2777; Code 节点<br><span style="font-size:0.65rem;">清洗空白 + 截断到 8000 字 + 统计</span></div>
+      </div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-row">
+        <div class="flow-box magenta" style="padding:10px 16px;">&#x2778; LLM 问答<br><span style="font-size:0.65rem;">System Prompt 防幻觉 + 文档上下文</span></div>
+      </div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-row">
+        <div class="flow-box cyan" style="padding:10px 16px;">&#x2779; Answer / End<br><span style="font-size:0.65rem;">输出回答 + 文档使用统计</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-counter">12 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 13 — 案例2: 关键技巧
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s13">
+  <div class="slide-content reveal">
+    <h2>案例 2 — 关键技巧总结</h2>
+    <div class="divider"></div>
+    <div class="grid-3" style="margin-top:var(--content-gap);">
+      <div class="neon-card">
+        <h3>&#x2776; 防幻觉三件套</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">(1) System Prompt 明确 <span class="hi">只能基于文档回答</span>；(2) 设定拒绝话术模板；(3) 告诉用户文档是否被截断（增进透明度）。</p>
+      </div>
+      <div class="neon-card">
+        <h3>&#x2777; Code 做预处理</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">文档提取器输出的原始文本常有 <span class="ci">多余空白和特殊字符</span>。Code 节点清洗并截断，使 LLM 收到的上下文干净整洁，回答质量显著提升。</p>
+      </div>
+      <div class="neon-card">
+        <h3>&#x2778; 大文档分批策略</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">超过 8000 字的文档：用 Code 节点 <span class="hi">按段落分割后分批调用 LLM</span>（需要循环迭代节点），每批独立问答，最后合并结果。</p>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:var(--content-gap);">
+      <span class="ci">适用场景：</span>合同审查、论文研读、技术文档问答、规章制度查询。任何需要"基于文件内容精准回答"的场景都可以用此模式。
+    </div>
+  </div>
+  <div class="slide-counter">13 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 14 — 案例3: 工作流结构
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s14">
+  <div class="slide-content reveal">
+    <h2>案例 3：API 数据聚合管线 <span class="badge badge-yellow">中级</span></h2>
+    <div class="divider"></div>
+    <p><span class="ci">场景：</span>输入城市名，并行调用两个天气 API（当前天气 + 未来预报），合并数据后用 LLM 生成自然语言播报。</p>
+    <div class="diagram-area" style="margin-top:var(--content-gap);">
+      <p style="font-size:var(--small-size); color:var(--cyan); margin-bottom:0.5rem;">工作流结构 — 并行 HTTP + Code 合并 + LLM 输出</p>
+      <!-- Top -->
+      <div class="flow-row" style="margin-bottom:4px;">
+        <div class="flow-box cyan">Start<br>city_name</div>
+      </div>
+      <div class="flow-arrow" style="font-size:var(--small-size);">&#x252C;&#x2500;&#x2500; 并行分支 &#x2500;&#x2500;&#x252C;</div>
+      <!-- Parallel HTTP -->
+      <div class="flow-row" style="justify-content:space-around; width:100%; max-width:600px; margin:0 auto;">
+        <div class="flow-box yellow" style="font-size:0.7rem;">HTTP: 当前天气<br>api.openweathermap.org</div>
+        <div class="flow-box yellow" style="font-size:0.7rem;">HTTP: 天气预报<br>api.openweathermap.org/forecast</div>
+      </div>
+      <div class="flow-row" style="margin-top:4px;">
+        <div class="flow-arrow" style="font-size:var(--small-size);">&#x2534;&#x2500;&#x2500; 汇聚 &#x2500;&#x2500;&#x2534;</div>
+      </div>
+      <!-- Code merge -->
+      <div class="flow-row" style="margin-bottom:4px;">
+        <div class="flow-box green">Code: 合并数据</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box magenta">LLM: 天气播报</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-box cyan">End</div>
+      </div>
+    </div>
+    <p style="margin-top:var(--content-gap); font-size:var(--small-size);">
+      <span class="hi">核心知识点：</span>并行 HTTP 请求、Code 节点做数据转换、env 环境变量管理 API Key、Jinja2 模板循环
+    </p>
+  </div>
+  <div class="slide-counter">14 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 15 — 案例3: Step 1-3
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s15">
+  <div class="slide-content reveal">
+    <h2>案例 3 — Step 1-3：Start + 并行 HTTP</h2>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div class="neon-card">
+        <h3>Step 1: Start 节点</h3>
+        <div class="code-block" style="margin-top:0.5rem;">
+<span class="kw">city_name</span>  <span class="cm"># Text 类型，如 "Beijing"</span>
+        </div>
+      </div>
+      <div class="neon-card">
+        <h3>Step 2: HTTP — 当前天气</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">方法：<span class="ci">GET</span></p>
+        <div class="code-block" style="margin-top:0.3rem; font-size:0.65rem;">
+<span class="cm"># URL 配置</span>
+<span class="str">https://api.openweathermap.org/data/2.5/weather</span>
+  ?q=<span class="kw">{{city_name}}</span>
+  &amp;appid=<span class="kw">{{env.WEATHER_API_KEY}}</span>
+  &amp;units=metric
+        </div>
+      </div>
+    </div>
+    <div class="neon-card" style="margin-top:var(--content-gap);">
+      <h3>Step 3: HTTP — 未来天气预报（5天/3小时间隔）</h3>
+      <div class="grid-2" style="margin-top:0.5rem;">
+        <div>
+          <p style="font-size:var(--small-size);">方法：<span class="ci">GET</span></p>
+          <div class="code-block" style="font-size:0.65rem;">
+<span class="str">https://api.openweathermap.org/data/2.5/forecast</span>
+  ?q=<span class="kw">{{city_name}}</span>
+  &amp;appid=<span class="kw">{{env.WEATHER_API_KEY}}</span>
+  &amp;units=metric
+          </div>
+        </div>
+        <div>
+          <div class="tip">
+            <span class="ci">env 变量配置：</span><br>
+            在 Dify 工作流设置 &rarr; 环境变量中添加：<br>
+            <span class="ci">WEATHER_API_KEY</span> = <span class="hi">your_openweathermap_key</span><br><br>
+            <span class="hi">安全原则：</span>API Key 绝不写在节点配置中，统一用 <span class="ci">{{env.XXX}}</span> 引用。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-counter">15 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 16 — 案例3: Step 4 Code
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s16">
+  <div class="slide-content reveal">
+    <h2>案例 3 — Step 4：Code 节点完整实现</h2>
+    <div class="divider"></div>
+    <div class="neon-card" style="flex:1; display:flex; flex-direction:column;">
+      <div class="code-block" style="margin-top:0.5rem; flex:1; overflow-y:auto;">
+<span class="kw">def</span> <span class="fn">main</span>(<span class="fn">current_json</span>: <span class="kw">dict</span>, <span class="fn">forecast_json</span>: <span class="kw">dict</span>) <span class="kw">-></span> <span class="kw">dict</span>:
+    <span class="cm">"""合并两个天气 API 数据，提取关键信息"""</span>
+
+    <span class="cm"># 1. 当前天气数据提取</span>
+    <span class="fn">current</span> = {
+        <span class="str">"temp"</span>: <span class="fn">round</span>(<span class="fn">current_json</span>[<span class="str">"main"</span>][<span class="str">"temp"</span>], <span class="str">1</span>),
+        <span class="str">"feels_like"</span>: <span class="fn">round</span>(<span class="fn">current_json</span>[<span class="str">"main"</span>][<span class="str">"feels_like"</span>], <span class="str">1</span>),
+        <span class="str">"humidity"</span>: <span class="fn">current_json</span>[<span class="str">"main"</span>][<span class="str">"humidity"</span>],
+        <span class="str">"description"</span>: <span class="fn">current_json</span>[<span class="str">"weather"</span>][<span class="str">0</span>][<span class="str">"description"</span>],
+        <span class="str">"wind_speed"</span>: <span class="fn">current_json</span>[<span class="str">"wind"</span>][<span class="str">"speed"</span>],
+    }
+
+    <span class="cm"># 2. 温度 K &rarr; &deg;C 转换（如果 API 未指定 metric）</span>
+    <span class="kw">if</span> <span class="fn">current</span>[<span class="str">"temp"</span>] > <span class="str">100</span>:
+        <span class="fn">current</span>[<span class="str">"temp"</span>] = <span class="fn">round</span>(<span class="fn">current</span>[<span class="str">"temp"</span>] - <span class="str">273.15</span>, <span class="str">1</span>)
+        <span class="fn">current</span>[<span class="str">"feels_like"</span>] = <span class="fn">round</span>(<span class="fn">current</span>[<span class="str">"feels_like"</span>] - <span class="str">273.15</span>, <span class="str">1</span>)
+
+    <span class="cm"># 3. 预报数据：取每日 12:00 的代表性数据</span>
+    <span class="fn">daily_forecast</span> = []
+    <span class="kw">for</span> <span class="fn">item</span> <span class="kw">in</span> <span class="fn">forecast_json</span>[<span class="str">"list"</span>]:
+        <span class="kw">if</span> <span class="str">"12:00:00"</span> <span class="kw">in</span> <span class="fn">item</span>[<span class="str">"dt_txt"</span>]:
+            <span class="fn">daily_forecast</span>.<span class="fn">append</span>({
+                <span class="str">"date"</span>: <span class="fn">item</span>[<span class="str">"dt_txt"</span>][:<span class="str">10</span>],
+                <span class="str">"temp"</span>: <span class="fn">round</span>(<span class="fn">item</span>[<span class="str">"main"</span>][<span class="str">"temp"</span>], <span class="str">1</span>),
+                <span class="str">"desc"</span>: <span class="fn">item</span>[<span class="str">"weather"</span>][<span class="str">0</span>][<span class="str">"description"</span>],
+            })
+
+    <span class="cm"># 4. 取未来 5 天</span>
+    <span class="fn">daily_forecast</span> = <span class="fn">daily_forecast</span>[:<span class="str">5</span>]
+
+    <span class="kw">return</span> {
+        <span class="str">"current"</span>: <span class="fn">current</span>,
+        <span class="str">"forecast"</span>: <span class="fn">daily_forecast</span>,
+        <span class="str">"city"</span>: <span class="fn">current_json</span>.<span class="fn">get</span>(<span class="str">"name"</span>, <span class="str">"Unknown"</span>),
+    }
+      </div>
+    </div>
+  </div>
+  <div class="slide-counter">16 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 17 — 案例3: Step 5
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s17">
+  <div class="slide-content reveal">
+    <h2>案例 3 — Step 5：LLM 天气播报员</h2>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div class="neon-card">
+        <h3>System Prompt</h3>
+        <div class="code-block" style="margin-top:0.5rem;">
+你是一个专业的天气播报员。
+请将天气数据转换为自然、友好的播报语言。
+
+规则：
+1. 说明城市名称
+2. 先说当前天气，再说未来预报
+3. 如果有极端天气（高温/暴雨/大风），特别提醒
+4. 语气活泼但不夸张
+        </div>
+      </div>
+      <div class="neon-card">
+        <h3>User Prompt (Jinja2 模板)</h3>
+        <div class="code-block" style="margin-top:0.5rem;">
+<span class="cm">{# 当前天气 #}</span>
+**今日天气 - {{ city }}**
+- 温度：{{ current.temp }}&deg;C（体感 {{ current.feels_like }}&deg;C）
+- 天气：{{ current.description }}
+- 湿度：{{ current.humidity }}%
+- 风速：{{ current.wind_speed }} m/s
+
+<span class="cm">{# 未来预报 #}</span>
+**未来预报：**
+{% for day in forecast %}
+- **{{ day.date }}**：{{ day.temp }}&deg;C，{{ day.desc }}
+{% endfor %}
+
+请将以上数据转化为自然语言播报。
+        </div>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:var(--content-gap);">
+      <span class="ci">Jinja2 循环技巧：</span><span class="code">{% for day in forecast %}</span> 遍历 Code 节点返回的数组，每条预报自动生成一行。修改 Code 返回的天数即可动态调整播报范围。
+    </div>
+  </div>
+  <div class="slide-counter">17 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 18 — 案例3: 完整数据流图
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s18">
+  <div class="slide-content reveal">
+    <h2>案例 3 — 完整数据流图</h2>
+    <div class="divider"></div>
+    <div class="diagram-area" style="flex:1; justify-content:center;">
+      <p style="font-size:var(--small-size); color:var(--cyan); margin-bottom:var(--content-gap);">API 数据聚合管线 — 端到端数据流</p>
+
+      <div class="flow-row" style="margin-bottom:6px;">
+        <div class="flow-box cyan" style="padding:10px 16px;">&#x2776; Start<br><span style="font-size:0.65rem;">city_name = "Beijing"</span></div>
+      </div>
+      <div style="font-size:var(--small-size); color:var(--gray); margin:4px 0;">&#x252C;&#x2500;&#x2500; 两个 HTTP 节点同时发起请求 &#x2500;&#x2500;&#x252C;</div>
+      <div class="flow-row" style="justify-content:space-around; width:100%; max-width:640px; margin:0 auto 6px;">
+        <div class="flow-box yellow" style="padding:8px 16px; font-size:0.7rem;">&#x2777; HTTP 1<br>当前天气 API &rarr; JSON</div>
+        <div class="flow-box yellow" style="padding:8px 16px; font-size:0.7rem;">&#x2778; HTTP 2<br>天气预报 API &rarr; JSON</div>
+      </div>
+      <div style="font-size:var(--small-size); color:var(--gray); margin:4px 0;">&#x2534;&#x2500;&#x2500; 数据汇聚到 Code 节点 &#x2500;&#x2500;&#x2534;</div>
+      <div class="flow-row" style="margin-bottom:6px;">
+        <div class="flow-box green" style="padding:10px 16px;">&#x2779; Code: 合并数据<br><span style="font-size:0.65rem;">K&rarr;&deg;C 转换 | 提取每日12:00 | Top5天</span></div>
+      </div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-row" style="margin-bottom:6px;">
+        <div class="flow-box magenta" style="padding:10px 16px;">&#x277A; LLM: 天气播报<br><span style="font-size:0.65rem;">Jinja2 模板 &rarr; 自然语言播报</span></div>
+      </div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-row">
+        <div class="flow-box cyan" style="padding:10px 16px;">&#x277B; Answer / End<br><span style="font-size:0.65rem;">输出播报文本</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-counter">18 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 19 — 案例3: 关键技巧
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s19">
+  <div class="slide-content reveal">
+    <h2>案例 3 — 关键技巧总结</h2>
+    <div class="divider"></div>
+    <div class="grid-3" style="margin-top:var(--content-gap);">
+      <div class="neon-card">
+        <h3>&#x2776; 并行 HTTP 提效</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">两个 HTTP 节点不相互依赖时，Dify 自动 <span class="hi">并行执行</span>。总耗时 = max(请求1, 请求2) 而非 sum。多个独立 API 调用要充分利用此特性。</p>
+      </div>
+      <div class="neon-card">
+        <h3>&#x2777; Code 做数据转换</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">API 返回的原始 JSON 通常冗余且格式不统一。用 Code 节点做 <span class="ci">清洗 + 结构化 + 计算</span>（如 K&rarr;&deg;C 转换），LLM 收到的数据干净且可直接使用。</p>
+      </div>
+      <div class="neon-card">
+        <h3>&#x2778; env 管理密钥</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">使用 <span class="ci">{{env.WEATHER_API_KEY}}</span> 引用环境变量，<span class="hi">不将 API Key 写死在节点配置</span>中。同一工作流可导出到不同环境，只需修改 env 值。</p>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:var(--content-gap);">
+      <span class="ci">扩展思路：</span>此模式适用于任何"多源数据聚合"场景 — 股票数据(多交易所)、物流追踪(多快递商)、舆情监控(多社交媒体平台)。
+    </div>
+  </div>
+  <div class="slide-counter">19 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 20 — 案例4: 工作流结构 + Agent 工具绑定
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s20">
+  <div class="slide-content reveal">
+    <h2>案例 4：AI Agent 邮件处理 <span class="badge badge-magenta">高级</span></h2>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div class="neon-card">
+        <h3>工作流结构</h3>
+        <div class="diagram-area" style="margin-top:0.5rem; padding:10px;">
+          <div class="flow-row">
+            <div class="flow-box cyan">Start<br>email + sender</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-box magenta">Agent v2</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-box yellow">IF-ELSE<br>错误处理</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-box cyan">End<br>reply + actions</div>
+          </div>
+        </div>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">
+          <span class="ci">场景：</span>收到邮件后，AI Agent 自动查询日历、CRM 和知识库，决策是否需要回复，并生成回复草稿。
+        </p>
+      </div>
+      <div class="neon-card">
+        <h3>Agent 绑定的工具</h3>
+        <table class="tbl" style="margin-top:0.5rem;">
+          <tr><th>工具</th><th>用途</th></tr>
+          <tr><td>&#x1F4C5; <span class="ci">Calendar API</span></td><td>查询发件人在未来3天的空闲时段</td></tr>
+          <tr><td>&#x1F4C7; <span class="ci">CRM API</span></td><td>查看发件人公司/职位/历史沟通记录</td></tr>
+          <tr><td>&#x1F4DA; <span class="ci">知识库</span></td><td>检索产品 FAQ、价格表、政策文档</td></tr>
+          <tr><td>&#x2709; <span class="ci">Draft Email</span></td><td>Agent 调用此工具生成回复草稿</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:var(--content-gap);">
+      <span class="hi">Agent v2 核心优势：</span>Agent 自主决定 <span class="ci">哪些工具需要调用 + 调用顺序 + 调用几次</span>，而非预先写死分支逻辑。适合开放式的多步骤推理任务。
+    </div>
+  </div>
+  <div class="slide-counter">20 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 21 — 案例4: Step 1-2
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s21">
+  <div class="slide-content reveal">
+    <h2>案例 4 — Step 1-2：Start + Agent v2 节点</h2>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div class="neon-card">
+        <h3>Step 1: Start 节点</h3>
+        <div class="code-block" style="margin-top:0.5rem;">
+<span class="kw">email_content</span>  <span class="cm"># Text — 邮件全文</span>
+<span class="kw">sender_email</span>   <span class="cm"># Text — 发件人邮箱</span>
+        </div>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">这两个变量来自上游的邮件触发器（Email Trigger 或 Webhook）。</p>
+      </div>
+      <div class="neon-card">
+        <h3>Step 2: Agent v2 节点配置</h3>
+        <table class="tbl" style="margin-top:0.5rem;">
+          <tr><td>策略</td><td><span class="ci">ReAct</span> (Reasoning + Acting)</td></tr>
+          <tr><td>模型</td><td><span class="ci">GPT-4o / Claude 3.5 Sonnet</span></td></tr>
+          <tr><td>最大迭代</td><td><span class="ci">10</span> 轮 (Tools 调用 + 反思)</td></tr>
+          <tr><td>工具</td><td>Calendar API, CRM API, 知识库, Draft Email</td></tr>
+          <tr><td>输出变量</td><td><span class="ci">text</span> (回复草稿), <span class="ci">tool_calls</span> (操作记录)</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:var(--content-gap);">
+      <span class="ci">ReAct 策略工作原理：</span>Agent 每轮执行 Thought &rarr; Action &rarr; Observation 循环。先"思考"需要什么信息，再"行动"调用工具，拿到"观察"结果后决定下一步或生成最终回复。
+    </div>
+  </div>
+  <div class="slide-counter">21 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 22 — 案例4: Agent System Prompt
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s22">
+  <div class="slide-content reveal">
+    <h2>案例 4 — Agent System Prompt 完整内容</h2>
+    <div class="divider"></div>
+    <div class="neon-card" style="flex:1; display:flex; flex-direction:column;">
+      <div class="code-block" style="margin-top:0.5rem; flex:1; overflow-y:auto;">
+<span class="kw">你是一个智能邮件处理助理。</span>
+<span class="kw">你需要阅读收到的邮件，查询相关信息，判断如何回复。</span>
+
+<span class="kw">工作规则：</span>
+
+1. <span class="hi">先理解邮件意图</span>
+   - 是会议邀请？产品咨询？投诉？合作意向？
+   - 判断紧急程度和重要性
+
+2. <span class="hi">查询相关信息</span>
+   - 使用 Calendar 工具查你的空闲时段（会议邀请时）
+   - 使用 CRM 工具查发件人背景（陌生发件人时）
+   - 使用知识库查产品信息（产品咨询时）
+
+3. <span class="hi">生成回复草稿</span>
+   - 使用 Draft Email 工具生成回复
+   - 回复应专业、友好、具体
+   - 如果是会议邀请，提供 2-3 个可选时间
+   - 如果是投诉，表示关注并提出解决方案
+   - 如果无法处理，说明原因并给出替代联系方式
+
+<span class="kw">工具使用指南：</span>
+- <span class="ci">Calendar</span>：参数 start_date (今天), end_date (今天+3天)
+- <span class="ci">CRM</span>：参数 email (发件人邮箱)
+- <span class="ci">知识库</span>：参数 query (从邮件中提取的关键问题)
+- <span class="ci">Draft Email</span>：参数 reply_to, subject, body
+
+<span class="kw">重要原则：</span>
+<span class="hi">不要编造任何信息。</span> 如果工具返回错误或空结果，
+如实告知并在回复中说明"暂时无法查询到相关信息"。
+      </div>
+    </div>
+  </div>
+  <div class="slide-counter">22 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 23 — 案例4: Step 3-4
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s23">
+  <div class="slide-content reveal">
+    <h2>案例 4 — Step 3-4：错误处理 + End 输出</h2>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div class="neon-card">
+        <h3>Step 3: IF-ELSE 错误处理</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">Agent 执行可能失败（工具超时/API限流/推理异常），需要 <span class="hi">fallback 机制</span>：</p>
+        <div class="code-block" style="margin-top:0.5rem;">
+<span class="kw">IF</span>   Agent.status == <span class="str">"succeeded"</span>
+      &rarr; <span class="fn">正常输出 Answer</span>
+
+<span class="kw">ELSE</span> <span class="cm"># Agent 执行失败</span>
+      &rarr; <span class="fn">LLM Fallback：生成通用回复模板</span>
+      &rarr; <span class="fn">告知用户"系统暂时无法处理，请稍后重试"</span>
+        </div>
+        <p style="font-size:var(--small-size); margin-top:0.4rem;">
+          也可以记录 <span class="ci">Agent 的错误信息</span> 到日志（通过 Webhook 发送到监控系统）。
+        </p>
+      </div>
+      <div class="neon-card">
+        <h3>Step 4: End 输出结构</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">Answer 节点输出结构化数据：</p>
+        <table class="tbl" style="margin-top:0.3rem;">
+          <tr><th>变量</th><th>来源</th><th>类型</th></tr>
+          <tr><td><span class="ci">reply_draft</span></td><td>Agent.text</td><td>Text</td></tr>
+          <tr><td><span class="ci">actions_taken</span></td><td>Agent.tool_calls</td><td>Array[Text]</td></tr>
+          <tr><td><span class="ci">crm_info</span></td><td>CRM API 输出</td><td>Text</td></tr>
+          <tr><td><span class="ci">status</span></td><td>Agent.status</td><td>Text</td></tr>
+        </table>
+        <p style="font-size:var(--small-size); margin-top:0.5rem;">
+          下游系统（如邮件发送服务）根据 <span class="ci">status</span> 决定是否自动发送或人工审核。
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-counter">23 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 24 — 案例4: 关键技巧
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s24">
+  <div class="slide-content reveal">
+    <h2>案例 4 — 关键技巧总结</h2>
+    <div class="divider"></div>
+    <div class="grid-3" style="margin-top:var(--content-gap);">
+      <div class="neon-card">
+        <h3>&#x2776; Agent vs 固定分支</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">案例1 用 IF-ELSE + 分类器做 <span class="hi">确定性路由</span>（可预测、快速）。案例4 用 Agent 做 <span class="ci">自主推理</span>（灵活、适合开放场景）。根据需求选择正确范式。</p>
+      </div>
+      <div class="neon-card">
+        <h3>&#x2777; 最大迭代设上限</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">Agent 可无限循环调用工具，需设置 <span class="ci">最大迭代次数</span>（建议 5-10 轮）防止陷入死循环或消耗过多 Token。超过上限自动终止并输出已有结果。</p>
+      </div>
+      <div class="neon-card">
+        <h3>&#x2778; Fallback 保底输出</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">Agent 失败时不要静默报错。用 IF-ELSE 检测 <span class="ci">Agent.status</span>，失败时走 <span class="hi">Fallback 分支</span>生成友好的"稍后重试"消息，保证用户体验不中断。</p>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:var(--content-gap);">
+      <span class="ci">安全提醒：</span>Agent 自动发邮件前务必加 <span class="hi">人工审核节点(HITL)</span>，避免 AI 幻觉导致错误回复发给客户。进阶篇中将详细讲解 HITL 配置。
+    </div>
+  </div>
+  <div class="slide-counter">24 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 25 — 案例5: 工作流结构
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s25">
+  <div class="slide-content reveal">
+    <h2>案例 5：定时数据分析报表 <span class="badge badge-magenta">高级</span></h2>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div class="neon-card">
+        <h3>场景与工作流结构</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);"><span class="ci">场景：</span>每天早 9 点自动拉取业务数据，清洗分析后生成 Markdown 报告，推送到企业微信群。</p>
+        <div class="diagram-area" style="margin-top:0.5rem; padding:10px;">
+          <div class="flow-row">
+            <div class="flow-box yellow">Cron<br>0 9 * * *</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-box yellow">HTTP<br>拉数据</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-box green">Code<br>数据清洗</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-box magenta">LLM<br>生成报告</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-box cyan">HTTP<br>推企微</div>
+          </div>
+        </div>
+      </div>
+      <div class="neon-card">
+        <h3>五个核心节点</h3>
+        <table class="tbl" style="margin-top:0.5rem;">
+          <tr><th>节点</th><th>作用</th></tr>
+          <tr><td>&#x23F0; Cron 触发器</td><td>每天 9:00 自动执行</td></tr>
+          <tr><td>&#x1F310; HTTP 请求</td><td>从业务 API 拉取原始数据</td></tr>
+          <tr><td>&#x1F4BB; Code</td><td>数据清洗 + 指标计算</td></tr>
+          <tr><td>&#x1F9E0; LLM</td><td>生成 Markdown 分析报告</td></tr>
+          <tr><td>&#x1F4E8; HTTP Webhook</td><td>推送到企业微信群机器人</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="slide-counter">25 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 26 — 案例5: Step 1-2
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s26">
+  <div class="slide-content reveal">
+    <h2>案例 5 — Step 1-2：Cron 触发器 + HTTP 拉数据</h2>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div class="neon-card">
+        <h3>Step 1: Cron 触发器</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">将 Start 节点替换为 <span class="hi">定时触发器(Cron Trigger)</span>：</p>
+        <div class="code-block" style="margin-top:0.5rem;">
+<span class="cm"># Cron 表达式</span>
+<span class="str">0 9 * * *</span>
+
+<span class="cm"># 含义：每天 9:00 执行</span>
+<span class="cm"># ┌──── 分钟 (0)</span>
+<span class="cm"># │ ┌── 小时 (9)</span>
+<span class="cm"># │ │ ┌ 日期 (* = 每天)</span>
+<span class="cm"># │ │ │ ┌ 月份 (* = 每月)</span>
+<span class="cm"># │ │ │ │ ┌ 星期 (* = 每星期)</span>
+<span class="cm"># 0 9 * * *</span>
+        </div>
+        <p style="font-size:var(--small-size); margin-top:0.4rem;">
+          其他常用表达式：<br>
+          <span class="ci">0 */6 * * *</span> — 每6小时<br>
+          <span class="ci">0 9 * * 1</span> — 每周一早9点
+        </p>
+      </div>
+      <div class="neon-card">
+        <h3>Step 2: HTTP 拉取业务数据</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">添加 <span class="ci">HTTP 请求</span> 节点拉取昨天的业务数据：</p>
+        <div class="code-block" style="margin-top:0.5rem;">
+<span class="cm"># 方法：GET</span>
+<span class="kw">URL：</span>
+<span class="str">https://api.example.com/v1/dashboard</span>
+  ?date=<span class="kw">{{yesterday}}</span>
+  &amp;metrics=revenue,orders,users
+
+<span class="kw">Headers：</span>
+  Authorization: Bearer <span class="kw">{{env.API_TOKEN}}</span>
+        </div>
+        <p style="font-size:var(--small-size); margin-top:0.4rem;">
+          <span class="ci">注意：</span>Cron 触发的工作流没有用户输入，需在 HTTP 节点中 <span class="hi">硬编码查询参数</span> 或使用 Dify 内置变量。
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-counter">26 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 27 — 案例5: Step 3 Code
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s27">
+  <div class="slide-content reveal">
+    <h2>案例 5 — Step 3：Code 节点完整实现</h2>
+    <div class="divider"></div>
+    <div class="neon-card" style="flex:1; display:flex; flex-direction:column;">
+      <div class="code-block" style="margin-top:0.5rem; flex:1; overflow-y:auto;">
+<span class="kw">from</span> <span class="fn">datetime</span> <span class="kw">import</span> <span class="fn">datetime</span>, <span class="fn">timedelta</span>
+
+<span class="kw">def</span> <span class="fn">main</span>(<span class="fn">raw_data</span>: <span class="kw">dict</span>) <span class="kw">-></span> <span class="kw">dict</span>:
+    <span class="cm">"""清洗业务数据并计算关键指标"""</span>
+
+    <span class="fn">yesterday</span> = (<span class="fn">datetime</span>.<span class="fn">now</span>() - <span class="fn">timedelta</span>(<span class="fn">days</span>=<span class="str">1</span>))
+    <span class="fn">date_str</span> = <span class="fn">yesterday</span>.<span class="fn">strftime</span>(<span class="str">"%Y-%m-%d"</span>)
+
+    <span class="cm"># 1. 昨日营收</span>
+    <span class="fn">revenue</span> = <span class="fn">raw_data</span>.<span class="fn">get</span>(<span class="str">"revenue"</span>, <span class="str">0</span>)
+    <span class="fn">revenue_str</span> = <span class="fn">f</span><span class="str">"&#165;{revenue:,.2f}"</span>
+
+    <span class="cm"># 2. 订单统计</span>
+    <span class="fn">orders</span> = <span class="fn">raw_data</span>.<span class="fn">get</span>(<span class="str">"orders"</span>, {})
+    <span class="fn">total_orders</span> = <span class="fn">orders</span>.<span class="fn">get</span>(<span class="str">"total"</span>, <span class="str">0</span>)
+    <span class="fn">avg_order_value</span> = <span class="fn">revenue</span> / <span class="fn">total_orders</span> <span class="kw">if</span> <span class="fn">total_orders</span> > <span class="str">0</span> <span class="kw">else</span> <span class="str">0</span>
+
+    <span class="cm"># 3. Top 5 产品</span>
+    <span class="fn">products</span> = <span class="fn">sorted</span>(
+        <span class="fn">raw_data</span>.<span class="fn">get</span>(<span class="str">"products"</span>, []),
+        <span class="fn">key</span>=<span class="kw">lambda</span> <span class="fn">x</span>: <span class="fn">x</span>.<span class="fn">get</span>(<span class="str">"sales"</span>, <span class="str">0</span>),
+        <span class="fn">reverse</span>=<span class="str">True</span>
+    )[:<span class="str">5</span>]
+
+    <span class="cm"># 4. 用户指标</span>
+    <span class="fn">users</span> = <span class="fn">raw_data</span>.<span class="fn">get</span>(<span class="str">"users"</span>, {})
+    <span class="fn">new_users</span> = <span class="fn">users</span>.<span class="fn">get</span>(<span class="str">"new"</span>, <span class="str">0</span>)
+    <span class="fn">active_users</span> = <span class="fn">users</span>.<span class="fn">get</span>(<span class="str">"active"</span>, <span class="str">0</span>)
+
+    <span class="kw">return</span> {
+        <span class="str">"date"</span>: <span class="fn">date_str</span>,
+        <span class="str">"revenue"</span>: <span class="fn">revenue_str</span>,
+        <span class="str">"total_orders"</span>: <span class="fn">total_orders</span>,
+        <span class="str">"avg_order_value"</span>: <span class="fn">f</span><span class="str">"&#165;{avg_order_value:,.0f}"</span>,
+        <span class="str">"top_products"</span>: <span class="fn">products</span>,
+        <span class="str">"new_users"</span>: <span class="fn">new_users</span>,
+        <span class="str">"active_users"</span>: <span class="fn">active_users</span>,
+    }
+      </div>
+    </div>
+  </div>
+  <div class="slide-counter">27 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 28 — 案例5: Step 4-5
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s28">
+  <div class="slide-content reveal">
+    <h2>案例 5 — Step 4-5：LLM 报告 + 企微推送</h2>
+    <div class="divider"></div>
+    <div class="grid-2">
+      <div class="neon-card">
+        <h3>Step 4: LLM 生成 Markdown 报告</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">System Prompt 中的格式要求：</p>
+        <div class="code-block" style="margin-top:0.3rem;">
+你是一个数据分析师。
+请根据数据生成 Markdown 格式日报。
+
+报告结构：
+1. **标题**：{{ date }} 业务日报
+2. **核心指标**：营收/订单/客单价
+3. **Top 5 产品**：用列表展示
+4. **关键洞察**：与昨日对比的亮点/异常
+5. **建议**：1-2 条改进建议
+
+要求：简洁专业，800 字以内。
+        </div>
+      </div>
+      <div class="neon-card">
+        <h3>Step 5: 企微 Webhook 推送</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">添加 <span class="ci">HTTP 请求</span> 节点发送到企业微信群机器人：</p>
+        <div class="code-block" style="margin-top:0.3rem;">
+<span class="cm"># 方法：POST</span>
+<span class="kw">URL：</span>
+<span class="str">https://qyapi.weixin.qq.com/cgi-bin/webhook/</span>
+  <span class="str">send?key=</span><span class="kw">{{env.WECHAT_WEBHOOK_KEY}}</span>
+
+<span class="kw">Body (JSON)：</span>
+{
+  <span class="str">"msgtype"</span>: <span class="str">"markdown"</span>,
+  <span class="str">"markdown"</span>: {
+    <span class="str">"content"</span>: <span class="kw">{{LLM_REPORT.text}}</span>
+  }
+}
+        </div>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:var(--content-gap);">
+      <span class="ci">企业微信 Markdown 限制：</span>不支持表格和复杂格式。如需表格，可将报告渲染为 <span class="hi">图片</span>（用 Node.js Canvas 或 Playwright 截图），通过 image 类型发送。
+    </div>
+  </div>
+  <div class="slide-counter">28 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 29 — 案例5: 完整自动化管线
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s29">
+  <div class="slide-content reveal">
+    <h2>案例 5 — 完整自动化管线回顾</h2>
+    <div class="divider"></div>
+    <div class="diagram-area" style="flex:1; justify-content:center;">
+      <p style="font-size:var(--small-size); color:var(--cyan); margin-bottom:var(--content-gap);">定时数据分析报表 — 端到端自动化管线</p>
+
+      <div class="flow-row" style="margin-bottom:6px;">
+        <div class="flow-box yellow" style="padding:10px 16px;">&#x2776; Cron Trigger<br><span style="font-size:0.65rem;">每天 9:00 AM 自动唤醒</span></div>
+      </div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-row" style="margin-bottom:6px;">
+        <div class="flow-box yellow" style="padding:10px 16px;">&#x2777; HTTP Request<br><span style="font-size:0.65rem;">GET /api/dashboard — 拉取原始业务数据</span></div>
+      </div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-row" style="margin-bottom:6px;">
+        <div class="flow-box green" style="padding:10px 16px;">&#x2778; Code Node<br><span style="font-size:0.65rem;">营收格式化 | 订单统计 | Top5产品 | 用户指标</span></div>
+      </div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-row" style="margin-bottom:6px;">
+        <div class="flow-box magenta" style="padding:10px 16px;">&#x2779; LLM<br><span style="font-size:0.65rem;">Markdown 报告：核心指标 + 洞察 + 建议</span></div>
+      </div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-row">
+        <div class="flow-box cyan" style="padding:10px 16px;">&#x277A; HTTP Webhook<br><span style="font-size:0.65rem;">POST &rarr; 企业微信群机器人</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-counter">29 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 30 — 案例5: 关键技巧
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s30">
+  <div class="slide-content reveal">
+    <h2>案例 5 — 关键技巧总结</h2>
+    <div class="divider"></div>
+    <div class="grid-3" style="margin-top:var(--content-gap);">
+      <div class="neon-card">
+        <h3>&#x2776; Cron 语法要测试</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">Cron 配置错误会导致报表不触发。建议先用 <span class="ci">每5分钟</span>（*/5 * * * *）测试，确认无误后再改为目标时间。Dify 控制台可见下次执行时间。</p>
+      </div>
+      <div class="neon-card">
+        <h3>&#x2777; 数据异常要告警</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">在 Code 节点中检测 <span class="hi">异常指标</span>（如营收暴跌 50%），通过 IF-ELSE 走单独的告警分支，发送 @所有人 消息或调用电话告警 API。</p>
+      </div>
+      <div class="neon-card">
+        <h3>&#x2778; 幂等性设计</h3>
+        <p style="margin-top:0.5rem; font-size:var(--small-size);">定时任务可能因重试而重复执行。在 Code 节点中检查 <span class="ci">数据日期</span>，如果当天的报告已生成过则跳过，避免群内重复推送。</p>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:var(--content-gap);">
+      <span class="ci">扩展方向：</span>加入多个 Cron 触发器（早报 + 晚报 + 周报），通过 <span class="hi">trigger_type</span> 变量区分不同周期，一份工作流覆盖所有定时场景。
+    </div>
+  </div>
+  <div class="slide-counter">30 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 31 — 通用最佳实践
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s31">
+  <div class="slide-content reveal">
+    <h2>通用最佳实践总结</h2>
+    <div class="divider"></div>
+    <div class="grid-4" style="margin-top:var(--content-gap);">
+      <!-- Naming -->
+      <div class="neon-card">
+        <h3>&#x1F4DD; 命名规范</h3>
+        <ul style="list-style:none; padding:0; margin-top:0.5rem; font-size:var(--small-size); color:var(--gray);">
+          <li>&#x2714; 节点名 = <span class="ci">前缀_功能</span><br><span style="font-size:0.65rem;">如 LLM_订单客服、HTTP_天气API</span></li>
+          <li>&#x2714; 变量用 <span class="ci">snake_case</span><br><span style="font-size:0.65rem;">如 api_response、user_id</span></li>
+          <li>&#x2714; 输出描述写清楚<br><span style="font-size:0.65rem;">字段名 + 类型 + 示例值</span></li>
+        </ul>
+      </div>
+      <!-- Error handling -->
+      <div class="neon-card">
+        <h3>&#x26A0; 错误处理</h3>
+        <ul style="list-style:none; padding:0; margin-top:0.5rem; font-size:var(--small-size); color:var(--gray);">
+          <li>&#x2714; 每个 HTTP 后加 <span class="ci">状态码检查</span><br><span style="font-size:0.65rem;">IF status != 200 &rarr; Fallback</span></li>
+          <li>&#x2714; Agent 必须设 <span class="ci">max_iterations</span></li>
+          <li>&#x2714; Code 节点 <span class="hi">try-except</span> 包裹<br><span style="font-size:0.65rem;">任何异常都返回结构化错误</span></li>
+        </ul>
+      </div>
+      <!-- Performance -->
+      <div class="neon-card">
+        <h3>&#x26A1; 性能优化</h3>
+        <ul style="list-style:none; padding:0; margin-top:0.5rem; font-size:var(--small-size); color:var(--gray);">
+          <li>&#x2714; 独立节点 <span class="ci">自动并行</span></li>
+          <li>&#x2714; 简单任务用 <span class="ci">便宜模型</span></li>
+          <li>&#x2714; 知识库检索设 <span class="ci">Score 阈值</span><br><span style="font-size:0.65rem;">减少 LLM 上下文大小</span></li>
+        </ul>
+      </div>
+      <!-- Debugging -->
+      <div class="neon-card">
+        <h3>&#x1F50D; 调试技巧</h3>
+        <ul style="list-style:none; padding:0; margin-top:0.5rem; font-size:var(--small-size); color:var(--gray);">
+          <li>&#x2714; 用 <span class="ci">Preview 模式</span> 单步执行</li>
+          <li>&#x2714; 中间加 <span class="ci">Template 节点</span> 查看变量</li>
+          <li>&#x2714; 用 <span class="hi">日志 Webhook</span> 记录关键路径<br><span style="font-size:0.65rem;">记录到 Lark/飞书/企微做监控</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:var(--content-gap);">
+      <span class="hi">黄金法则：</span>先跑通最简单的线性流程，再逐步添加分支、错误处理、并行优化。不要一开始就追求完美架构。
+    </div>
+  </div>
+  <div class="slide-counter">31 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SLIDE 32 — 结束页
+     ═══════════════════════════════════════════════ -->
+<div class="slide" id="s32">
+  <div class="slide-content reveal" style="align-items:center; text-align:center; gap:var(--content-gap);">
+    <div class="badge badge-cyan" style="font-size:var(--body-size); padding:6px 20px;">第五篇预告</div>
+    <h1>进阶篇</h1>
+    <h2 style="border-left:none; font-size:var(--h2-size);">触发器模式 / HITL 人工审核 / 循环迭代<br>错误处理策略 / Agent 多工具编排</h2>
+    <p class="subtitle" style="max-width:600px;">从"会用节点"到"架构设计"的最后一公里</p>
+    <div style="margin-top:var(--content-gap);">
+      <div class="flow-row" style="gap:20px;">
+        <div class="flow-box magenta">&gt;_ 触发器模式</div>
+        <div class="flow-box cyan">&gt;_ HITL</div>
+        <div class="flow-box green">&gt;_ 循环 &amp; 迭代</div>
+        <div class="flow-box yellow">&gt;_ 错误处理</div>
+      </div>
+    </div>
+    <p style="margin-top:var(--content-gap); font-size:var(--small-size); color:var(--gray);">
+      感谢阅读 &nbsp;|&nbsp; 动手搭建是最好的学习方式
+    </p>
+  </div>
+  <div class="slide-counter">32 / 32</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SCRIPTS
+     ═══════════════════════════════════════════════ -->
+<script>
+(function() {
+  'use strict';
+
+  /* ── Build progress dots ── */
+  var slides = document.querySelectorAll('.slide');
+  var dotsContainer = document.getElementById('dots');
+  slides.forEach(function(s, i) {
+    var a = document.createElement('a');
+    a.href = '#s' + (i + 1);
+    a.title = 'Slide ' + (i + 1);
+    a.setAttribute('data-index', i);
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      slides[i].scrollIntoView({ behavior: 'smooth' });
+    });
+    dotsContainer.appendChild(a);
+  });
+
+  /* ── Intersection Observer for reveal + active dot ── */
+  var dotLinks = dotsContainer.querySelectorAll('a');
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      var idx = parseInt(entry.target.id.replace('s', ''), 10) - 1;
+      if (entry.isIntersecting) {
+        dotLinks.forEach(function(d) { d.classList.remove('active'); });
+        if (dotLinks[idx]) dotLinks[idx].classList.add('active');
+
+        /* Reveal children */
+        entry.target.querySelectorAll('.reveal').forEach(function(el) {
+          el.classList.add('visible');
+        });
+      }
+    });
+  }, { threshold: 0.4 });
+
+  slides.forEach(function(s) { observer.observe(s); });
+
+  /* ── Keyboard navigation ── */
+  document.addEventListener('keydown', function(e) {
+    var currentSlide = null;
+    slides.forEach(function(s, i) {
+      var rect = s.getBoundingClientRect();
+      if (rect.top >= -100 && rect.top <= window.innerHeight * 0.6) {
+        currentSlide = i;
+      }
+    });
+    if (currentSlide === null) return;
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+      e.preventDefault();
+      var next = Math.min(currentSlide + 1, slides.length - 1);
+      slides[next].scrollIntoView({ behavior: 'smooth' });
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      var prev = Math.max(currentSlide - 1, 0);
+      slides[prev].scrollIntoView({ behavior: 'smooth' });
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      slides[0].scrollIntoView({ behavior: 'smooth' });
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      slides[slides.length - 1].scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+
+  /* ── Touch support ── */
+  var touchStartY = 0;
+  document.addEventListener('touchstart', function(e) {
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    var diff = touchStartY - e.changedTouches[0].clientY;
+    if (Math.abs(diff) < 50) return;
+    var currentSlide = null;
+    slides.forEach(function(s, i) {
+      var rect = s.getBoundingClientRect();
+      if (rect.top >= -100 && rect.top <= window.innerHeight * 0.6) {
+        currentSlide = i;
+      }
+    });
+    if (currentSlide === null) return;
+    if (diff > 0 && currentSlide < slides.length - 1) {
+      slides[currentSlide + 1].scrollIntoView({ behavior: 'smooth' });
+    } else if (diff < 0 && currentSlide > 0) {
+      slides[currentSlide - 1].scrollIntoView({ behavior: 'smooth' });
+    }
+  }, { passive: true });
+
+  /* ── Initial reveal for first visible slide ── */
+  window.addEventListener('load', function() {
+    var firstVisible = null;
+    slides.forEach(function(s) {
+      var rect = s.getBoundingClientRect();
+      if (rect.top >= -100 && rect.top <= window.innerHeight * 0.6 && !firstVisible) {
+        firstVisible = s;
+      }
+    });
+    if (firstVisible) {
+      firstVisible.querySelectorAll('.reveal').forEach(function(el) {
+        el.classList.add('visible');
+      });
+      var idx = parseInt(firstVisible.id.replace('s', ''), 10) - 1;
+      if (dotLinks[idx]) dotLinks[idx].classList.add('active');
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

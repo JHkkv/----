@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dify 工作流教程 — 节点篇：28 种节点完全详解</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   VIEWPORT FITTING: MANDATORY BASE STYLES
+   =========================================== */
+html, body { height: 100%; overflow-x: hidden; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+.slide { width: 100vw; height: 100vh; height: 100dvh; overflow: hidden; scroll-snap-align: start; display: flex; flex-direction: column; position: relative; }
+.slide-content { flex: 1; display: flex; flex-direction: column; justify-content: center; max-height: 100%; overflow: hidden; padding: var(--slide-padding); }
+:root {
+  --title-size: clamp(1.5rem, 5vw, 4rem);
+  --h2-size: clamp(1.25rem, 3.5vw, 2.5rem);
+  --h3-size: clamp(1rem, 2.5vw, 1.75rem);
+  --body-size: clamp(0.75rem, 1.5vw, 1.125rem);
+  --small-size: clamp(0.65rem, 1vw, 0.875rem);
+  --slide-padding: clamp(1rem, 4vw, 4rem);
+  --content-gap: clamp(0.5rem, 2vw, 2rem);
+}
+@media (max-height: 700px) { :root { --slide-padding: clamp(0.75rem, 3vw, 2rem); --title-size: clamp(1.25rem, 4.5vw, 2.5rem); } }
+@media (max-height: 500px) { :root { --slide-padding: clamp(0.4rem, 2vw, 1rem); --title-size: clamp(1rem, 3.5vw, 1.5rem); --body-size: clamp(0.65rem, 1vw, 0.85rem); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; } html { scroll-behavior: auto; } }
+
+/* ===========================================
+   NEON CYBER THEME
+   =========================================== */
+body {
+  margin: 0; padding: 0;
+  background: #0a0e1a; color: #f0f0f0;
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+}
+
+/* Colors */
+:root {
+  --c-bg: #0a0e1a; --c-card: #0d1117;
+  --c-cyan: #00f0ff; --c-magenta: #ff00e5;
+  --c-green: #00ff88; --c-gold: #ffd740;
+  --c-blue: #448aff; --c-red: #ff5252;
+  --c-text: #f0f0f0; --c-dim: #8892a8;
+  --c-purple: #b388ff;
+}
+
+/* Background Effects */
+.bg-grid {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,240,255,0.03) 39px, rgba(0,240,255,0.03) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,240,255,0.03) 39px, rgba(0,240,255,0.03) 40px);
+}
+.bg-glow { position: absolute; border-radius: 50%; filter: blur(180px); opacity: 0.1; pointer-events: none; z-index: 0; }
+.bg-glow-cyan { width: 500px; height: 500px; background: var(--c-cyan); top: -150px; left: -100px; }
+.bg-glow-magenta { width: 450px; height: 450px; background: var(--c-magenta); bottom: -150px; right: -100px; }
+
+/* Typography */
+h1 { font-family: 'Noto Sans SC', sans-serif; font-weight: 900; font-size: var(--title-size); line-height: 1.15; margin: 0; background: linear-gradient(135deg, var(--c-cyan) 0%, #80deea 40%, var(--c-magenta) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+h2 { font-family: 'Noto Sans SC', sans-serif; font-weight: 700; font-size: var(--h2-size); margin: 0; color: var(--c-cyan); }
+h3 { font-weight: 600; font-size: var(--h3-size); margin: 0; color: var(--c-text); }
+.neon-tag { display: inline-block; padding: 0.2em 0.7em; border-radius: 999px; font-size: var(--small-size); font-weight: 600; letter-spacing: 0.03em; border: 1px solid rgba(0,240,255,0.3); color: var(--c-cyan); background: rgba(0,240,255,0.08); }
+.neon-tag.magenta { border-color: rgba(255,0,229,0.3); color: var(--c-magenta); background: rgba(255,0,229,0.08); }
+.neon-tag.gold { border-color: rgba(255,215,64,0.4); color: var(--c-gold); background: rgba(255,215,64,0.08); }
+.neon-tag.green { border-color: rgba(0,255,136,0.3); color: var(--c-green); background: rgba(0,255,136,0.08); }
+.neon-tag.red { border-color: rgba(255,82,82,0.3); color: var(--c-red); background: rgba(255,82,82,0.08); }
+
+/* Cards */
+.data-card {
+  background: var(--c-card); border: 1px solid rgba(0,240,255,0.12);
+  border-radius: 12px; padding: clamp(0.6rem, 1.5vw, 1.2rem);
+  position: relative; overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.data-card:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(0,240,255,0.1); }
+.data-card.cyan-b { border-left: 3px solid var(--c-cyan); }
+.data-card.magenta-b { border-left: 3px solid var(--c-magenta); }
+.data-card.gold-b { border-left: 3px solid var(--c-gold); }
+.data-card.green-b { border-left: 3px solid var(--c-green); }
+.data-card.purple-b { border-left: 3px solid var(--c-purple); }
+
+/* Grid */
+.grid { display: grid; gap: clamp(0.5rem, 1.5vw, 1rem); }
+.grid-2 { grid-template-columns: 1fr 1fr; }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+.grid-5 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); }
+
+/* Code */
+code, .code {
+  font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+  background: #0d1117; color: var(--c-cyan);
+  padding: 0.15em 0.4em; border-radius: 4px;
+  font-size: var(--small-size);
+}
+.code-block {
+  font-family: 'JetBrains Mono', monospace;
+  background: #0d1117; color: var(--c-cyan);
+  padding: clamp(0.4rem, 1vw, 0.8rem) clamp(0.6rem, 1.5vw, 1rem);
+  border-radius: 8px; font-size: clamp(0.55rem, 0.9vw, 0.8rem);
+  line-height: 1.5; overflow-x: auto; white-space: pre-wrap;
+  border: 1px solid rgba(0,240,255,0.1);
+  max-height: 28vh; overflow-y: auto;
+}
+.code-block .s { color: var(--c-green); }
+.code-block .k { color: var(--c-magenta); }
+.code-block .c { color: var(--c-dim); }
+.code-block .n { color: var(--c-gold); }
+
+/* Table */
+.ref-table { width: 100%; border-collapse: collapse; font-size: var(--small-size); }
+.ref-table th { background: rgba(0,240,255,0.08); color: var(--c-cyan); padding: 0.4em 0.6em; text-align: left; font-weight: 600; border-bottom: 1px solid rgba(0,240,255,0.2); white-space: nowrap; }
+.ref-table td { padding: 0.35em 0.6em; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--c-text); }
+.ref-table tr:hover td { background: rgba(0,240,255,0.03); }
+
+/* Nodes */
+.node-box { display: inline-block; padding: 0.25em 0.6em; border-radius: 6px; font-size: var(--small-size); font-weight: 600; border: 1px solid; }
+.node-box.flow { color: var(--c-green); border-color: rgba(0,255,136,0.3); background: rgba(0,255,136,0.06); }
+.node-box.ai { color: var(--c-cyan); border-color: rgba(0,240,255,0.3); background: rgba(0,240,255,0.06); }
+.node-box.data { color: var(--c-gold); border-color: rgba(255,215,64,0.3); background: rgba(255,215,64,0.06); }
+.node-box.trigger { color: var(--c-purple); border-color: rgba(179,136,255,0.3); background: rgba(179,136,255,0.06); }
+.node-box.interact { color: var(--c-red); border-color: rgba(255,82,82,0.3); background: rgba(255,82,82,0.06); }
+
+/* Flow diagram */
+.flow-row { display: flex; align-items: center; justify-content: center; gap: clamp(0.3rem, 1.5vw, 1rem); flex-wrap: wrap; }
+.flow-node { padding: 0.4em 0.8em; border-radius: 8px; font-size: var(--small-size); font-weight: 600; border: 1px solid rgba(0,240,255,0.25); background: rgba(0,240,255,0.06); color: var(--c-cyan); white-space: nowrap; }
+.flow-node.magenta { border-color: rgba(255,0,229,0.25); color: var(--c-magenta); background: rgba(255,0,229,0.06); }
+.flow-node.gold { border-color: rgba(255,215,64,0.3); color: var(--c-gold); background: rgba(255,215,64,0.06); }
+.flow-node.green { border-color: rgba(0,255,136,0.25); color: var(--c-green); background: rgba(0,255,136,0.06); }
+.flow-arrow { color: var(--c-cyan); font-weight: 700; opacity: 0.5; }
+
+/* Highlight */
+.hl-cyan { color: var(--c-cyan); font-weight: 700; }
+.hl-magenta { color: var(--c-magenta); font-weight: 700; }
+.hl-gold { color: var(--c-gold); font-weight: 700; }
+.hl-green { color: var(--c-green); font-weight: 700; }
+.hl-red { color: var(--c-red); font-weight: 700; }
+
+/* Navigation */
+.nav-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; height: 2.5rem; backdrop-filter: blur(20px); background: rgba(10,14,26,0.9); border-bottom: 1px solid rgba(0,240,255,0.08); }
+.nav-bar .logo { font-weight: 700; font-size: 0.8rem; color: var(--c-cyan); letter-spacing: 0.03em; }
+.nav-bar .slide-counter { font-size: 0.75rem; color: var(--c-dim); }
+.nav-dots { position: fixed; right: 1rem; top: 50%; transform: translateY(-50%); z-index: 100; display: flex; flex-direction: column; gap: 0.4rem; }
+.nav-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.15); cursor: pointer; transition: all 0.3s; border: none; padding: 0; }
+.nav-dot.active { background: var(--c-cyan); box-shadow: 0 0 10px rgba(0,240,255,0.4); transform: scale(1.4); }
+.keyboard-hint { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); z-index: 100; font-size: 0.65rem; color: rgba(255,255,255,0.2); letter-spacing: 0.04em; pointer-events: none; }
+
+/* Animations */
+.reveal { opacity: 0; transform: translateY(25px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+.reveal-delay-4 { transition-delay: 0.32s; }
+.reveal-delay-5 { transition-delay: 0.40s; }
+
+/* Bullet lists */
+.bullet-list { list-style: none; padding: 0; margin: 0; }
+.bullet-list li { padding: 0.2em 0; font-size: var(--body-size); display: flex; align-items: flex-start; gap: 0.4em; }
+.bullet-list li::before { content: '◆'; color: var(--c-cyan); font-size: 0.5em; margin-top: 0.55em; flex-shrink: 0; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .nav-bar { padding: 0 0.8rem; }
+  .nav-dots { right: 0.3rem; }
+  .flow-arrow { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav-bar">
+  <span class="logo">&#9670; Dify 工作流教程 · 第二篇：节点篇</span>
+  <span class="slide-counter"><span id="cur">1</span> / <span id="tot">21</span></span>
+</nav>
+<div class="nav-dots" id="navDots"></div>
+<div class="keyboard-hint">&#8593;&#8595; 或 滚轮 翻页 · Space/Shift+Space · Home/End</div>
+
+<!-- ============================================================
+     SLIDE 1: TITLE
+     ============================================================ -->
+<section class="slide" id="s1">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan"></div>
+  <div class="bg-glow bg-glow-magenta"></div>
+  <div class="slide-content" style="align-items: center; text-align: center;">
+    <div class="reveal"><span class="neon-tag">Dify 工作流搭建完全教程</span></div>
+    <h1 class="reveal reveal-delay-1" style="margin: 0.4em 0 0.2em;">第二篇：节点篇</h1>
+    <p class="reveal reveal-delay-2" style="font-size: var(--h3-size); color: var(--c-dim); max-width: 700px; margin: 0.3em auto;">
+      28 种节点完全详解 — 基于真实源码
+    </p>
+    <div class="reveal reveal-delay-3" style="display: flex; gap: clamp(1rem, 3vw, 2rem); margin-top: 1.5rem; flex-wrap: wrap; justify-content: center;">
+      <div style="text-align: center;"><div style="font-size: clamp(1.3rem, 3vw, 2rem); font-weight: 900; color: var(--c-cyan);">28</div><div style="font-size: var(--small-size); color: var(--c-dim);">节点类型</div></div>
+      <div style="text-align: center;"><div style="font-size: clamp(1.3rem, 3vw, 2rem); font-weight: 900; color: var(--c-magenta);">5</div><div style="font-size: var(--small-size); color: var(--c-dim);">功能分类</div></div>
+      <div style="text-align: center;"><div style="font-size: clamp(1.3rem, 3vw, 2rem); font-weight: 900; color: var(--c-gold);">21</div><div style="font-size: var(--small-size); color: var(--c-dim);">页详解</div></div>
+    </div>
+    <p class="reveal reveal-delay-4" style="font-size: var(--small-size); color: var(--c-dim); margin-top: 1.5rem;">
+      涵盖配置方法 · 输出结构 · 代码示例 · 避坑指南 · 源码对照
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 2: 节点分类总览
+     ============================================================ -->
+<section class="slide" id="s2">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag">总览</span>
+      <h2 style="margin-top: 0.3em;">28 种节点 · 5 大分类</h2>
+    </div>
+    <div class="grid grid-5 reveal reveal-delay-1" style="max-width: min(95vw, 1100px); margin: 0 auto;">
+      <!-- 流程控制 -->
+      <div class="data-card" style="text-align: center;">
+        <div style="font-size: 1.5rem; margin-bottom: 0.3em;">&#128994;</div>
+        <h3 style="font-size: var(--body-size); color: var(--c-green);">流程控制</h3>
+        <div style="font-size: var(--small-size); color: var(--c-dim); margin-top: 0.3em; line-height: 1.5;">
+          <span class="node-box flow">Start</span>
+          <span class="node-box flow">End</span>
+          <span class="node-box flow">Answer</span>
+          <span class="node-box flow">IF-ELSE</span>
+          <span class="node-box flow">Iteration</span>
+          <span class="node-box flow">Loop</span>
+        </div>
+      </div>
+      <!-- AI/LLM -->
+      <div class="data-card" style="text-align: center;">
+        <div style="font-size: 1.5rem; margin-bottom: 0.3em;">&#128309;</div>
+        <h3 style="font-size: var(--body-size); color: var(--c-cyan);">AI / LLM</h3>
+        <div style="font-size: var(--small-size); color: var(--c-dim); margin-top: 0.3em; line-height: 1.5;">
+          <span class="node-box ai">LLM</span>
+          <span class="node-box ai">知识检索</span>
+          <span class="node-box ai">问题分类器</span>
+          <span class="node-box ai">参数提取器</span>
+          <span class="node-box ai">Agent</span>
+        </div>
+      </div>
+      <!-- 数据处理 -->
+      <div class="data-card" style="text-align: center;">
+        <div style="font-size: 1.5rem; margin-bottom: 0.3em;">&#128993;</div>
+        <h3 style="font-size: var(--body-size); color: var(--c-gold);">数据处理</h3>
+        <div style="font-size: var(--small-size); color: var(--c-dim); margin-top: 0.3em; line-height: 1.5;">
+          <span class="node-box data">Code</span>
+          <span class="node-box data">Template</span>
+          <span class="node-box data">Assigner</span>
+          <span class="node-box data">Aggregator</span>
+          <span class="node-box data">HTTP</span>
+          <span class="node-box data">DocExtractor</span>
+          <span class="node-box data">ListFilter</span>
+        </div>
+      </div>
+      <!-- 触发器 -->
+      <div class="data-card" style="text-align: center;">
+        <div style="font-size: 1.5rem; margin-bottom: 0.3em;">&#128995;</div>
+        <h3 style="font-size: var(--body-size); color: var(--c-purple);">触发器</h3>
+        <div style="font-size: var(--small-size); color: var(--c-dim); margin-top: 0.3em; line-height: 1.5;">
+          <span class="node-box trigger">Webhook</span>
+          <span class="node-box trigger">Schedule</span>
+          <span class="node-box trigger">Plugin</span>
+          <span class="node-box trigger">DataSource</span>
+        </div>
+      </div>
+      <!-- 交互/工具 -->
+      <div class="data-card" style="text-align: center;">
+        <div style="font-size: 1.5rem; margin-bottom: 0.3em;">&#128308;</div>
+        <h3 style="font-size: var(--body-size); color: var(--c-red);">交互 / 工具</h3>
+        <div style="font-size: var(--small-size); color: var(--c-dim); margin-top: 0.3em; line-height: 1.5;">
+          <span class="node-box interact">Tool</span>
+          <span class="node-box interact">HumanInput</span>
+          <span class="node-box interact">KnowledgeIndex</span>
+        </div>
+      </div>
+    </div>
+    <p class="reveal reveal-delay-2" style="font-size: var(--small-size); color: var(--c-dim); text-align: center; margin-top: var(--content-gap);">
+      每个节点都基于 Dify 源码中的 <code>BlockEnum</code>、<code>entities</code> 和 <code>useConfig</code> 实际定义
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 3: LLM 节点
+     ============================================================ -->
+<section class="slide" id="s3">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan" style="opacity:0.08;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag">AI/LLM #1</span>
+      <h2 style="margin-top: 0.3em;">LLM — 大语言模型节点</h2>
+      <p style="color: var(--c-dim); font-size: var(--small-size);">调用大语言模型进行文本生成、推理、分析</p>
+    </div>
+    <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem); max-width: min(95vw, 1050px); margin: 0 auto; align-items: start;">
+      <!-- 左列：配置 -->
+      <div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.5em;">核心配置</h3>
+        <div class="data-card cyan-b" style="font-size: var(--small-size);">
+          <p style="margin: 0 0 0.3em;"><span class="hl-cyan">模型选择：</span>在 Dify 设置 &#8594; 模型供应商中预配置</p>
+          <p style="margin: 0 0 0.3em;"><span class="hl-cyan">提示词：</span>支持 <code>{{变量}}</code> 插值，引用上游节点字段</p>
+          <p style="margin: 0 0 0.3em;"><span class="hl-cyan">上下文：</span>注入外部文本（知识库检索结果等）</p>
+          <p style="margin: 0;"><span class="hl-cyan">记忆 (Memory)：</span>Chat 模式下可开启对话记忆</p>
+        </div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin: 0.6em 0 0.4em;">输出结构</h3>
+        <table class="ref-table">
+          <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+          <tr><td>text</td><td>string</td><td>LLM 生成的文本</td></tr>
+          <tr><td>reasoning_content</td><td>string</td><td>思考过程 (o1/Claude)</td></tr>
+          <tr><td>usage</td><td>object</td><td>Token 用量统计</td></tr>
+        </table>
+      </div>
+      <!-- 右列：技巧 -->
+      <div>
+        <h3 style="color: var(--c-magenta); font-size: var(--body-size); margin-bottom: 0.5em;">常用技巧</h3>
+        <ul class="bullet-list" style="font-size: var(--small-size);">
+          <li><span class="hl-cyan">System/User 分离：</span>System Prompt 设角色，User Prompt 传实际输入</li>
+          <li><span class="hl-cyan">Jinja2 控制格式：</span>要求 LLM 输出 JSON &#8594; 下游 Code 节点解析</li>
+          <li><span class="hl-cyan">Vision 多模态：</span>LLM 节点支持传入图片文件（需视觉模型）</li>
+          <li><span class="hl-cyan">reasoning_content：</span>对推理模型，可获取完整思考链路</li>
+        </ul>
+        <div class="code-block reveal reveal-delay-2" style="margin-top: 0.6em;">
+<span class="c">// 源码：LLM_OUTPUT_STRUCT</span>
+<span class="c">// web/app/components/workflow/constants.ts</span>
+<span class="k">export</span> <span class="k">const</span> <span class="n">LLM_OUTPUT_STRUCT</span>: Var[] = [
+  { <span class="s">variable</span>: <span class="s">'text'</span>, <span class="s">type</span>: VarType.string },
+  { <span class="s">variable</span>: <span class="s">'reasoning_content'</span>, <span class="s">type</span>: VarType.string },
+  { <span class="s">variable</span>: <span class="s">'usage'</span>, <span class="s">type</span>: VarType.object },
+]
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 4: LLM 避坑 + 代码示例
+     ============================================================ -->
+<section class="slide" id="s4">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-magenta" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag magenta">避坑指南</span>
+      <h2 style="margin-top: 0.3em;">LLM 节点 — 三大常见错误</h2>
+    </div>
+    <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem); max-width: min(95vw, 1050px); margin: 0 auto;">
+      <!-- 左侧：3 个坑 -->
+      <div style="display: flex; flex-direction: column; gap: clamp(0.4rem, 1vw, 0.7rem);">
+        <div class="data-card" style="border-left: 3px solid var(--c-red);">
+          <h3 style="font-size: var(--body-size); color: var(--c-red);">&#10060; 变量引用格式错误</h3>
+          <p style="font-size: var(--small-size); color: var(--c-dim); margin: 0.2em 0;">必须写 <code>{{nodeId.fieldName}}</code>，不是 <code>{{nodeId.output}}</code>。<br>字段名需与上游节点的 <b>输出变量名</b> 完全一致。</p>
+        </div>
+        <div class="data-card" style="border-left: 3px solid var(--c-red);">
+          <h3 style="font-size: var(--body-size); color: var(--c-red);">&#10060; 上下文窗口溢出</h3>
+          <p style="font-size: var(--small-size); color: var(--c-dim); margin: 0.2em 0;">知识检索结果太长，超出模型 token 限制。<br>解决：限制 TopK、设置分数阈值、控制上下文长度。</p>
+        </div>
+        <div class="data-card" style="border-left: 3px solid var(--c-red);">
+          <h3 style="font-size: var(--body-size); color: var(--c-red);">&#10060; 忘记配置错误处理</h3>
+          <p style="font-size: var(--small-size); color: var(--c-dim); margin: 0.2em 0;">LLM 调用失败默认终止整个工作流。<br>建议在节点设置中启用 <b>"失败时继续"</b>，配合 IF-ELSE 兜底。</p>
+        </div>
+      </div>
+      <!-- 右侧：源码示例 -->
+      <div>
+        <h3 style="font-size: var(--body-size); color: var(--c-cyan); margin-bottom: 0.4em;">&#128218; 提示词模板示例</h3>
+        <div class="code-block" style="margin-bottom: 0.5em;">
+<span class="c">// System Prompt</span>
+你是一个专业的数据分析师。请分析以下数据：
+
+{{start.query}}
+
+请从以下维度进行分析：
+<span class="n">1.</span> 数据趋势
+<span class="n">2.</span> 异常点
+<span class="n">3.</span> 改进建议
+
+<span class="c">// 输出格式要求</span>
+请以 JSON 格式返回：
+{
+  <span class="s">"trend"</span>: <span class="s">"..."</span>,
+  <span class="s">"anomalies"</span>: [...],
+  <span class="s">"suggestions"</span>: [...]
+}
+        </div>
+        <p style="font-size: var(--small-size); color: var(--c-dim); line-height: 1.5;">
+          <span class="hl-green">&#10004;</span> 变量引用格式正确: <code>{{start.query}}</code><br>
+          <span class="hl-green">&#10004;</span> 输出格式明确、可用于下游解析<br>
+          <span class="hl-green">&#10004;</span> 提示词聚焦具体分析维度
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 5: KnowledgeRetrieval 知识库检索
+     ============================================================ -->
+<section class="slide" id="s5">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag">AI/LLM #2</span>
+      <h2 style="margin-top: 0.3em;">KnowledgeRetrieval — 知识库检索</h2>
+      <p style="color: var(--c-dim); font-size: var(--small-size);">从 Dify 知识库中检索与查询最相关的文档片段</p>
+    </div>
+    <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem); max-width: min(95vw, 1050px); margin: 0 auto; align-items: start;">
+      <!-- 左：检索模式 -->
+      <div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.4em;">3 种检索模式</h3>
+        <div class="data-card cyan-b" style="margin-bottom: 0.5em;">
+          <p style="font-size: var(--small-size); margin: 0 0 0.3em;"><span class="hl-cyan">混合检索（推荐）：</span>关键词 + 语义向量双路召回后融合排序，兼顾精确匹配和语义匹配</p>
+          <p style="font-size: var(--small-size); margin: 0 0 0.3em;"><span class="hl-cyan">语义检索：</span>纯向量相似度，适合长文本、模糊问题</p>
+          <p style="font-size: var(--small-size); margin: 0;"><span class="hl-cyan">全文检索：</span>纯关键词匹配，适合精确查询（编号/姓名/术语）</p>
+        </div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.3em;">关键配置参数</h3>
+        <table class="ref-table">
+          <tr><th>参数</th><th>推荐值</th><th>说明</th></tr>
+          <tr><td>TopK</td><td>3 - 5</td><td>返回最相关的 K 个片段</td></tr>
+          <tr><td>分数阈值</td><td>0.5 - 0.7</td><td>低于此分数丢弃</td></tr>
+          <tr><td>Rerank</td><td>可选</td><td>对 TopK 结果再精排</td></tr>
+        </table>
+      </div>
+      <!-- 右：输出结构 -->
+      <div>
+        <h3 style="color: var(--c-magenta); font-size: var(--body-size); margin-bottom: 0.4em;">输出结构 & 标准模式</h3>
+        <div class="code-block" style="margin-bottom: 0.5em;">
+{ <span class="s">result</span>: [{
+  <span class="s">content</span>: <span class="s">string</span>,     <span class="c">// 片段正文</span>
+  <span class="s">title</span>: <span class="s">string</span>,       <span class="c">// 所属文档标题</span>
+  <span class="s">url</span>: <span class="s">string</span>,         <span class="c">// 文档 URL</span>
+  <span class="s">icon</span>: <span class="s">string</span>,
+  <span class="s">metadata</span>: {
+    <span class="s">dataset_id</span>: <span class="s">string</span>,
+    <span class="s">dataset_name</span>: <span class="s">string</span>,
+    <span class="s">document_name</span>: <span class="s">string</span>,
+    <span class="s">segment_position</span>: <span class="s">number</span>,
+    <span class="s">segment_word_count</span>: <span class="s">number</span>,
+    <span class="s">score</span>: <span class="s">number</span>
+  }
+}]}
+        </div>
+        <p style="font-size: var(--small-size); color: var(--c-dim); margin-bottom: 0.3em;"><span class="hl-green">标准 RAG 模式：</span></p>
+        <div class="flow-row" style="justify-content: flex-start; font-size: var(--small-size);">
+          <span class="flow-node">Start</span><span class="flow-arrow">&#8594;</span>
+          <span class="flow-node magenta">知识检索</span><span class="flow-arrow">&#8594;</span>
+          <span class="flow-node">LLM</span><span class="flow-arrow">&#8594;</span>
+          <span class="flow-node green">Answer</span>
+        </div>
+        <p style="font-size: var(--small-size); color: var(--c-dim); margin-top: 0.3em;">在 LLM 上下文配置中引入 <code>{{知识检索节点.result}}</code></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 6: KnowledgeRetrieval 避坑
+     ============================================================ -->
+<section class="slide" id="s6">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-magenta" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag magenta">避坑指南</span>
+      <h2 style="margin-top: 0.3em;">知识检索 — 4 个关键决策</h2>
+    </div>
+    <div class="reveal reveal-delay-1" style="max-width: min(95vw, 950px); margin: 0 auto;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.4rem, 1.5vw, 0.8rem);">
+        <div class="data-card" style="border-left: 3px solid var(--c-red);">
+          <h3 style="font-size: var(--body-size); color: var(--c-red);">&#10060; 不设分数阈值</h3>
+          <p style="font-size: var(--small-size); color: var(--c-dim); margin: 0.2em 0;">低质量结果会污染 LLM 上下文，导致幻觉或答非所问。<br><span class="hl-green">&#10004;</span> 设置 <code>score >= 0.5</code> 过滤噪音。</p>
+        </div>
+        <div class="data-card" style="border-left: 3px solid var(--c-red);">
+          <h3 style="font-size: var(--body-size); color: var(--c-red);">&#10060; TopK 太大</h3>
+          <p style="font-size: var(--small-size); color: var(--c-dim); margin: 0.2em 0;">检索结果 + 提示词 + 回复会超出模型上下文窗口。<br><span class="hl-green">&#10004;</span> TopK 3-5，配合 Rerank 精排。</p>
+        </div>
+        <div class="data-card" style="border-left: 3px solid var(--c-red);">
+          <h3 style="font-size: var(--body-size); color: var(--c-red);">&#10060; 只用语义检索查精确值</h3>
+          <p style="font-size: var(--small-size); color: var(--c-dim); margin: 0.2em 0;">编号/代码/日期/人名需要精确命中。<br><span class="hl-green">&#10004;</span> 精确查询用<b>全文检索</b>或<b>混合检索</b>。</p>
+        </div>
+        <div class="data-card green-b">
+          <h3 style="font-size: var(--body-size); color: var(--c-green);">&#9989; 最佳实践</h3>
+          <p style="font-size: var(--small-size); color: var(--c-dim); margin: 0.2em 0;">
+            1. 知识库分段控制在 500-1000 token<br>
+            2. 启用混合检索 + Rerank<br>
+            3. 在 LLM 提示词中标注引用来源<br>
+            4. 分数阈值从 0.5 开始，逐步调优
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 7: IF-ELSE 条件分支
+     ============================================================ -->
+<section class="slide" id="s7">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag">流程控制 #1</span>
+      <h2 style="margin-top: 0.3em;">IF-ELSE — 条件分支</h2>
+      <p style="color: var(--c-dim); font-size: var(--small-size);">IF / ELIF / ELSE 匹配链，支持 AND/OR 组合条件</p>
+    </div>
+    <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem); max-width: min(95vw, 1050px); margin: 0 auto; align-items: start;">
+      <!-- 左：条件类型 -->
+      <div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.4em;">支持的条件类型</h3>
+        <table class="ref-table" style="margin-bottom: 0.5em;">
+          <tr><th>条件</th><th>说明</th><th>示例</th></tr>
+          <tr><td>is / is not</td><td>等于 / 不等于</td><td>status is "paid"</td></tr>
+          <tr><td>contains</td><td>包含子串</td><td>query contains "退款"</td></tr>
+          <tr><td>starts_with</td><td>以...开头</td><td>code starts_with "ERR"</td></tr>
+          <tr><td>is_empty</td><td>是否为空</td><td>result is_empty</td></tr>
+          <tr><td>greater_than</td><td>数值大于</td><td>score > 0.8</td></tr>
+          <tr><td>in / not in</td><td>集合包含</td><td>city in ["北京","上海"]</td></tr>
+        </table>
+        <p style="font-size: var(--small-size); color: var(--c-dim);">条件组合：多个条件通过 <span class="hl-cyan">AND</span>（全部满足）或 <span class="hl-cyan">OR</span>（任一满足）组合。</p>
+      </div>
+      <!-- 右：模式 -->
+      <div>
+        <h3 style="color: var(--c-magenta); font-size: var(--body-size); margin-bottom: 0.4em;">意图路由模式</h3>
+        <div class="code-block" style="margin-bottom: 0.5em;">
+<span class="c">// 意图路由示例</span>
+<span class="k">IF</span>   sys.query <span class="k">contains</span> <span class="s">"退款"</span>  <span class="c">→ 退款处理分支</span>
+<span class="k">ELIF</span> sys.query <span class="k">contains</span> <span class="s">"退货"</span>  <span class="c">→ 退货处理分支</span>
+<span class="k">ELIF</span> sys.query <span class="k">contains</span> <span class="s">"物流"</span>  <span class="c">→ 物流查询分支</span>
+<span class="k">ELSE</span>                               <span class="c">→ 智能客服兜底</span>
+        </div>
+        <div class="data-card magenta-b">
+          <h3 style="font-size: var(--body-size); color: var(--c-magenta);">配合问题分类器的完整路由</h3>
+          <div class="flow-row" style="justify-content: flex-start; margin-top: 0.3em; font-size: var(--small-size);">
+            <span class="flow-node">Start</span><span class="flow-arrow">&#8594;</span>
+            <span class="flow-node magenta">分类器</span><span class="flow-arrow">&#8594;</span>
+            <span class="flow-node gold">IF-ELSE</span>
+          </div>
+          <p style="font-size: var(--small-size); color: var(--c-dim); margin-top: 0.3em;">
+            class_label == "refund" &rarr; 退款处理<br>
+            class_label == "inquiry" &rarr; 咨询处理<br>
+            ELSE &rarr; 通用客服
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 8: IF-ELSE 避坑
+     ============================================================ -->
+<section class="slide" id="s8">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-magenta" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag magenta">避坑指南</span>
+      <h2 style="margin-top: 0.3em;">IF-ELSE — 三大致命错误</h2>
+    </div>
+    <div class="reveal reveal-delay-1" style="max-width: min(95vw, 950px); margin: 0 auto;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: clamp(0.4rem, 1.5vw, 0.8rem);">
+        <div class="data-card" style="border-left: 3px solid var(--c-red); text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: 0.3em;">&#9940;</div>
+          <h3 style="font-size: var(--body-size); color: var(--c-red);">分支逻辑不互斥</h3>
+          <p style="font-size: var(--small-size); color: var(--c-dim); margin: 0.3em 0;">第一个 IF 条件太宽，导致后续分支永远不会执行。<br><br><span class="hl-green">修复：</span>从<b>最具体</b>的条件开始，逐步放宽。</p>
+        </div>
+        <div class="data-card" style="border-left: 3px solid var(--c-red); text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: 0.3em;">&#9940;</div>
+          <h3 style="font-size: var(--body-size); color: var(--c-red);">忘记 ELSE 兜底</h3>
+          <p style="font-size: var(--small-size); color: var(--c-dim); margin: 0.3em 0;">没有匹配条件时不会报错，但工作流会静默跳过，导致下游节点收到空值。<br><br><span class="hl-green">修复：</span>每个 IF-ELSE 必须有 ELSE。</p>
+        </div>
+        <div class="data-card" style="border-left: 3px solid var(--c-red); text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: 0.3em;">&#9940;</div>
+          <h3 style="font-size: var(--body-size); color: var(--c-red);">深层嵌套 &gt;3 层</h3>
+          <p style="font-size: var(--small-size); color: var(--c-dim); margin: 0.3em 0;">画布混乱、难以调试、执行路径组合爆炸。<br><br><span class="hl-green">修复：</span>超过 3 层嵌套用<b>问题分类器</b>扁平化。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 9: Code 节点
+     ============================================================ -->
+<section class="slide" id="s9">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag">数据处理 #1</span>
+      <h2 style="margin-top: 0.3em;">Code — 代码执行节点</h2>
+      <p style="color: var(--c-dim); font-size: var(--small-size);">Python3 / JavaScript 沙箱执行，处理复杂数据转换</p>
+    </div>
+    <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem); max-width: min(95vw, 1050px); margin: 0 auto; align-items: start;">
+      <!-- 左：配置说明 -->
+      <div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.4em;">核心机制</h3>
+        <div class="data-card cyan-b" style="font-size: var(--small-size); margin-bottom: 0.5em;">
+          <p style="margin: 0 0 0.3em;"><span class="hl-cyan">语言：</span>Python3 或 JavaScript (Node.js)</p>
+          <p style="margin: 0 0 0.3em;"><span class="hl-cyan">输入变量：</span>声明引用，名称与 <code>args.变量名</code> 对应</p>
+          <p style="margin: 0 0 0.3em;"><span class="hl-cyan">main() 函数：</span>返回 dict/object 成为下游可引用的输出字段</p>
+          <p style="margin: 0;"><span class="hl-cyan">版本：</span>取决于 Dify 沙箱环境中的 Python/Node 版本</p>
+        </div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.3em;">典型场景</h3>
+        <ul class="bullet-list" style="font-size: var(--small-size);">
+          <li>JSON 解析与结构化提取</li>
+          <li>数组过滤、排序、聚合</li>
+          <li>数据清洗与格式转换</li>
+          <li>多源数据合并与计算</li>
+        </ul>
+      </div>
+      <!-- 右：完整示例 -->
+      <div>
+        <h3 style="color: var(--c-magenta); font-size: var(--body-size); margin-bottom: 0.4em;">Python 完整示例</h3>
+        <div class="code-block">
+<span class="k">def</span> <span class="n">main</span>(args):
+    <span class="c"># args 是输入变量 dict</span>
+    text = args.get(<span class="s">'input_text'</span>, <span class="s">''</span>)
+
+    <span class="c"># 处理逻辑</span>
+    word_count = <span class="n">len</span>(text.split())
+    lines = text.split(<span class="s">'\n'</span>)
+
+    <span class="c"># 返回 dict — 成为下游可引用的输出</span>
+    <span class="k">return</span> {
+        <span class="s">'word_count'</span>: word_count,
+        <span class="s">'line_count'</span>: <span class="n">len</span>(lines),
+        <span class="s">'summary'</span>: text[:<span class="n">200</span>] + <span class="s">'...'</span>
+            <span class="k">if</span> <span class="n">len</span>(text) > <span class="n">200</span> <span class="k">else</span> text
+    }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 10: Code 节点避坑 + 沙箱限制
+     ============================================================ -->
+<section class="slide" id="s10">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-magenta" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag magenta">避坑指南</span>
+      <h2 style="margin-top: 0.3em;">Code 节点 — 沙箱限制与常见错误</h2>
+    </div>
+    <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem); max-width: min(95vw, 1050px); margin: 0 auto; align-items: start;">
+      <!-- 左：沙箱限制 -->
+      <div>
+        <h3 style="color: var(--c-red); font-size: var(--body-size); margin-bottom: 0.4em;">沙箱限制（必须了解）</h3>
+        <div class="data-card" style="border-left: 3px solid var(--c-red); font-size: var(--small-size);">
+          <p style="margin: 0 0 0.3em;">&#128274; 默认<b>无外部网络访问</b></p>
+          <p style="margin: 0 0 0.3em;">&#128274; <b>无文件系统写权限</b>（可读临时文件）</p>
+          <p style="margin: 0 0 0.3em;">&#128274; <b>执行超时限制</b>（不宜做耗时操作）</p>
+          <p style="margin: 0;">&#128274; <b>内存限制</b>（大数据处理需分批）</p>
+        </div>
+        <div class="code-block" style="margin-top: 0.5em;">
+<span class="c">// 源码：CodeLanguage 枚举</span>
+<span class="c">// api/core/workflow/nodes/code/entities.py</span>
+<span class="k">class</span> <span class="n">CodeLanguage</span>:
+    <span class="n">PYTHON3</span>   = <span class="s">"python3"</span>
+    <span class="n">JAVASCRIPT</span> = <span class="s">"javascript"</span>
+        </div>
+      </div>
+      <!-- 右：避坑 -->
+      <div>
+        <h3 style="color: var(--c-magenta); font-size: var(--body-size); margin-bottom: 0.4em;">常见错误 & JSON 聚合示例</h3>
+        <div class="data-card" style="border-left: 3px solid var(--c-red); font-size: var(--small-size); margin-bottom: 0.5em;">
+          <p style="margin: 0 0 0.2em;">&#10060; <b>耗时操作超时</b> — 大数据拆成多个节点</p>
+          <p style="margin: 0 0 0.2em;">&#10060; <b>返回不可序列化对象</b> — 只能返回 dict/list/str/int/float/bool/None</p>
+          <p style="margin: 0;">&#10060; <b>忘记声明输入变量</b> — 代码中 <code>args['xxx']</code> 会为空</p>
+        </div>
+        <div class="code-block">
+<span class="c">// JSON 解析与聚合</span>
+<span class="k">def</span> <span class="n">main</span>(args):
+    <span class="k">import</span> json
+    items = args[<span class="s">'items'</span>]
+    merged = [{<span class="s">'name'</span>: i[<span class="s">'name'</span>],
+              <span class="s">'score'</span>: <span class="n">float</span>(i[<span class="s">'score'</span>])}
+             <span class="k">for</span> i <span class="k">in</span> items]
+    <span class="k">return</span> {
+        <span class="s">'merged'</span>: merged,
+        <span class="s">'avg'</span>: <span class="n">sum</span>(x[<span class="s">'score'</span>]
+                   <span class="k">for</span> x <span class="k">in</span> merged) / <span class="n">len</span>(merged)
+    }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 11: HTTPRequest 节点
+     ============================================================ -->
+<section class="slide" id="s11">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag">数据处理 #2</span>
+      <h2 style="margin-top: 0.3em;">HTTPRequest — HTTP 请求节点</h2>
+      <p style="color: var(--c-dim); font-size: var(--small-size);">在工作流中调用任何外部 REST API</p>
+    </div>
+    <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem); max-width: min(95vw, 1050px); margin: 0 auto; align-items: start;">
+      <!-- 左：参数表 -->
+      <div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.4em;">配置参数</h3>
+        <table class="ref-table">
+          <tr><th>参数</th><th>说明</th></tr>
+          <tr><td>Method</td><td>GET / POST / PUT / PATCH / DELETE / HEAD</td></tr>
+          <tr><td>URL</td><td>支持变量插值 <code>https://api.xxx.com/users/{{id}}</code></td></tr>
+          <tr><td>Headers</td><td>Key-Value，支持引用变量</td></tr>
+          <tr><td>Body</td><td>JSON / Form-Data / x-www-form-urlencoded / Raw Text / Binary</td></tr>
+          <tr><td>Auth</td><td>None / Bearer Token / Basic Auth / API Key</td></tr>
+          <tr><td>Timeout</td><td>默认 10s，可自定义</td></tr>
+        </table>
+      </div>
+      <!-- 右：输出结构 -->
+      <div>
+        <h3 style="color: var(--c-magenta); font-size: var(--body-size); margin-bottom: 0.4em;">输出结构</h3>
+        <div class="code-block" style="margin-bottom: 0.5em;">
+<span class="c">// web/app/components/workflow/constants.ts</span>
+{
+  <span class="s">body</span>: <span class="s">string</span>,          <span class="c">// 响应体（文本）</span>
+  <span class="s">status_code</span>: <span class="s">number</span>,   <span class="c">// HTTP 状态码</span>
+  <span class="s">headers</span>: <span class="s">object</span>,       <span class="c">// 响应头 Key-Value</span>
+  <span class="s">files</span>: <span class="s">File[]</span>          <span class="c">// 响应文件列表</span>
+}
+        </div>
+        <div class="data-card cyan-b" style="font-size: var(--small-size);">
+          <p style="margin: 0;"><span class="hl-cyan">API Key 授权配置：</span>支持放在 Header / Cookie / Query Parameter 三种位置，适合对接第三方 API。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 12: HTTPRequest 常见模式 + 避坑
+     ============================================================ -->
+<section class="slide" id="s12">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-magenta" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag magenta">模式 & 避坑</span>
+      <h2 style="margin-top: 0.3em;">HTTPRequest — 常见模式与避坑</h2>
+    </div>
+    <div class="reveal reveal-delay-1" style="max-width: min(95vw, 1000px); margin: 0 auto;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem);">
+        <!-- 模式 -->
+        <div>
+          <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.4em;">2 种典型模式</h3>
+          <div class="data-card cyan-b" style="margin-bottom: 0.5em;">
+            <p style="font-size: var(--small-size); margin: 0 0 0.3em;"><span class="hl-cyan">模式 1：Agent 调用外部数据源</span></p>
+            <div class="flow-row" style="justify-content: flex-start; font-size: var(--small-size);">
+              <span class="flow-node">Start</span><span class="flow-arrow">&#8594;</span>
+              <span class="flow-node gold">HTTP</span><span class="flow-arrow">&#8594;</span>
+              <span class="flow-node">Code</span><span class="flow-arrow">&#8594;</span>
+              <span class="flow-node magenta">LLM</span><span class="flow-arrow">&#8594;</span>
+              <span class="flow-node green">End</span>
+            </div>
+            <p style="font-size: var(--small-size); color: var(--c-dim); margin-top: 0.2em;">调企业 CRM API 查客户 &#8594; Code 格式化 &#8594; LLM 生成报告</p>
+          </div>
+          <div class="data-card magenta-b">
+            <p style="font-size: var(--small-size); margin: 0 0 0.3em;"><span class="hl-magenta">模式 2：API 聚合器</span></p>
+            <div class="flow-row" style="justify-content: flex-start; font-size: var(--small-size);">
+              <span class="flow-node">Webhook</span><span class="flow-arrow">&#8594;</span>
+              <span class="flow-node gold">HTTP A</span><span class="flow-arrow">+</span>
+              <span class="flow-node gold">HTTP B</span><span class="flow-arrow">&#8594;</span>
+              <span class="flow-node">Code</span><span class="flow-arrow">&#8594;</span>
+              <span class="flow-node green">End</span>
+            </div>
+            <p style="font-size: var(--small-size); color: var(--c-dim); margin-top: 0.2em;">两个独立 API 可并行调用，用 Code 节点合并结果</p>
+          </div>
+        </div>
+        <!-- 避坑 -->
+        <div>
+          <h3 style="color: var(--c-red); font-size: var(--body-size); margin-bottom: 0.4em;">三大避坑</h3>
+          <div class="data-card" style="border-left: 3px solid var(--c-red); margin-bottom: 0.4em;">
+            <p style="font-size: var(--small-size); margin: 0;"><span class="hl-red">&#10060; 响应体编码问题</span><br>不是 UTF-8 编码时出现乱码。在 Code 节点中手动 <code>.decode('gbk')</code> 处理。</p>
+          </div>
+          <div class="data-card" style="border-left: 3px solid var(--c-red); margin-bottom: 0.4em;">
+            <p style="font-size: var(--small-size); margin: 0;"><span class="hl-red">&#10060; 不处理 HTTP 错误码</span><br>4xx/5xx 导致节点失败，后续全部中断。启用<b>"失败时继续"</b>，用 IF-ELSE 检查 <code>status_code</code>。</p>
+          </div>
+          <div class="data-card" style="border-left: 3px solid var(--c-red);">
+            <p style="font-size: var(--small-size); margin: 0;"><span class="hl-red">&#10060; URL 参数未编码</span><br>中文/特殊字符需 URL encode。用 Code 节点 <code>urllib.parse.quote()</code> 预处理。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 13: TemplateTransform 模板转换
+     ============================================================ -->
+<section class="slide" id="s13">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag">数据处理 #3</span>
+      <h2 style="margin-top: 0.3em;">TemplateTransform — Jinja2 模板转换</h2>
+      <p style="color: var(--c-dim); font-size: var(--small-size);">将变量渲染为文本，最适合格式化检索结果 &#8594; LLM 上下文</p>
+    </div>
+    <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem); max-width: min(95vw, 1050px); margin: 0 auto; align-items: start;">
+      <!-- 左：语法 -->
+      <div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.4em;">常用 Jinja2 语法</h3>
+        <div class="code-block" style="margin-bottom: 0.5em;">
+<span class="c">{# 变量 #}</span>
+{{ variable_name }}
+
+<span class="c">{# 过滤器 #}</span>
+{{ text | upper }}
+{{ text | truncate(<span class="n">100</span>) }}
+{{ items | length }}
+{{ date | default(<span class="s">'未知'</span>) }}
+
+<span class="c">{# 循环 #}</span>
+{% <span class="k">for</span> item <span class="k">in</span> items %}
+  - {{ loop.index }}. {{ item.name }}
+{% <span class="k">endfor</span> %}
+
+<span class="c">{# 条件 #}</span>
+{% <span class="k">if</span> score > <span class="n">0.8</span> %}
+  匹配度高
+{% <span class="k">elif</span> score > <span class="n">0.5</span> %}
+  匹配度中
+{% <span class="k">else</span> %}
+  匹配度低
+{% <span class="k">endif</span> %}
+        </div>
+      </div>
+      <!-- 右：实例 + 避坑 -->
+      <div>
+        <h3 style="color: var(--c-magenta); font-size: var(--body-size); margin-bottom: 0.4em;">格式化检索结果为 LLM 上下文</h3>
+        <div class="code-block" style="margin-bottom: 0.5em;">
+以下是与 <span class="s">"{{ sys.query }}"</span> 相关的知识库内容：
+
+{% <span class="k">for</span> item <span class="k">in</span> knowledge.result %}
+---
+文档：{{ item.title }}
+来源：{{ item.url }}
+
+{{ item.content }}
+{% <span class="k">endfor</span> %}
+
+请基于以上信息回答用户问题。
+        </div>
+        <h3 style="color: var(--c-red); font-size: var(--body-size); margin-bottom: 0.3em;">避坑</h3>
+        <div class="data-card" style="border-left: 3px solid var(--c-red); font-size: var(--small-size);">
+          <p style="margin: 0 0 0.2em;">&#10060; <b>模板语法错误</b> — Jinja2 报错不直观，先用简单模板测试</p>
+          <p style="margin: 0 0 0.2em;">&#10060; <b>变量不存在</b> — 渲染为空白，用 <code>| default()</code> 防御</p>
+          <p style="margin: 0;">&#10060; <b>用模板做复杂逻辑</b> — 超过 10 行用 Code 节点</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 14: Start + End 节点
+     ============================================================ -->
+<section class="slide" id="s14">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag">流程控制 #2</span>
+      <h2 style="margin-top: 0.3em;">Start + End — 工作流的入口与出口</h2>
+    </div>
+    <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem); max-width: min(95vw, 1050px); margin: 0 auto; align-items: start;">
+      <!-- Start -->
+      <div>
+        <h3 style="color: var(--c-green); font-size: var(--body-size); margin-bottom: 0.4em;">&#9654; Start — 输入变量</h3>
+        <table class="ref-table" style="margin-bottom: 0.4em;">
+          <tr><th>类型</th><th>说明</th></tr>
+          <tr><td>文本</td><td>单行/多行文本</td></tr>
+          <tr><td>段落</td><td>长文本输入</td></tr>
+          <tr><td>数字</td><td>数值</td></tr>
+          <tr><td>文件</td><td>支持 image/document/audio/video</td></tr>
+          <tr><td>下拉选项</td><td>预设枚举值</td></tr>
+        </table>
+        <p style="font-size: var(--small-size); color: var(--c-dim); margin-bottom: 0.3em;"><span class="hl-cyan">系统变量（自动注入）：</span></p>
+        <table class="ref-table">
+          <tr><td>sys.query</td><td>用户输入文本</td></tr>
+          <tr><td>sys.files</td><td>上传的文件列表</td></tr>
+          <tr><td>sys.user_id</td><td>用户 ID</td></tr>
+          <tr><td>sys.app_id</td><td>应用 ID</td></tr>
+          <tr><td>sys.workflow_id</td><td>工作流 ID</td></tr>
+          <tr><td>sys.timestamp</td><td>触发时间戳</td></tr>
+        </table>
+      </div>
+      <!-- End -->
+      <div>
+        <h3 style="color: var(--c-magenta); font-size: var(--body-size); margin-bottom: 0.4em;">&#9632; End — 输出变量</h3>
+        <div class="data-card magenta-b" style="font-size: var(--small-size); margin-bottom: 0.5em;">
+          <p style="margin: 0 0 0.3em;"><span class="hl-magenta">输出即为 API 响应 JSON 的 key：</span></p>
+          <div class="code-block">
+{
+  <span class="s">"result"</span>: <span class="s">"分析完成"</span>,
+  <span class="s">"score"</span>: <span class="n">85</span>,
+  <span class="s">"suggestions"</span>: [<span class="s">"建议1"</span>, <span class="s">"建议2"</span>]
+}
+          </div>
+        </div>
+        <h3 style="color: var(--c-red); font-size: var(--body-size); margin-bottom: 0.3em;">避坑</h3>
+        <div class="data-card" style="border-left: 3px solid var(--c-red); font-size: var(--small-size);">
+          <p style="margin: 0 0 0.2em;">&#10060; <b>IF-ELSE 分支没连到 End</b> — 那条路径永远不返回结果</p>
+          <p style="margin: 0;">&#10060; <b>输出变量引用范围外变量</b> — 迭代/循环内部变量在外部不可见</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 15: Answer + VariableAssigner
+     ============================================================ -->
+<section class="slide" id="s15">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag">流程控制 #3</span>
+      <h2 style="margin-top: 0.3em;">Answer + VariableAssigner</h2>
+    </div>
+    <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem); max-width: min(95vw, 1050px); margin: 0 auto; align-items: start;">
+      <!-- Answer -->
+      <div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.4em;">Answer — 答案节点</h3>
+        <div class="data-card cyan-b" style="font-size: var(--small-size); margin-bottom: 0.5em;">
+          <p style="margin: 0;"><span class="hl-cyan">仅 Chat 模式可用！</span>生成用户可见的聊天回复消息。</p>
+        </div>
+        <h3 style="color: var(--c-magenta); font-size: var(--body-size); margin-bottom: 0.3em;">Answer vs End 对比</h3>
+        <table class="ref-table">
+          <tr><th></th><th style="color:var(--c-cyan);">Answer</th><th style="color:var(--c-magenta);">End</th></tr>
+          <tr><td>模式</td><td>仅 Chat</td><td>Chat + Workflow</td></tr>
+          <tr><td>作用</td><td>用户可见的聊天回复</td><td>API 返回的结构化数据</td></tr>
+          <tr><td>场景</td><td>对话式应用</td><td>API 调用、自动化</td></tr>
+        </table>
+        <div class="flow-row" style="justify-content: flex-start; margin-top: 0.4em; font-size: var(--small-size);">
+          <span class="flow-node magenta">LLM</span><span class="flow-arrow">&#8594;</span>
+          <span class="flow-node cyan" style="border-color:rgba(0,240,255,0.25);color:var(--c-cyan);background:rgba(0,240,255,0.06);">Answer</span>
+        </div>
+        <div class="flow-row" style="justify-content: flex-start; margin-top: 0.2em; font-size: var(--small-size);">
+          <span class="flow-node magenta">LLM</span><span class="flow-arrow">&#8594;</span>
+          <span class="flow-node green">End</span>
+        </div>
+      </div>
+      <!-- VariableAssigner -->
+      <div>
+        <h3 style="color: var(--c-gold); font-size: var(--body-size); margin-bottom: 0.4em;">VariableAssigner — 变量赋值器</h3>
+        <div class="data-card gold-b" style="font-size: var(--small-size); margin-bottom: 0.5em;">
+          <p style="margin: 0;">在工作流执行中写入/覆盖变量值。类似编程中的 <code>=</code> 赋值。</p>
+        </div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.3em;">3 个典型场景</h3>
+        <ol style="font-size: var(--small-size); color: var(--c-dim); padding-left: 1.2em; margin: 0;">
+          <li style="margin-bottom: 0.2em;">处理中间结果需要持久化到会话变量</li>
+          <li style="margin-bottom: 0.2em;">聚合多个分支的结果到一个变量</li>
+          <li>对会话变量做增量写入（如累计计数）</li>
+        </ol>
+        <div class="code-block" style="margin-top: 0.4em;">
+<span class="c">// 赋值配置</span>
+变量名: <span class="s">user_topic</span>
+值: {{ llm_node.text }}
+        </div>
+        <div class="data-card" style="border-left: 3px solid var(--c-red); font-size: var(--small-size); margin-top: 0.4em;">
+          <p style="margin: 0;">&#10060; 变量名与系统变量冲突<br>&#10060; 迭代内部写入的变量外部不可见</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 16: QuestionClassifier 问题分类器
+     ============================================================ -->
+<section class="slide" id="s16">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag">AI/LLM #3</span>
+      <h2 style="margin-top: 0.3em;">QuestionClassifier — 问题分类器</h2>
+      <p style="color: var(--c-dim); font-size: var(--small-size);">使用 LLM 将用户输入分类到预设类别，输出类别标签</p>
+    </div>
+    <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem); max-width: min(95vw, 1050px); margin: 0 auto; align-items: start;">
+      <!-- 左：配置 -->
+      <div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.4em;">配置方式</h3>
+        <div class="code-block" style="margin-bottom: 0.5em;">
+<span class="c">// 分类定义</span>
+分类 <span class="n">1</span>:
+  name:  <span class="s">"退款申请"</span>
+  label: <span class="s">"refund"</span>
+  描述:  <span class="s">"用户要求退款、取消订单"</span>
+
+分类 <span class="n">2</span>:
+  name:  <span class="s">"商品咨询"</span>
+  label: <span class="s">"product_inquiry"</span>
+  描述:  <span class="s">"询问商品信息、规格、库存"</span>
+        </div>
+        <h3 style="color: var(--c-magenta); font-size: var(--body-size); margin-bottom: 0.3em;">输出结构</h3>
+        <div class="code-block">
+{
+  <span class="s">"class_name"</span>:  <span class="s">"退款申请"</span>,
+  <span class="s">"class_label"</span>: <span class="s">"refund"</span>,
+  <span class="s">"usage"</span>: { <span class="c">/* Token 用量 */</span> }
+}
+        </div>
+      </div>
+      <!-- 右：路由流程图 -->
+      <div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.4em;">配合 IF-ELSE 做意图路由</h3>
+        <div class="data-card" style="text-align: center; font-size: var(--small-size);">
+          <div class="flow-row" style="margin-bottom: 0.4em;">
+            <span class="flow-node">Start</span><span class="flow-arrow">&#8594;</span>
+            <span class="flow-node magenta">问题分类器</span><span class="flow-arrow">&#8594;</span>
+            <span class="flow-node gold">IF-ELSE</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.3em; text-align: center;">
+            <div style="padding:0.3em; border:1px solid rgba(0,240,255,0.2); border-radius:6px;">refund<br><span style="font-size:0.65rem;color:var(--c-dim);">&#8594; 退款处理</span></div>
+            <div style="padding:0.3em; border:1px solid rgba(255,0,229,0.2); border-radius:6px;">inquiry<br><span style="font-size:0.65rem;color:var(--c-dim);">&#8594; 咨询处理</span></div>
+            <div style="padding:0.3em; border:1px solid rgba(255,215,64,0.2); border-radius:6px;">ELSE<br><span style="font-size:0.65rem;color:var(--c-dim);">&#8594; 通用客服</span></div>
+          </div>
+        </div>
+        <h3 style="color: var(--c-red); font-size: var(--body-size); margin: 0.6em 0 0.3em;">避坑</h3>
+        <div class="data-card" style="border-left: 3px solid var(--c-red); font-size: var(--small-size);">
+          <p style="margin: 0 0 0.2em;">&#10060; <b>描述不精确</b> — LLM 容易误分类，描述要具体</p>
+          <p style="margin: 0 0 0.2em;">&#10060; <b>类别过多</b> — 超过 10 个准确率下降，考虑两层分类</p>
+          <p style="margin: 0;">&#10060; <b>不用 IF-ELSE 处理未知类别</b> — ELSE 兜底非常重要</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 17: ParameterExtractor 参数提取器
+     ============================================================ -->
+<section class="slide" id="s17">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag">AI/LLM #4</span>
+      <h2 style="margin-top: 0.3em;">ParameterExtractor — 参数提取器</h2>
+      <p style="color: var(--c-dim); font-size: var(--small-size);">从非结构化文本中提取结构化参数，适合 NL &#8594; 结构化数据</p>
+    </div>
+    <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem); max-width: min(95vw, 1050px); margin: 0 auto; align-items: start;">
+      <!-- 左：参数定义 -->
+      <div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.4em;">参数定义</h3>
+        <table class="ref-table" style="margin-bottom: 0.5em;">
+          <tr><th>属性</th><th>说明</th></tr>
+          <tr><td>name</td><td>参数名称</td></tr>
+          <tr><td>type</td><td>text / number / bool / select / array</td></tr>
+          <tr><td>description</td><td>告诉 LLM 如何提取（关键！）</td></tr>
+          <tr><td>required</td><td>是否必填</td></tr>
+        </table>
+        <div class="data-card cyan-b" style="font-size: var(--small-size);">
+          <p style="margin: 0;"><span class="hl-cyan">提示：</span>可从已安装的插件工具中一键导入参数定义，保持工具调用和参数提取的一致性。</p>
+        </div>
+      </div>
+      <!-- 右：YAML 配置 -->
+      <div>
+        <h3 style="color: var(--c-magenta); font-size: var(--body-size); margin-bottom: 0.4em;">完整 YAML 配置示例</h3>
+        <div class="code-block">
+<span class="c"># 旅行规划助手 — 参数提取</span>
+参数:
+  - <span class="s">name</span>: city
+    <span class="s">type</span>: text
+    <span class="s">description</span>: <span class="s">"用户提到的城市名"</span>
+    <span class="s">required</span>: true
+
+  - <span class="s">name</span>: budget
+    <span class="s">type</span>: number
+    <span class="s">description</span>: <span class="s">"预算金额，单位元"</span>
+    <span class="s">required</span>: false
+
+  - <span class="s">name</span>: travel_dates
+    <span class="s">type</span>: <span class="s">array[text]</span>
+    <span class="s">description</span>: <span class="s">"旅行日期列表"</span>
+    <span class="s">required</span>: false
+        </div>
+        <p style="font-size: var(--small-size); color: var(--c-dim); margin-top: 0.4em;">
+          用户输入：<i>"帮我规划一下北京3天游，预算3000"</i><br>
+          &#8594; 提取：city="北京", budget=3000, travel_dates=[]
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 18: DocumentExtractor + DataSource
+     ============================================================ -->
+<section class="slide" id="s18">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag">数据处理 + 触发器</span>
+      <h2 style="margin-top: 0.3em;">DocumentExtractor + DataSource</h2>
+    </div>
+    <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem); max-width: min(95vw, 1050px); margin: 0 auto; align-items: start;">
+      <!-- DocExtractor -->
+      <div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.4em;">DocumentExtractor — 文档提取器</h3>
+        <div class="data-card cyan-b" style="font-size: var(--small-size); margin-bottom: 0.5em;">
+          <p style="margin: 0 0 0.3em;"><span class="hl-cyan">支持格式：</span>PDF / Word / Excel / PPT</p>
+          <p style="margin: 0 0 0.3em;"><span class="hl-cyan">输出格式：</span>text 或 markdown</p>
+          <p style="margin: 0;"><span class="hl-cyan">高精度模式：</span>支持调用 Unstructured API 进行高精度结构化提取</p>
+        </div>
+        <div class="flow-row" style="justify-content: flex-start; font-size: var(--small-size);">
+          <span class="flow-node">Start</span><span class="flow-arrow">&#8594;</span>
+          <span class="flow-node gold">DocExtractor</span><span class="flow-arrow">&#8594;</span>
+          <span class="flow-node magenta">LLM</span><span class="flow-arrow">&#8594;</span>
+          <span class="flow-node green">End</span>
+        </div>
+        <p style="font-size: var(--small-size); color: var(--c-dim); margin-top: 0.3em;">上传文档 &#8594; 提取文本 &#8594; LLM 分析 &#8594; 返回结果</p>
+      </div>
+      <!-- DataSource -->
+      <div>
+        <h3 style="color: var(--c-purple); font-size: var(--body-size); margin-bottom: 0.4em;">DataSource — 数据源</h3>
+        <div class="data-card purple-b" style="font-size: var(--small-size); margin-bottom: 0.5em;">
+          <p style="margin: 0;">主动从外部（数据库/API）拉取数据作为工作流起始输入。</p>
+        </div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.3em;">Start vs DataSource vs Trigger</h3>
+        <table class="ref-table">
+          <tr><th>类型</th><th>触发方式</th><th>适用场景</th></tr>
+          <tr><td>Start</td><td>被动接收</td><td>API 调用时传入参数</td></tr>
+          <tr><td>DataSource</td><td>主动拉取</td><td>从外部源拉取数据</td></tr>
+          <tr><td>Trigger</td><td>自动触发</td><td>定时/Webhook/事件驱动</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 19: ListFilter 列表过滤器
+     ============================================================ -->
+<section class="slide" id="s19">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag">数据处理 #4</span>
+      <h2 style="margin-top: 0.3em;">ListFilter — 列表过滤器</h2>
+      <p style="color: var(--c-dim); font-size: var(--small-size);">对数组变量进行过滤、排序、去重、限制操作</p>
+    </div>
+    <div class="reveal reveal-delay-1" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.5vw, 1.2rem); max-width: min(95vw, 1050px); margin: 0 auto; align-items: start;">
+      <!-- 左：配置说明 -->
+      <div>
+        <h3 style="color: var(--c-cyan); font-size: var(--body-size); margin-bottom: 0.4em;">配置方式</h3>
+        <table class="ref-table" style="margin-bottom: 0.5em;">
+          <tr><th>配置项</th><th>说明</th></tr>
+          <tr><td>变量</td><td>引用数组类型变量</td></tr>
+          <tr><td>过滤条件</td><td>字段 + 条件 + 值</td></tr>
+          <tr><td>排序</td><td>按字段 ASC / DESC</td></tr>
+          <tr><td>限制</td><td>取前 N 条</td></tr>
+        </table>
+        <div class="code-block" style="margin-bottom: 0.4em;">
+<span class="c"># YAML 配置示例</span>
+变量: <span class="s">{{迭代节点.output}}</span>
+过滤条件:
+  - 字段: <span class="s">score</span>
+    条件: <span class="s">greater_than</span>
+    值: <span class="n">0.8</span>
+排序: <span class="s">score DESC</span>
+限制: <span class="n">10</span>
+        </div>
+      </div>
+      <!-- 右：避坑 -->
+      <div>
+        <h3 style="color: var(--c-magenta); font-size: var(--body-size); margin-bottom: 0.4em;">支持的操作</h3>
+        <div class="data-card magenta-b" style="font-size: var(--small-size); margin-bottom: 0.5em;">
+          <p style="margin: 0 0 0.2em;"><span class="hl-magenta">过滤：</span>基于条件筛选（is, contains, greater_than, is_empty 等）</p>
+          <p style="margin: 0 0 0.2em;"><span class="hl-magenta">排序：</span>按指定字段升序/降序</p>
+          <p style="margin: 0 0 0.2em;"><span class="hl-magenta">去重：</span>按字段去重</p>
+          <p style="margin: 0;"><span class="hl-magenta">限制：</span>取前 N 条</p>
+        </div>
+        <h3 style="color: var(--c-red); font-size: var(--body-size); margin-bottom: 0.3em;">避坑</h3>
+        <div class="data-card" style="border-left: 3px solid var(--c-red); font-size: var(--small-size);">
+          <p style="margin: 0 0 0.2em;">&#10060; <b>字段名不一致</b> — 区分大小写，要与数据中实际字段名完全匹配</p>
+          <p style="margin: 0 0 0.2em;">&#10060; <b>空数组不设默认值</b> — 过滤后为空时下游节点可能出错</p>
+          <p style="margin: 0;">&#10060; <b>过滤后忘记限制数量</b> — 大数据集需要 limit 控制</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 20: 其他节点速查表
+     ============================================================ -->
+<section class="slide" id="s20">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan" style="opacity:0.06;"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align: center; margin-bottom: var(--content-gap);">
+      <span class="neon-tag">速查表</span>
+      <h2 style="margin-top: 0.3em;">其他节点速查表</h2>
+      <p style="color: var(--c-dim); font-size: var(--small-size);">9 个常用节点 — 用途与关键点一览</p>
+    </div>
+    <div class="reveal reveal-delay-1" style="max-width: min(95vw, 1050px); margin: 0 auto; overflow-x: auto;">
+      <table class="ref-table" style="font-size: clamp(0.55rem, 0.85vw, 0.75rem);">
+        <tr><th style="min-width:80px;">节点</th><th style="min-width:50px;">分类</th><th style="min-width:120px;">用途</th><th>关键点</th></tr>
+        <tr>
+          <td><span class="node-box interact">Tool</span></td>
+          <td>交互/工具</td>
+          <td>调用已安装的插件工具</td>
+          <td>需先在"工具"页面安装插件；参数可从工具定义自动导入</td>
+        </tr>
+        <tr>
+          <td><span class="node-box flow">Iteration</span></td>
+          <td>流程控制</td>
+          <td>并行处理数组，每个元素一个子工作流</td>
+          <td>内部是独立子工作流；适合批量 LLM 调用、批量 HTTP 请求；输出为数组</td>
+        </tr>
+        <tr>
+          <td><span class="node-box flow">Loop</span></td>
+          <td>流程控制</td>
+          <td>条件循环（while），满足条件继续</td>
+          <td>包含 LoopStart + LoopEnd；有最大循环次数限制防止死循环</td>
+        </tr>
+        <tr>
+          <td><span class="node-box data">Aggregator</span></td>
+          <td>数据处理</td>
+          <td>收集多条上游输出为数组</td>
+          <td>适合配合迭代使用；将多条结果汇聚为单数组传给下游</td>
+        </tr>
+        <tr>
+          <td><span class="node-box interact">KnowledgeIndex</span></td>
+          <td>交互/工具</td>
+          <td>创建/更新知识库索引</td>
+          <td>用于数据预处理管线；支持增量更新和全量重建</td>
+        </tr>
+        <tr>
+          <td><span class="node-box data">Assigner</span></td>
+          <td>数据处理</td>
+          <td>旧版变量赋值（与 VariableAssigner 同）</td>
+          <td>新项目直接用 VariableAssigner；旧版逐步废弃</td>
+        </tr>
+        <tr>
+          <td><span class="node-box interact">HumanInput</span></td>
+          <td>交互/工具</td>
+          <td>暂停工作流等待人工操作</td>
+          <td>HITL (Human-in-the-Loop)；适合审批、人工审核流程</td>
+        </tr>
+        <tr>
+          <td><span class="node-box trigger">Trigger 3类</span></td>
+          <td>触发器</td>
+          <td>自动触发工作流执行</td>
+          <td>Webhook (HTTP回调) / Schedule (定时) / Plugin (插件事件)；见进阶篇</td>
+        </tr>
+        <tr>
+          <td><span class="node-box flow" style="color:var(--c-dim);border-color:rgba(136,138,168,0.3);background:rgba(136,138,168,0.04);">Note</span></td>
+          <td>辅助</td>
+          <td>画布上的注释/说明</td>
+          <td>不参与执行，纯视觉辅助；适合标注节点组、添加流程说明</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SLIDE 21: 结束页
+     ============================================================ -->
+<section class="slide" id="s21">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-cyan"></div>
+  <div class="bg-glow bg-glow-magenta" style="opacity:0.08;"></div>
+  <div class="slide-content" style="align-items: center; text-align: center;">
+    <div class="reveal"><span class="neon-tag green">第二篇完结</span></div>
+    <h1 class="reveal reveal-delay-1" style="margin: 0.4em 0 0.2em;">28 种节点全部覆盖</h1>
+    <p class="reveal reveal-delay-2" style="font-size: var(--body-size); color: var(--c-dim); max-width: 650px; margin: 0.5em auto; line-height: 1.6;">
+      从 Start 到 End，从 LLM 到 Tool，<br>
+      每个节点都基于 Dify 源码中的真实定义。
+    </p>
+    <div class="reveal reveal-delay-3" style="margin-top: 1.5rem;">
+      <p style="font-size: var(--body-size); color: var(--c-text);">
+        下一篇：<span class="hl-magenta">变量篇</span> — 变量系统与数据传递
+      </p>
+      <div style="margin-top: 1rem;">
+        <span class="neon-tag">第一篇：概念篇</span>
+        <span class="neon-tag magenta" style="margin-left: 0.5em;">第二篇：节点篇 &#10004;</span>
+        <span class="neon-tag" style="margin-left: 0.5em;">第三篇：变量篇</span>
+        <span class="neon-tag gold" style="margin-left: 0.5em;">第四篇：实战篇</span>
+        <span class="neon-tag green" style="margin-left: 0.5em;">第五篇：进阶篇</span>
+      </div>
+    </div>
+    <p class="reveal reveal-delay-4" style="font-size: var(--small-size); color: var(--c-dim); margin-top: 1.5rem;">
+      Dify 工作流搭建完全教程 · 基于真实源码 · 2026年7月
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCRIPT: Presentation Controller
+     ============================================================ -->
+<script>
+(function() {
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  let isTransitioning = false;
+
+  document.getElementById('tot').textContent = total;
+
+  // Build nav dots
+  const dotsContainer = document.getElementById('navDots');
+  for (let i = 0; i < total; i++) {
+    const dot = document.createElement('button');
+    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+    dot.addEventListener('click', () => goTo(i));
+    dotsContainer.appendChild(dot);
+  }
+  const dots = document.querySelectorAll('.nav-dot');
+
+  function updateUI() {
+    document.getElementById('cur').textContent = current + 1;
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    if (window.location.hash !== '#s' + (current + 1)) {
+      history.replaceState(null, '', '#s' + (current + 1));
+    }
+  }
+
+  function goTo(index) {
+    if (isTransitioning || index === current || index < 0 || index >= total) return;
+    isTransitioning = true;
+    current = index;
+    slides[current].scrollIntoView({ behavior: 'smooth' });
+    updateUI();
+    const reveals = slides[current].querySelectorAll('.reveal');
+    reveals.forEach(el => el.classList.add('visible'));
+    setTimeout(() => { isTransitioning = false; }, 800);
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || (e.key === ' ' && !e.shiftKey)) { e.preventDefault(); next(); }
+    if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || (e.key === ' ' && e.shiftKey)) { e.preventDefault(); prev(); }
+    if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+    if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
+    if (e.key === 'Escape') {
+      document.querySelector('html').style.scrollSnapType = 'none';
+      setTimeout(() => { document.querySelector('html').style.scrollSnapType = 'y mandatory'; }, 3000);
+    }
+  });
+
+  // Mouse wheel (debounced)
+  let wheelTimeout;
+  document.addEventListener('wheel', e => {
+    if (wheelTimeout) return;
+    wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
+    if (e.deltaY > 30) next();
+    else if (e.deltaY < -30) prev();
+  }, { passive: true });
+
+  // Touch swipe
+  let touchStartY = 0;
+  document.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const diff = touchStartY - e.changedTouches[0].clientY;
+    if (Math.abs(diff) > 50) { diff > 0 ? next() : prev(); }
+  });
+
+  // Intersection Observer for reveal + slide tracking
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = Array.from(slides).indexOf(entry.target);
+        if (idx !== -1 && idx !== current) {
+          current = idx;
+          updateUI();
+        }
+        entry.target.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+      }
+    });
+  }, { threshold: 0.5 });
+
+  slides.forEach(s => observer.observe(s));
+
+  // Initialize first slide reveals
+  setTimeout(() => {
+    slides[0].querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+  }, 100);
+
+  // Handle initial hash
+  if (window.location.hash) {
+    const match = window.location.hash.match(/s(\d+)/);
+    if (match) {
+      const idx = parseInt(match[1]) - 1;
+      if (idx >= 0 && idx < total) {
+        setTimeout(() => goTo(idx), 300);
+      }
+    }
+  }
+
+  updateUI();
+})();
+</script>
+</body>
+</html>
