@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dify 工作流教程 — 概念篇：架构与核心概念</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg-card: rgba(13, 17, 28, 0.85);
+  --cyan: #00f0ff;
+  --magenta: #ff00e5;
+  --text: #e0e6f0;
+  --text-dim: #8892b0;
+  --code-bg: #0d1117;
+  --green: #00ff88;
+  --yellow: #ffd966;
+  --red: #ff5555;
+  --purple: #bd93f9;
+  --orange: #ffb86c;
+  --blue: #4da6ff;
+  --card-border: rgba(0, 240, 255, 0.3);
+  --glow-cyan: 0 0 20px rgba(0, 240, 255, 0.4), 0 0 60px rgba(0, 240, 255, 0.1);
+  --glow-magenta: 0 0 20px rgba(255, 0, 229, 0.4), 0 0 60px rgba(255, 0, 229, 0.1);
+
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+/* ====== Grid background ====== */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ====== Slide base ====== */
+.slide {
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(24px, 4vh, 60px) clamp(20px, 5vw, 100px);
+  position: relative;
+  z-index: 1;
+}
+
+.slide-inner {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+/* ====== Reveal animation ====== */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.reveal-stagger.visible > *:nth-child(1) { transition-delay: 0.05s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(2) { transition-delay: 0.10s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(3) { transition-delay: 0.15s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(4) { transition-delay: 0.20s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(5) { transition-delay: 0.25s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(6) { transition-delay: 0.30s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(7) { transition-delay: 0.35s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(8) { transition-delay: 0.40s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(9) { transition-delay: 0.45s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(10) { transition-delay: 0.50s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(11) { transition-delay: 0.55s; opacity: 1; transform: translateY(0); }
+.reveal-stagger.visible > *:nth-child(12) { transition-delay: 0.60s; opacity: 1; transform: translateY(0); }
+
+/* ====== Glow pulse ====== */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: var(--glow-cyan); }
+  50% { box-shadow: 0 0 30px rgba(0, 240, 255, 0.6), 0 0 80px rgba(0, 240, 255, 0.2); }
+}
+@keyframes glowPulseMagenta {
+  0%, 100% { box-shadow: var(--glow-magenta); }
+  50% { box-shadow: 0 0 30px rgba(255, 0, 229, 0.6), 0 0 80px rgba(255, 0, 229, 0.2); }
+}
+@keyframes textGlow {
+  0%, 100% { text-shadow: 0 0 10px var(--cyan), 0 0 30px rgba(0, 240, 255, 0.5); }
+  50% { text-shadow: 0 0 20px var(--cyan), 0 0 60px rgba(0, 240, 255, 0.8); }
+}
+
+.glow-pulse { animation: glowPulse 3s ease-in-out infinite; }
+.glow-pulse-magenta { animation: glowPulseMagenta 3s ease-in-out infinite; }
+.text-glow { animation: textGlow 2.5s ease-in-out infinite; }
+
+/* ====== Typography ====== */
+h1 {
+  font-family: var(--font-sans);
+  font-size: clamp(28px, 5vw, 64px);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+h2 {
+  font-family: var(--font-sans);
+  font-size: clamp(22px, 3.5vw, 42px);
+  font-weight: 700;
+  color: var(--cyan);
+  margin-bottom: clamp(16px, 3vh, 36px);
+}
+h3 {
+  font-family: var(--font-sans);
+  font-size: clamp(18px, 2.5vw, 28px);
+  font-weight: 600;
+  color: var(--text);
+}
+.subtitle {
+  font-size: clamp(16px, 2vw, 24px);
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+/* ====== Cards ====== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: clamp(14px, 2.5vh, 28px) clamp(16px, 3vw, 32px);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--glow-cyan);
+}
+.card-magenta {
+  border-color: rgba(255, 0, 229, 0.3);
+  box-shadow: var(--glow-magenta);
+}
+
+/* ====== Code blocks ====== */
+pre, code {
+  font-family: var(--font-mono);
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: clamp(10px, 2vh, 20px) clamp(14px, 2.5vw, 24px);
+  overflow-x: auto;
+  font-size: clamp(12px, 1.2vw, 15px);
+  line-height: 1.6;
+  color: var(--green);
+}
+pre .kw { color: var(--magenta); }
+pre .str { color: var(--yellow); }
+pre .fn { color: var(--blue); }
+pre .cm { color: var(--text-dim); font-style: italic; }
+
+/* ====== Grid layouts ====== */
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(12px, 2vh, 24px); }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(10px, 2vh, 20px); }
+.grid-5 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: clamp(8px, 1.5vh, 16px); }
+
+/* ====== Flow diagram nodes ====== */
+.flow-node {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(6px, 1.5vh, 14px) clamp(12px, 2vw, 24px);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: clamp(12px, 1.1vw, 15px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.fn-cyan { background: rgba(0, 240, 255, 0.15); border: 1px solid var(--cyan); color: var(--cyan); }
+.fn-magenta { background: rgba(255, 0, 229, 0.15); border: 1px solid var(--magenta); color: var(--magenta); }
+.fn-green { background: rgba(0, 255, 136, 0.15); border: 1px solid var(--green); color: var(--green); }
+.fn-yellow { background: rgba(255, 217, 102, 0.15); border: 1px solid var(--yellow); color: var(--yellow); }
+.fn-purple { background: rgba(189, 147, 249, 0.15); border: 1px solid var(--purple); color: var(--purple); }
+.fn-orange { background: rgba(255, 184, 108, 0.15); border: 1px solid var(--orange); color: var(--orange); }
+
+.flow-arrow {
+  display: inline-flex;
+  align-items: center;
+  color: var(--cyan);
+  font-size: clamp(16px, 2vw, 24px);
+  margin: 0 8px;
+}
+
+/* ====== Architecture layers ====== */
+.arch-layer {
+  background: var(--bg-card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: clamp(12px, 2vh, 24px) clamp(14px, 2.5vw, 28px);
+  position: relative;
+}
+.arch-layer .layer-num {
+  font-family: var(--font-mono);
+  font-size: clamp(12px, 1vw, 14px);
+  color: var(--cyan);
+  font-weight: 700;
+}
+.arch-layer .layer-label {
+  font-size: clamp(12px, 1.1vw, 14px);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+/* ====== Progress dots ====== */
+.progress-dots {
+  position: fixed;
+  right: clamp(8px, 2vw, 20px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+}
+.progress-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.progress-dot:hover { background: rgba(0, 240, 255, 0.5); }
+.progress-dot.active {
+  background: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan);
+  border-color: var(--cyan);
+}
+
+/* ====== Slide counter ====== */
+.slide-counter {
+  position: fixed;
+  bottom: clamp(10px, 2vh, 24px);
+  right: clamp(16px, 3vw, 40px);
+  font-family: var(--font-mono);
+  font-size: clamp(13px, 1.1vw, 16px);
+  color: var(--text-dim);
+  z-index: 100;
+  background: rgba(10, 14, 26, 0.8);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 240, 255, 0.2);
+}
+.slide-counter .current { color: var(--cyan); font-weight: 700; }
+
+/* ====== Nav hint ====== */
+.nav-hint {
+  position: fixed;
+  bottom: clamp(10px, 2vh, 24px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(11px, 1vw, 13px);
+  color: rgba(255,255,255,0.25);
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* ====== Short-height breakpoints ====== */
+@media (max-height: 700px) {
+  .slide { padding: 16px 32px; }
+  h2 { margin-bottom: 12px; }
+  .grid-2, .grid-3, .grid-5 { gap: 8px; }
+}
+@media (max-height: 600px) {
+  .slide { padding: 12px 24px; }
+  h2 { margin-bottom: 8px; }
+  .grid-2, .grid-3, .grid-5 { gap: 6px; }
+  pre { padding: 8px 12px; }
+}
+@media (max-height: 500px) {
+  .slide { padding: 8px 20px; }
+  h1 { font-size: clamp(20px, 4vw, 36px); }
+  h2 { font-size: clamp(16px, 2.5vw, 24px); margin-bottom: 6px; }
+}
+
+/* ====== Reduced motion ====== */
+@media (prefers-reduced-motion: reduce) {
+  .reveal { transition: none; }
+  .reveal-stagger > * { transition: none; }
+  .glow-pulse, .glow-pulse-magenta, .text-glow { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* ====== Misc helpers ====== */
+.text-center { text-align: center; }
+.text-cyan { color: var(--cyan); }
+.text-magenta { color: var(--magenta); }
+.text-green { color: var(--green); }
+.text-yellow { color: var(--yellow); }
+.text-dim { color: var(--text-dim); }
+.text-purple { color: var(--purple); }
+.text-orange { color: var(--orange); }
+.mono { font-family: var(--font-mono); }
+.mt-1 { margin-top: clamp(8px, 1.5vh, 16px); }
+.mt-2 { margin-top: clamp(14px, 2.5vh, 28px); }
+.mb-1 { margin-bottom: clamp(8px, 1.5vh, 16px); }
+.mb-2 { margin-bottom: clamp(14px, 2.5vh, 28px); }
+.gap-1 { gap: clamp(8px, 1.5vh, 16px); }
+.gap-2 { gap: clamp(12px, 2vh, 24px); }
+
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 0.9vw, 12px);
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--cyan);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+/* ====== Comparison table ====== */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: clamp(12px, 1.2vw, 15px);
+}
+.compare-table th {
+  text-align: left;
+  color: var(--cyan);
+  font-weight: 600;
+  padding: clamp(8px, 1.5vh, 14px) clamp(10px, 2vw, 20px);
+  border-bottom: 1px solid var(--card-border);
+  font-family: var(--font-mono);
+}
+.compare-table td {
+  padding: clamp(8px, 1.5vh, 14px) clamp(10px, 2vw, 20px);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  vertical-align: top;
+}
+.compare-table tr:hover td { background: rgba(0, 240, 255, 0.03); }
+</style>
+</head>
+<body>
+
+<!-- Progress dots -->
+<nav class="progress-dots" id="progressDots" aria-label="Slide navigation"></nav>
+
+<!-- Slide counter -->
+<div class="slide-counter"><span class="current" id="currentSlideNum">1</span> / <span id="totalSlideNum">18</span></div>
+
+<!-- Nav hint -->
+<div class="nav-hint">← → 键 / 滚轮 / 触摸滑动 导航</div>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 1: Title -->
+<!-- ====================================================================== -->
+<main>
+<section class="slide" id="slide-1">
+  <div class="slide-inner text-center reveal">
+    <p class="mono text-cyan mb-1" style="font-size:clamp(12px,1.2vw,16px);letter-spacing:0.2em;">DIFY WORKFLOW COMPLETE TUTORIAL</p>
+    <h1 style="margin-bottom:clamp(12px,2vh,24px);">
+      <span style="color:#fff;">Dify 工作流搭建</span><br>
+      <span class="text-glow">完全教程</span>
+    </h1>
+    <div style="margin:clamp(16px,3vh,32px) 0;">
+      <p style="font-size:clamp(18px,2.5vw,32px);font-weight:600;color:var(--magenta);text-shadow:0 0 15px rgba(255,0,229,0.5);">第一篇：概念篇</p>
+      <p style="font-size:clamp(16px,2vw,26px);color:var(--text-dim);margin-top:8px;">架构与核心概念</p>
+    </div>
+    <div style="margin-top:clamp(20px,4vh,48px);">
+      <span class="tag" style="font-size:clamp(11px,1vw,14px);padding:4px 14px;">Graph Engine</span>
+      <span class="tag" style="font-size:clamp(11px,1vw,14px);padding:4px 14px;border-color:rgba(255,0,229,0.3);color:var(--magenta);background:rgba(255,0,229,0.1);">VariablePool</span>
+      <span class="tag" style="font-size:clamp(11px,1vw,14px);padding:4px 14px;">28 Nodes</span>
+      <span class="tag" style="font-size:clamp(11px,1vw,14px);padding:4px 14px;border-color:rgba(0,255,136,0.3);color:var(--green);background:rgba(0,255,136,0.1);">SSE Events</span>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 2: 什么是 Dify 工作流 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-2">
+  <div class="slide-inner reveal">
+    <h2>什么是 Dify 工作流</h2>
+    <div class="grid-2" style="align-items:center;">
+      <div>
+        <p style="font-size:clamp(15px,1.4vw,20px);margin-bottom:clamp(12px,2vh,24px);">可视化编排 LLM 应用的<strong class="text-cyan">画布</strong></p>
+        <ul style="list-style:none;padding:0;font-size:clamp(13px,1.2vw,16px);">
+          <li style="margin-bottom:clamp(6px,1vh,12px);"><span class="tag" style="margin-right:8px;">Box</span> 每个方块 = <strong>Node（节点）</strong></li>
+          <li style="margin-bottom:clamp(6px,1vh,12px);"><span class="tag" style="margin-right:8px;border-color:rgba(255,0,229,0.3);color:var(--magenta);background:rgba(255,0,229,0.1);">Arrow</span> 每条连线 = <strong>Edge（边）</strong></li>
+          <li style="margin-bottom:clamp(6px,1vh,12px);"><span class="tag" style="margin-right:8px;">Graph</span> 整体 = <strong>Directed Graph（有向图）</strong></li>
+        </ul>
+        <p class="mt-1" style="font-size:clamp(12px,1.1vw,14px);color:var(--text-dim);">底层引擎：<span class="mono text-cyan">Graphon</span> — 一个基于有向图的通用任务执行框架</p>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+        <div style="display:flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:8px;">
+          <span class="flow-node fn-green">Input</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node fn-cyan">Node A</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node fn-magenta">Node B</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node fn-yellow">Node C</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node fn-green">Output</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="flow-arrow" style="transform:rotate(90deg);">→</span>
+          <span class="flow-node fn-purple">Node D</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 3: 工作流执行流程 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-3">
+  <div class="slide-inner reveal">
+    <h2>工作流执行流程 <span class="subtitle mono">— 4-Step Execution Lifecycle</span></h2>
+    <div class="reveal-stagger" style="display:flex;flex-direction:column;gap:clamp(8px,1.5vh,16px);margin-top:clamp(12px,2vh,24px);">
+      <div class="card" style="display:flex;align-items:flex-start;gap:16px;">
+        <span style="font-family:var(--font-mono);font-size:clamp(24px,3vw,36px);font-weight:800;color:var(--cyan);min-width:48px;text-align:center;">1</span>
+        <div>
+          <h3>解析图配置</h3>
+          <p class="text-dim" style="font-size:clamp(12px,1.1vw,14px);">读取 workflow graph config → 构建 <span class="mono text-cyan">nodes + edges</span> 数据结构</p>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:flex-start;gap:16px;">
+          <span style="font-family:var(--font-mono);font-size:clamp(24px,3vw,36px);font-weight:800;color:var(--magenta);min-width:48px;text-align:center;">2</span>
+          <div>
+            <h3>初始化 VariablePool</h3>
+            <p class="text-dim" style="font-size:clamp(12px,1.1vw,14px);">创建 KV 存储 → 注入 <span class="mono text-magenta">系统变量</span>（sys.query, sys.user_id ...）</p>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:flex-start;gap:16px;">
+          <span style="font-family:var(--font-mono);font-size:clamp(24px,3vw,36px);font-weight:800;color:var(--green);min-width:48px;text-align:center;">3</span>
+          <div>
+            <h3>创建 GraphEngine</h3>
+            <p class="text-dim" style="font-size:clamp(12px,1.1vw,14px);">传入 graph + variable_pool → 从<span class="mono text-green">起始节点</span>开始遍历</p>
+          </div>
+        </div>
+      </div>
+      <div class="card card-magenta">
+        <div style="display:flex;align-items:flex-start;gap:16px;">
+          <span style="font-family:var(--font-mono);font-size:clamp(24px,3vw,36px);font-weight:800;color:var(--yellow);min-width:48px;text-align:center;">4</span>
+          <div>
+            <h3>节点按拓扑顺序执行</h3>
+            <p class="text-dim" style="font-size:clamp(12px,1.1vw,14px);">拓扑排序 → 依次 run() → <span class="mono text-yellow">SSE 流式事件</span>输出每个节点结果</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 4: 三层架构图 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-4">
+  <div class="slide-inner reveal">
+    <h2>三层架构图</h2>
+    <div class="reveal-stagger" style="display:flex;flex-direction:column;gap:clamp(8px,1.3vh,16px);margin-top:clamp(12px,2vh,24px);">
+
+      <!-- Layer 1 -->
+      <div class="arch-layer glow-pulse" style="border-color:rgba(255,0,229,0.5);">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div>
+            <span class="layer-num">LAYER 1</span>
+            <h3 style="display:inline;margin-left:12px;">前端面板层</h3>
+          </div>
+          <span class="layer-label mono">web/app/components/</span>
+        </div>
+        <div class="mt-1" style="display:flex;gap:10px;flex-wrap:wrap;">
+          <span class="tag" style="border-color:rgba(255,0,229,0.3);color:var(--magenta);background:rgba(255,0,229,0.1);">React Flow 画布</span>
+          <span class="tag" style="border-color:rgba(255,0,229,0.3);color:var(--magenta);background:rgba(255,0,229,0.1);">节点配置面板</span>
+          <span class="tag" style="border-color:rgba(255,0,229,0.3);color:var(--magenta);background:rgba(255,0,229,0.1);">BlockEnum 类型定义</span>
+          <span class="tag" style="border-color:rgba(255,0,229,0.3);color:var(--magenta);background:rgba(255,0,229,0.1);">拖拽连线交互</span>
+        </div>
+      </div>
+
+      <!-- Layer 2 -->
+      <div class="arch-layer glow-pulse" style="border-color:rgba(0,240,255,0.5);">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div>
+            <span class="layer-num">LAYER 2</span>
+            <h3 style="display:inline;margin-left:12px;">工作流编排层</h3>
+          </div>
+          <span class="layer-label mono">api/core/workflow/</span>
+        </div>
+        <div class="mt-1" style="display:flex;gap:10px;flex-wrap:wrap;">
+          <span class="tag">节点注册中心</span>
+          <span class="tag">VariablePool</span>
+          <span class="tag">模板渲染引擎</span>
+          <span class="tag">节点运行器</span>
+          <span class="tag" style="border-color:rgba(255,0,229,0.3);color:var(--magenta);background:rgba(255,0,229,0.1);">GraphEngine 接口</span>
+        </div>
+      </div>
+
+      <!-- Layer 3 -->
+      <div class="arch-layer glow-pulse" style="border-color:rgba(0,255,136,0.5);">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div>
+            <span class="layer-num">LAYER 3</span>
+            <h3 style="display:inline;margin-left:12px;">图执行引擎</h3>
+          </div>
+          <span class="layer-label mono">graphon/</span>
+        </div>
+        <div class="mt-1" style="display:flex;gap:10px;flex-wrap:wrap;">
+          <span class="tag" style="border-color:rgba(0,255,136,0.3);color:var(--green);background:rgba(0,255,136,0.1);">拓扑排序</span>
+          <span class="tag" style="border-color:rgba(0,255,136,0.3);color:var(--green);background:rgba(0,255,136,0.1);">事件流 (SSE)</span>
+          <span class="tag" style="border-color:rgba(0,255,136,0.3);color:var(--green);background:rgba(0,255,136,0.1);">变量分段管理</span>
+          <span class="tag" style="border-color:rgba(0,255,136,0.3);color:var(--green);background:rgba(0,255,136,0.1);">并发调度</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 5: 前端 BlockEnum -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-5">
+  <div class="slide-inner reveal">
+    <h2>前端 BlockEnum <span class="subtitle mono">— TypeScript Enum</span></h2>
+    <p class="mb-1" style="font-size:clamp(14px,1.2vw,18px);">定义所有节点类型的枚举，共 <strong class="text-cyan" style="font-size:clamp(22px,2.5vw,36px);">28</strong> 种</p>
+    <pre style="font-size:clamp(11px,1vw,14px);"><span class="kw">export</span> <span class="kw">enum</span> <span class="fn">BlockEnum</span> {
+  <span class="cm">// 流程控制</span>
+  Start = <span class="str">"start"</span>,
+  End = <span class="str">"end"</span>,
+  Answer = <span class="str">"answer"</span>,
+  IfElse = <span class="str">"if-else"</span>,
+  Iteration = <span class="str">"iteration"</span>,
+  Loop = <span class="str">"loop"</span>,
+
+  <span class="cm">// AI/LLM</span>
+  LLM = <span class="str">"llm"</span>,
+  KnowledgeRetrieval = <span class="str">"knowledge-retrieval"</span>,
+  QuestionClassifier = <span class="str">"question-classifier"</span>,
+  ParameterExtractor = <span class="str">"parameter-extractor"</span>,
+  Agent = <span class="str">"agent"</span>,
+
+  <span class="cm">// 数据处理</span>
+  Code = <span class="str">"code"</span>,
+  TemplateTransform = <span class="str">"template-transform"</span>,
+  VariableAssigner = <span class="str">"variable-assigner"</span>,
+  VariableAggregator = <span class="str">"variable-aggregator"</span>,
+  HttpRequest = <span class="str">"http-request"</span>,
+  DocExtractor = <span class="str">"doc-extractor"</span>,
+  ListFilter = <span class="str">"list-operator"</span>,
+
+  <span class="cm">// 触发器</span>
+  Webhook = <span class="str">"webhook"</span>,
+  Schedule = <span class="str">"schedule"</span>,
+  Plugin = <span class="str">"plugin"</span>,
+  DataSource = <span class="str">"datasource"</span>,
+
+  <span class="cm">// 交互/工具</span>
+  Tool = <span class="str">"tool"</span>,
+  HumanInput = <span class="str">"human-input"</span>,
+  KnowledgeIndex = <span class="str">"knowledge-index"</span>,
+  <span class="cm">// ... 其余类型</span>
+}</pre>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 6: 节点注册机制 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-6">
+  <div class="slide-inner reveal">
+    <h2>节点注册机制 <span class="subtitle mono">— Python Backend</span></h2>
+    <div class="grid-2" style="align-items:start;">
+      <div>
+        <h3 class="mb-1">register_nodes()</h3>
+        <pre style="font-size:clamp(10px,0.95vw,13px);"><span class="kw">def</span> <span class="fn">register_nodes</span>() -> <span class="kw">None</span>:
+    <span class="str">"""注册所有工作流节点类型"""</span>
+    <span class="kw">from</span> api.core.workflow <span class="kw">import</span> NodeRegistry
+
+    <span class="cm"># 流程控制类</span>
+    NodeRegistry.<span class="fn">register</span>(StartNode)
+    NodeRegistry.<span class="fn">register</span>(EndNode)
+    NodeRegistry.<span class="fn">register</span>(IfElseNode)
+    <span class="cm"># ...</span>
+
+    <span class="cm"># AI/LLM 类</span>
+    NodeRegistry.<span class="fn">register</span>(LLMNode)
+    NodeRegistry.<span class="fn">register</span>(AgentNode)
+    <span class="cm"># ... 共 28 种</span></pre>
+      </div>
+      <div>
+        <h3 class="mb-1">resolve_workflow_node_class()</h3>
+        <pre style="font-size:clamp(10px,0.95vw,13px);"><span class="kw">def</span> <span class="fn">resolve_workflow_node_class</span>(
+    node_type: <span class="kw">str</span>
+) -> <span class="kw">type</span>[BaseNode]:
+    <span class="str">"""根据 BlockEnum 字符串
+       解析为 Python 节点类"""</span>
+    <span class="kw">return</span> NodeRegistry.<span class="fn">get</span>(
+        node_type
+    )
+
+<span class="cm"># 示例:</span>
+<span class="cm"># "llm" → LLMNode</span>
+<span class="cm"># "code" → CodeNode</span>
+<span class="cm"># "if-else" → IfElseNode</span></pre>
+      </div>
+    </div>
+    <p class="mt-1 text-center text-dim" style="font-size:clamp(11px,1vw,13px);">每个 Node 类继承 BaseNode，实现 <span class="mono text-yellow">_run()</span> 方法定义自身执行逻辑</p>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 7: 28 种节点 — 5 大类总览 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-7">
+  <div class="slide-inner reveal">
+    <h2>28 种节点 — 5 大类总览</h2>
+    <div class="grid-5">
+      <div class="card" style="border-color:rgba(0,255,136,0.5);">
+        <h3 style="color:var(--green);font-size:clamp(15px,1.3vw,20px);">流程控制类 <span class="mono" style="font-size:clamp(12px,1vw,14px);">(6种)</span></h3>
+        <ul style="list-style:none;padding:0;margin-top:8px;font-size:clamp(11px,1vw,14px);">
+          <li class="text-green mono">Start</li>
+          <li class="text-green mono">End</li>
+          <li class="text-green mono">Answer</li>
+          <li class="text-green mono">IF-ELSE</li>
+          <li class="text-green mono">Iteration</li>
+          <li class="text-green mono">Loop</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:rgba(0,240,255,0.5);">
+        <h3 style="color:var(--cyan);font-size:clamp(15px,1.3vw,20px);">AI/LLM 类 <span class="mono" style="font-size:clamp(12px,1vw,14px);">(5种)</span></h3>
+        <ul style="list-style:none;padding:0;margin-top:8px;font-size:clamp(11px,1vw,14px);">
+          <li class="text-cyan mono">LLM</li>
+          <li class="text-cyan mono">知识检索</li>
+          <li class="text-cyan mono">问题分类器</li>
+          <li class="text-cyan mono">参数提取器</li>
+          <li class="text-cyan mono">Agent</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:rgba(255,217,102,0.5);">
+        <h3 style="color:var(--yellow);font-size:clamp(15px,1.3vw,20px);">数据处理类 <span class="mono" style="font-size:clamp(12px,1vw,14px);">(7种)</span></h3>
+        <ul style="list-style:none;padding:0;margin-top:8px;font-size:clamp(11px,1vw,14px);">
+          <li class="text-yellow mono">Code</li>
+          <li class="text-yellow mono">模板转换</li>
+          <li class="text-yellow mono">变量赋值器</li>
+          <li class="text-yellow mono">变量聚合器</li>
+          <li class="text-yellow mono">HTTP 请求</li>
+          <li class="text-yellow mono">文档提取器</li>
+          <li class="text-yellow mono">列表操作</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:rgba(189,147,249,0.5);">
+        <h3 style="color:var(--purple);font-size:clamp(15px,1.3vw,20px);">触发器类 <span class="mono" style="font-size:clamp(12px,1vw,14px);">(4种)</span></h3>
+        <ul style="list-style:none;padding:0;margin-top:8px;font-size:clamp(11px,1vw,14px);">
+          <li class="text-purple mono">Webhook</li>
+          <li class="text-purple mono">定时触发</li>
+          <li class="text-purple mono">插件</li>
+          <li class="text-purple mono">DataSource</li>
+        </ul>
+      </div>
+      <div class="card card-magenta" style="border-color:rgba(255,85,85,0.5);">
+        <h3 style="color:var(--red);font-size:clamp(15px,1.3vw,20px);">交互/工具类 <span class="mono" style="font-size:clamp(12px,1vw,14px);">(6种)</span></h3>
+        <ul style="list-style:none;padding:0;margin-top:8px;font-size:clamp(11px,1vw,14px);">
+          <li class="text-red mono">Tool</li>
+          <li class="text-red mono">人工输入</li>
+          <li class="text-red mono">知识库索引</li>
+          <li class="text-red mono">文件处理</li>
+          <li class="text-red mono">数据库查询</li>
+          <li class="text-red mono">API 调用</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 8: 执行模型 — 拓扑排序 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-8">
+  <div class="slide-inner reveal">
+    <h2>执行模型 — 拓扑排序</h2>
+    <div class="grid-2" style="align-items:center;">
+      <div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:clamp(8px,1.5vh,16px);margin-bottom:clamp(12px,2vh,24px);">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;">
+            <span class="flow-node fn-green">Start</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node fn-yellow">HTTP</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node fn-cyan">LLM</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node fn-green">End</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="flow-node fn-purple">Code</span>
+            <span class="flow-arrow" style="transform:rotate(45deg);">→</span>
+          </div>
+        </div>
+        <p style="font-size:clamp(13px,1.1vw,16px);">引擎从起始节点出发，<strong class="text-cyan">按边的方向依次执行</strong>。<br>Code 与 HTTP 并行 → 汇聚到 LLM</p>
+      </div>
+      <div>
+        <pre style="font-size:clamp(10px,0.9vw,13px);"><span class="kw">class</span> <span class="fn">WorkflowGraphTopology</span>:
+    <span class="kw">def</span> <span class="fn">is_upstream</span>(
+        self,
+        node_a: <span class="kw">str</span>,
+        node_b: <span class="kw">str</span>
+    ) -> <span class="kw">bool</span>:
+        <span class="str">"""检查 node_a 是否在
+           node_b 的上游"""</span>
+        <span class="kw">if</span> node_a == node_b:
+            <span class="kw">return</span> <span class="kw">True</span>
+        <span class="kw">for</span> edge <span class="kw">in</span> self.edges:
+            <span class="kw">if</span> edge.source == node_a:
+                <span class="kw">if</span> self.<span class="fn">is_upstream</span>(
+                    edge.target, node_b
+                ):
+                    <span class="kw">return</span> <span class="kw">True</span>
+        <span class="kw">return</span> <span class="kw">False</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 9: 流式事件 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-9">
+  <div class="slide-inner reveal">
+    <h2>流式事件 <span class="subtitle mono">— SSE (Server-Sent Events)</span></h2>
+    <div class="grid-3">
+      <div class="card">
+        <h3 class="text-cyan mono" style="font-size:clamp(13px,1.1vw,17px);">GraphNodeEventBase</h3>
+        <p class="text-dim mt-1" style="font-size:clamp(11px,1vw,14px);">节点事件基类</p>
+        <pre style="font-size:clamp(10px,0.9vw,12px);margin-top:8px;"><span class="kw">class</span> <span class="fn">GraphNodeEventBase</span>:
+    node_id: <span class="kw">str</span>
+    node_type: <span class="kw">str</span>
+    event_type: <span class="kw">str</span>
+    <span class="cm"># node_started</span>
+    <span class="cm"># node_finished</span>
+    <span class="cm"># node_iteration</span></pre>
+      </div>
+      <div class="card card-magenta">
+        <h3 class="text-magenta mono" style="font-size:clamp(13px,1.1vw,17px);">GraphEngineEvent</h3>
+        <p class="text-dim mt-1" style="font-size:clamp(11px,1vw,14px);">工作流级别事件</p>
+        <pre style="font-size:clamp(10px,0.9vw,12px);margin-top:8px;"><span class="kw">class</span> <span class="fn">GraphEngineEvent</span>:
+    event: <span class="kw">str</span>
+    <span class="cm"># workflow_started</span>
+    <span class="cm"># workflow_finished</span>
+    <span class="cm"># node_started</span>
+    <span class="cm"># node_finished</span>
+    data: <span class="kw">dict</span></pre>
+      </div>
+      <div class="card" style="border-color:rgba(255,85,85,0.5);">
+        <h3 class="text-red mono" style="font-size:clamp(13px,1.1vw,17px);">GraphRunFailedEvent</h3>
+        <p class="text-dim mt-1" style="font-size:clamp(11px,1vw,14px);">运行失败事件</p>
+        <pre style="font-size:clamp(10px,0.9vw,12px);margin-top:8px;"><span class="kw">class</span> <span class="fn">GraphRunFailedEvent</span>:
+    error: <span class="kw">str</span>
+    error_type: <span class="kw">str</span>
+    node_id: <span class="kw">str</span>
+    <span class="cm"># 携带失败的</span>
+    <span class="cm"># 节点信息</span>
+    <span class="cm"># 方便定位问题</span></pre>
+      </div>
+    </div>
+    <p class="mt-1 text-center text-dim" style="font-size:clamp(11px,1vw,13px);">前端通过 <span class="mono text-cyan">EventSource</span> 监听 SSE 流，实时更新画布状态（节点高亮、输出展示、进度动画）</p>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 10: 并行执行 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-10">
+  <div class="slide-inner reveal">
+    <h2>并行执行 <span class="subtitle mono">— Iteration Node</span></h2>
+    <div class="grid-2" style="align-items:center;">
+      <div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:clamp(12px,2vh,24px);">
+          <span style="background:rgba(0,240,255,0.2);border:1px solid var(--cyan);border-radius:8px;padding:clamp(8px,1.5vh,16px);font-family:var(--font-mono);font-size:clamp(12px,1.1vw,15px);color:var(--cyan);">E1</span>
+          <span style="background:rgba(0,240,255,0.2);border:1px solid var(--cyan);border-radius:8px;padding:clamp(8px,1.5vh,16px);font-family:var(--font-mono);font-size:clamp(12px,1.1vw,15px);color:var(--cyan);">E2</span>
+          <span style="background:rgba(0,240,255,0.2);border:1px solid var(--cyan);border-radius:8px;padding:clamp(8px,1.5vh,16px);font-family:var(--font-mono);font-size:clamp(12px,1.1vw,15px);color:var(--cyan);">E3</span>
+          <span style="background:rgba(0,240,255,0.2);border:1px solid var(--cyan);border-radius:8px;padding:clamp(8px,1.5vh,16px);font-family:var(--font-mono);font-size:clamp(12px,1.1vw,15px);color:var(--cyan);">E4</span>
+          <span style="background:rgba(0,240,255,0.2);border:1px solid var(--cyan);border-radius:8px;padding:clamp(8px,1.5vh,16px);font-family:var(--font-mono);font-size:clamp(12px,1.1vw,15px);color:var(--cyan);">E5</span>
+          <span style="background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:8px;padding:clamp(8px,1.5vh,16px);font-family:var(--font-mono);font-size:clamp(12px,1.1vw,15px);color:var(--text-dim);">...</span>
+          <span style="background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.2);border-radius:8px;padding:clamp(8px,1.5vh,16px);font-family:var(--font-mono);font-size:clamp(12px,1.1vw,15px);color:var(--text-dim);">E10</span>
+        </div>
+        <div style="text-align:center;">
+          <p><span class="text-cyan" style="font-size:clamp(18px,2vw,28px);font-weight:800;">10</span> 个元素</p>
+          <p>parallel = <span class="text-magenta" style="font-size:clamp(18px,2vw,28px);font-weight:800;">5</span></p>
+          <p class="text-dim" style="font-size:clamp(12px,1vw,14px);">→ 每次 5 个同时处理</p>
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:clamp(10px,0.9vw,13px);"><span class="cm"># Iteration 节点核心常量</span>
+MIN_ITERATION_PARALLEL_NUM = <span class="str">1</span>
+MAX_ITERATION_PARALLEL_NUM = <span class="str">10</span>
+
+<span class="kw">class</span> <span class="fn">IterationNode</span>(BaseNode):
+    parallel_nums: <span class="kw">int</span> = <span class="str">1</span>
+
+    <span class="kw">def</span> <span class="fn">_run</span>(self):
+        <span class="cm"># 将输入列表分片</span>
+        <span class="cm"># 每个并行 worker</span>
+        <span class="cm"># 独立子 VariablePool</span>
+        batches = <span class="fn">split_into_batches</span>(
+            self.input_list,
+            self.parallel_nums
+        )
+        <span class="cm"># asyncio.gather 并发执行</span>
+        <span class="kw">await</span> <span class="fn">asyncio.gather</span>(*[
+            self.<span class="fn">run_iter</span>(b)
+            <span class="kw">for</span> b <span class="kw">in</span> batches
+        ])</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 11: 变量系统初步 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-11">
+  <div class="slide-inner reveal">
+    <h2>变量系统初步 <span class="subtitle mono">— VariablePool</span></h2>
+    <p class="mb-1" style="font-size:clamp(13px,1.2vw,16px);">KV 存储，key = <span class="mono text-cyan">(node_id, field_name)</span> 元组</p>
+    <div class="grid-3">
+      <div class="card">
+        <h3 class="text-cyan mono" style="font-size:clamp(12px,1vw,14px);">("17200001", "text")</h3>
+        <p class="text-dim mt-1" style="font-size:clamp(11px,1vw,13px);">LLM 节点输出文本<br>"今天上海天气晴朗..."</p>
+      </div>
+      <div class="card card-magenta">
+        <h3 class="text-magenta mono" style="font-size:clamp(12px,1vw,14px);">("sys", "query")</h3>
+        <p class="text-dim mt-1" style="font-size:clamp(11px,1vw,13px);">系统变量 — 用户输入<br>"上海今天天气如何？"</p>
+      </div>
+      <div class="card" style="border-color:rgba(255,217,102,0.5);">
+        <h3 class="text-yellow mono" style="font-size:clamp(12px,1vw,14px);">("17200003", "result")</h3>
+        <p class="text-dim mt-1" style="font-size:clamp(11px,1vw,13px);">知识检索结果<br>[{content:"...", score:0.92}]</p>
+      </div>
+    </div>
+    <p class="mt-1 text-center text-dim" style="font-size:clamp(11px,1vw,13px);">每个节点的输出都以 <span class="mono text-green">(node_id, field_name)</span> 格式存入 VariablePool，下游节点通过此 key 引用</p>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 12: 变量池代码 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-12">
+  <div class="slide-inner reveal">
+    <h2>变量池代码 <span class="subtitle mono">— add_variables_to_pool()</span></h2>
+    <pre style="font-size:clamp(11px,1vw,14px);"><span class="kw">class</span> <span class="fn">VariablePool</span>:
+    <span class="kw">def</span> <span class="fn">add_variables_to_pool</span>(
+        self,
+        node_id: <span class="kw">str</span>,
+        outputs: <span class="kw">dict</span>
+    ) -> <span class="kw">None</span>:
+        <span class="str">"""将节点输出写入变量池
+
+        参数:
+            node_id: 节点 ID（如 "17200001"）
+            outputs: 节点输出字典
+                    {"text": "...",
+                     "usage": {...}}
+        """</span>
+        <span class="kw">for</span> field_name, value <span class="kw">in</span> outputs.items():
+            key = (node_id, field_name)
+            self._pool[key] = value
+
+    <span class="kw">def</span> <span class="fn">get_variable</span>(
+        self,
+        node_id: <span class="kw">str</span>,
+        field_name: <span class="kw">str</span>
+    ) -> <span class="kw">Any</span>:
+        <span class="str">"""读取变量"""</span>
+        <span class="kw">return</span> self._pool.get(
+            (node_id, field_name)
+        )</pre>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 13: 系统变量 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-13">
+  <div class="slide-inner reveal">
+    <h2>系统变量 <span class="subtitle mono">— SystemVariableKey</span></h2>
+    <div class="grid-2" style="align-items:start;">
+      <div>
+        <h3 class="mb-1">后端定义 (Python Enum)</h3>
+        <pre style="font-size:clamp(10px,0.9vw,13px);"><span class="kw">class</span> <span class="fn">SystemVariableKey</span>(
+    <span class="kw">str</span>, <span class="kw">Enum</span>
+):
+    QUERY = <span class="str">"query"</span>
+    FILES = <span class="str">"files"</span>
+    USER_ID = <span class="str">"user_id"</span>
+    APP_ID = <span class="str">"app_id"</span>
+    WORKFLOW_ID = <span class="str">"workflow_id"</span>
+    WORKFLOW_EXECUTION_ID = \
+        <span class="str">"workflow_execution_id"</span>
+    CONVERSATION_ID = \
+        <span class="str">"conversation_id"</span>
+    DIALOGUE_COUNT = \
+        <span class="str">"dialogue_count"</span>
+    TIMESTAMP = <span class="str">"timestamp"</span></pre>
+      </div>
+      <div>
+        <h3 class="mb-1">前端引用格式</h3>
+        <div class="card" style="font-size:clamp(12px,1.1vw,15px);">
+          <p class="mono"><span class="text-cyan">sys.query</span> <span class="text-dim">— 用户输入</span></p>
+          <p class="mono"><span class="text-cyan">sys.user_id</span> <span class="text-dim">— 用户 ID</span></p>
+          <p class="mono"><span class="text-cyan">sys.app_id</span> <span class="text-dim">— 应用 ID</span></p>
+          <p class="mono"><span class="text-cyan">sys.files</span> <span class="text-dim">— 上传文件列表</span></p>
+          <p class="mono"><span class="text-cyan">sys.workflow_id</span> <span class="text-dim">— 工作流 ID</span></p>
+          <p class="mono"><span class="text-cyan">sys.conversation_id</span> <span class="text-dim">— 对话 ID</span></p>
+          <p class="mono"><span class="text-cyan">sys.dialogue_count</span> <span class="text-dim">— 对话轮次</span></p>
+          <p class="mono"><span class="text-cyan">sys.timestamp</span> <span class="text-dim">— 当前时间戳</span></p>
+          <p class="mono"><span class="text-cyan">sys.workflow_execution_id</span> <span class="text-dim">— 执行 ID</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 14: 变量生命周期 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-14">
+  <div class="slide-inner reveal">
+    <h2>变量生命周期 <span class="subtitle mono">— 3-Stage Lifecycle</span></h2>
+    <div style="display:flex;align-items:center;justify-content:center;gap:clamp(8px,2vw,20px);flex-wrap:wrap;margin-top:clamp(16px,3vh,32px);">
+      <div class="card glow-pulse" style="text-align:center;flex:1;min-width:200px;">
+        <div style="font-family:var(--font-mono);font-size:clamp(36px,4vw,56px);color:var(--cyan);font-weight:800;">1</div>
+        <h3>工作流启动</h3>
+        <p class="text-dim" style="font-size:clamp(11px,1vw,14px);">注入系统变量<br>初始化空变量池</p>
+      </div>
+      <span style="font-size:clamp(24px,3vw,40px);color:var(--cyan);">→</span>
+      <div class="card glow-pulse-magenta" style="text-align:center;flex:1;min-width:200px;">
+        <div style="font-family:var(--font-mono);font-size:clamp(36px,4vw,56px);color:var(--magenta);font-weight:800;">2</div>
+        <h3>节点依次执行</h3>
+        <p class="text-dim" style="font-size:clamp(11px,1vw,14px);">每次节点输出<br>写入变量池</p>
+      </div>
+      <span style="font-size:clamp(24px,3vw,40px);color:var(--cyan);">→</span>
+      <div class="card" style="text-align:center;flex:1;min-width:200px;border-color:rgba(0,255,136,0.5);">
+        <div style="font-family:var(--font-mono);font-size:clamp(36px,4vw,56px);color:var(--green);font-weight:800;">3</div>
+        <h3>工作流结束</h3>
+        <p class="text-dim" style="font-size:clamp(11px,1vw,14px);">变量池销毁<br>资源释放</p>
+      </div>
+    </div>
+    <p class="mt-2 text-center text-dim" style="font-size:clamp(12px,1.1vw,15px);">迭代/循环节点内创建<strong class="text-cyan">子 VariablePool</strong>，隔离并行执行上下文</p>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 15: 变量引用方式 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-15">
+  <div class="slide-inner reveal">
+    <h2>变量引用方式 <span class="subtitle mono">— 4 种引用类型</span></h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3 class="text-cyan mono" style="font-size:clamp(13px,1.1vw,17px);">1. 系统变量</h3>
+        <pre style="font-size:clamp(11px,1vw,14px);margin-top:8px;">sys.query
+sys.user_id
+sys.files</pre>
+        <p class="text-dim mt-1" style="font-size:clamp(11px,1vw,13px);">运行时自动注入，只读</p>
+      </div>
+      <div class="card card-magenta">
+        <h3 class="text-magenta mono" style="font-size:clamp(13px,1.1vw,17px);">2. 上游节点输出</h3>
+        <pre style="font-size:clamp(11px,1vw,14px);margin-top:8px;">{{节点ID.字段名}}
+{{17200001.text}}
+{{llm_node.usage}}</pre>
+        <p class="text-dim mt-1" style="font-size:clamp(11px,1vw,13px);">Jinja2 模板语法，必须通过边关联</p>
+      </div>
+      <div class="card" style="border-color:rgba(0,255,136,0.5);">
+        <h3 class="text-green mono" style="font-size:clamp(13px,1.1vw,17px);">3. 环境变量</h3>
+        <pre style="font-size:clamp(11px,1vw,14px);margin-top:8px;">env.API_KEY
+env.BASE_URL
+env.SECRET_TOKEN</pre>
+        <p class="text-dim mt-1" style="font-size:clamp(11px,1vw,13px);">应用级别配置，发布时注入</p>
+      </div>
+      <div class="card" style="border-color:rgba(255,184,108,0.5);">
+        <h3 class="text-orange mono" style="font-size:clamp(13px,1.1vw,17px);">4. 对话变量</h3>
+        <pre style="font-size:clamp(11px,1vw,14px);margin-top:8px;">conversation.user_name
+conversation.context
+conversation.preferences</pre>
+        <p class="text-dim mt-1" style="font-size:clamp(11px,1vw,13px);">跨轮次持久化，Chat 模式可用</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 16: 两种运行模式 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-16">
+  <div class="slide-inner reveal">
+    <h2>三种运行模式</h2>
+    <table class="compare-table mt-1">
+      <thead>
+        <tr>
+          <th>特性</th>
+          <th style="color:var(--cyan);">Workflow 模式</th>
+          <th style="color:var(--magenta);">Chat 模式</th>
+          <th style="color:var(--purple);">Agent 模式</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">AppMode</td>
+          <td class="mono text-cyan">WORKFLOW</td>
+          <td class="mono text-magenta">CHAT</td>
+          <td class="mono text-purple">AGENT</td>
+        </tr>
+        <tr>
+          <td>对话上下文</td>
+          <td>无</td>
+          <td>有（多轮记忆）</td>
+          <td>有（推理链）</td>
+        </tr>
+        <tr>
+          <td>输出方式</td>
+          <td>End 节点定义</td>
+          <td>Answer 节点输出</td>
+          <td>Agent 节点 + 工具调用</td>
+        </tr>
+        <tr>
+          <td>核心节点</td>
+          <td>任意组合</td>
+          <td>Answer + LLM</td>
+          <td>Agent + Tool</td>
+        </tr>
+        <tr>
+          <td>适用场景</td>
+          <td>自动化任务、批量处理</td>
+          <td>对话 Bot、客服</td>
+          <td>自主推理、多步任务</td>
+        </tr>
+        <tr>
+          <td>变量持久化</td>
+          <td>单次执行</td>
+          <td>Conversation 级</td>
+          <td>Conversation 级</td>
+        </tr>
+        <tr>
+          <td>典型例子</td>
+          <td>SEO文章生成流水线</td>
+          <td>智能客服助手</td>
+          <td>数据分析助手</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 17: 开始搭建前必知的 8 件事 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-17">
+  <div class="slide-inner reveal">
+    <h2>开始搭建前必知的 <span class="text-magenta">8</span> 件事</h2>
+    <div class="reveal-stagger grid-2" style="margin-top:clamp(8px,1.5vh,16px);">
+      <div class="card" style="display:flex;gap:12px;align-items:baseline;">
+        <span class="mono text-cyan" style="font-size:clamp(16px,1.5vw,22px);font-weight:800;">01</span>
+        <div><strong>Start 节点决定输入</strong><br><span class="text-dim" style="font-size:clamp(11px,1vw,13px);">定义工作流接收哪些字段，相当于函数签名</span></div>
+      </div>
+      <div class="card" style="display:flex;gap:12px;align-items:baseline;">
+        <span class="mono text-cyan" style="font-size:clamp(16px,1.5vw,22px);font-weight:800;">02</span>
+        <div><strong>End 节点决定输出</strong><br><span class="text-dim" style="font-size:clamp(11px,1vw,13px);">只有 End 节点标记的字段才会作为 API 返回值</span></div>
+      </div>
+      <div class="card" style="display:flex;gap:12px;align-items:baseline;">
+        <span class="mono text-magenta" style="font-size:clamp(16px,1.5vw,22px);font-weight:800;">03</span>
+        <div><strong>变量引用必须依赖边</strong><br><span class="text-dim" style="font-size:clamp(11px,1vw,13px);">节点 A 要引用节点 B 的输出，必须先连线 A ← B</span></div>
+      </div>
+      <div class="card card-magenta" style="display:flex;gap:12px;align-items:baseline;">
+        <span class="mono text-magenta" style="font-size:clamp(16px,1.5vw,22px);font-weight:800;">04</span>
+        <div><strong>迭代/循环创建子作用域</strong><br><span class="text-dim" style="font-size:clamp(11px,1vw,13px);">内部变量独立，外部无法直接访问迭代内的输出</span></div>
+      </div>
+      <div class="card" style="display:flex;gap:12px;align-items:baseline;border-color:rgba(255,217,102,0.5);">
+        <span class="mono text-yellow" style="font-size:clamp(16px,1.5vw,22px);font-weight:800;">05</span>
+        <div><strong>分支按条件选择执行</strong><br><span class="text-dim" style="font-size:clamp(11px,1vw,13px);">IF-ELSE 条件分支只执行匹配的路径，其余跳过</span></div>
+      </div>
+      <div class="card" style="display:flex;gap:12px;align-items:baseline;border-color:rgba(0,255,136,0.5);">
+        <span class="mono text-green" style="font-size:clamp(16px,1.5vw,22px);font-weight:800;">06</span>
+        <div><strong>LLM 节点必须配模型</strong><br><span class="text-dim" style="font-size:clamp(11px,1vw,13px);">选择 LLM 提供方（OpenAI / Claude / 本地模型）并配置参数</span></div>
+      </div>
+      <div class="card" style="display:flex;gap:12px;align-items:baseline;border-color:rgba(189,147,249,0.5);">
+        <span class="mono text-purple" style="font-size:clamp(16px,1.5vw,22px);font-weight:800;">07</span>
+        <div><strong>Code 节点沙箱限制</strong><br><span class="text-dim" style="font-size:clamp(11px,1vw,13px);">仅 Python/JS，无网络访问（除 HTTP 请求库），超时限制</span></div>
+      </div>
+      <div class="card" style="display:flex;gap:12px;align-items:baseline;border-color:rgba(255,85,85,0.5);">
+        <span class="mono text-red" style="font-size:clamp(16px,1.5vw,22px);font-weight:800;">08</span>
+        <div><strong>发布后才能被 API 调用</strong><br><span class="text-dim" style="font-size:clamp(11px,1vw,13px);">画布中的修改必须"发布"后才会在 API 中生效</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<!-- SLIDE 18: 结束页 -->
+<!-- ====================================================================== -->
+<section class="slide" id="slide-18">
+  <div class="slide-inner text-center reveal">
+    <p class="mono text-cyan mb-1" style="font-size:clamp(12px,1.2vw,16px);letter-spacing:0.2em;">END OF PART 1</p>
+    <h1 style="margin-bottom:clamp(12px,2vh,24px);">
+      <span class="text-glow">下一篇预告</span>
+    </h1>
+    <div style="margin:clamp(16px,3vh,32px) 0;">
+      <p style="font-size:clamp(20px,3vw,40px);font-weight:700;color:var(--cyan);">节点篇</p>
+      <p style="font-size:clamp(16px,2vw,28px);color:var(--text-dim);">28 种节点完全详解</p>
+    </div>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:clamp(16px,3vh,32px);">
+      <span class="tag" style="font-size:clamp(11px,1vw,14px);padding:6px 16px;">Start / End 配置细节</span>
+      <span class="tag" style="font-size:clamp(11px,1vw,14px);padding:6px 16px;border-color:rgba(255,0,229,0.3);color:var(--magenta);background:rgba(255,0,229,0.1);">LLM 参数调优</span>
+      <span class="tag" style="font-size:clamp(11px,1vw,14px);padding:6px 16px;">IF-ELSE 分支策略</span>
+      <span class="tag" style="font-size:clamp(11px,1vw,14px);padding:6px 16px;border-color:rgba(0,255,136,0.3);color:var(--green);background:rgba(0,255,136,0.1);">Iteration 实战</span>
+      <span class="tag" style="font-size:clamp(11px,1vw,14px);padding:6px 16px;">Code 节点技巧</span>
+    </div>
+    <p class="mt-2 text-dim" style="font-size:clamp(13px,1.1vw,16px);">按 <span class="mono text-cyan">→</span> 键或点击右侧圆点可回顾前面内容</p>
+  </div>
+</section>
+</main>
+
+<script>
+(function() {
+  // ===== Presentation Controller =====
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  const dotsContainer = document.getElementById('progressDots');
+  const currentSlideNumEl = document.getElementById('currentSlideNum');
+  const totalSlideNumEl = document.getElementById('totalSlideNum');
+
+  totalSlideNumEl.textContent = totalSlides;
+
+  let currentIndex = 0;
+  let isTransitioning = false;
+  let touchStartY = 0;
+
+  // ===== Build progress dots =====
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('button');
+    dot.className = 'progress-dot';
+    dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+    dot.addEventListener('click', () => goToSlide(i));
+    dotsContainer.appendChild(dot);
+  }
+
+  function updateUI() {
+    currentSlideNumEl.textContent = currentIndex + 1;
+
+    const dots = dotsContainer.querySelectorAll('.progress-dot');
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  function goToSlide(index) {
+    if (index < 0 || index >= totalSlides || isTransitioning) return;
+    isTransitioning = true;
+    currentIndex = index;
+    updateUI();
+
+    slides[currentIndex].scrollIntoView({ behavior: 'smooth' });
+
+    setTimeout(() => {
+      isTransitioning = false;
+    }, 500);
+  }
+
+  function nextSlide() { goToSlide(currentIndex + 1); }
+  function prevSlide() { goToSlide(currentIndex - 1); }
+
+  // ===== Keyboard navigation =====
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+      case ' ':
+        e.preventDefault();
+        nextSlide();
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        e.preventDefault();
+        prevSlide();
+        break;
+      case 'Home':
+        e.preventDefault();
+        goToSlide(0);
+        break;
+      case 'End':
+        e.preventDefault();
+        goToSlide(totalSlides - 1);
+        break;
+    }
+  });
+
+  // ===== Mouse wheel =====
+  let wheelTimeout;
+  document.addEventListener('wheel', (e) => {
+    if (wheelTimeout) return;
+    wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
+
+    if (e.deltaY > 30) {
+      nextSlide();
+    } else if (e.deltaY < -30) {
+      prevSlide();
+    }
+  }, { passive: true });
+
+  // ===== Touch swipe =====
+  document.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    const deltaY = touchStartY - e.changedTouches[0].clientY;
+    if (Math.abs(deltaY) > 50) {
+      if (deltaY > 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    }
+  }, { passive: true });
+
+  // ===== Intersection Observer: reveal + sync index =====
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.4
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        // Reveal animation
+        const revealEls = entry.target.querySelectorAll('.reveal, .reveal-stagger');
+        revealEls.forEach(el => el.classList.add('visible'));
+
+        // Sync current index
+        const slideId = entry.target.id;
+        const match = slideId.match(/slide-(\d+)/);
+        if (match) {
+          const idx = parseInt(match[1], 10) - 1;
+          if (idx !== currentIndex) {
+            currentIndex = idx;
+            updateUI();
+          }
+        }
+      }
+    });
+  }, observerOptions);
+
+  slides.forEach(slide => observer.observe(slide));
+
+  // ===== Initialize =====
+  updateUI();
+
+  // Reveal first slide immediately
+  const firstReveal = slides[0].querySelector('.reveal');
+  if (firstReveal) firstReveal.classList.add('visible');
+})();
+</script>
+</body>
+</html>

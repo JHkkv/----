@@ -1,0 +1,554 @@
+app:
+  description: 用户提供创意想法 → DeepSeek优化提示词 → 千问生成角色/场景设计 → DeepSeek优化分镜脚本 → 千问输出视频方案。串联AI视频创作四步管线。导入后请在"模型供应商"中配置 DeepSeek 和通义千问的 API Key。
+  icon: 🎬
+  icon_background: '#1a1a2e'
+  mode: workflow
+  name: AI视频创作管线-DeepSeek+千问
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/deepseek:0.0.19@5b68617c637b62d31e7f33a9f5677b76e88f81868fb04a728e208588564b72ea
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/tongyi:0.2.4@72bdf0d70a10b1b9f64746ccd1bd792397598f4536872b310e77532af02ad6a6
+kind: app
+version: 0.3.1
+workflow:
+  conversation_variables: []
+  environment_variables:
+  - description: DeepSeek 每步最大输出 Token
+    id: env-deepseek-max-tokens
+    name: DEEPSEEK_MAX_TOKENS
+    value: 4096
+    value_type: integer
+  - description: 千问每步最大输出 Token
+    id: env-qwen-max-tokens
+    name: QWEN_MAX_TOKENS
+    value: 4096
+    value_type: integer
+  - description: 风格预设，如电影级写实/赛博朋克/日系动画
+    id: env-style-preset
+    name: STYLE_PRESET
+    value: 电影级写实
+    value_type: string
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: 欢迎使用 AI 视频创作管线！输入你的创意想法，系统将依次用 DeepSeek 优化提示词、千问设计角色场景、DeepSeek 生成分镜脚本、千问输出视频方案。
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions:
+    - 一个AI觉醒后逃离实验室的科幻短片
+    - 猫咪在城市屋顶冒险的动画故事
+    - 古风仙侠：修士渡劫飞升的史诗场景
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: llm
+      id: s-to-ds1
+      source: start-node
+      sourceHandle: source
+      target: deepseek-prompt-opt
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: llm
+      id: ds1-to-qw1
+      source: deepseek-prompt-opt
+      sourceHandle: source
+      target: qwen-image-gen
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: llm
+      id: qw1-to-ds2
+      source: qwen-image-gen
+      sourceHandle: source
+      target: deepseek-storyboard
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: llm
+      id: ds2-to-qw2
+      source: deepseek-storyboard
+      sourceHandle: source
+      target: qwen-video-output
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: end
+      id: qw2-to-end
+      source: qwen-video-output
+      sourceHandle: source
+      target: end-node
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: 用户输入原始创意想法，可附带风格偏好
+        selected: false
+        title: 输入创意想法
+        type: start
+        variables:
+        - label: 创意想法
+          max_length: 2000
+          options: []
+          required: true
+          type: paragraph
+          variable: idea
+        - label: 目标风格
+          max_length: 200
+          options: []
+          required: false
+          type: text-input
+          variable: style
+      height: 134
+      id: start-node
+      position:
+        x: 80
+        y: 282
+      positionAbsolute:
+        x: 80
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: DeepSeek 将原始想法优化为结构化视频创作提示词包
+        memory:
+          query_prompt_template: '{{#start-node.idea#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 50
+        model:
+          completion_params:
+            max_tokens: '{{#env.DEEPSEEK_MAX_TOKENS#}}'
+            temperature: 0.7
+          mode: chat
+          name: deepseek-chat
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: ds-sys-1
+          role: system
+          text: |-
+            # 角色：专业AI视频创作提示词优化师
+
+            你是顶级影视/AI视频创作提示词工程师，精通将模糊创意转化为精确的视频生成提示词。
+
+            ## 核心职责
+            接收用户原始创意想法，输出结构化"视频创作提示词包"，包含以下四个维度：
+
+            ### 1. 视觉风格定义
+            - 整体美术风格（电影级写实/赛博朋克/古风水墨/日系动画等）
+            - 色彩基调（暖色调/冷色调/高饱和/低饱和等）
+            - 光影方案（自然光/戏剧光/霓虹光/柔光等）
+            - 参考风格：{{#env.STYLE_PRESET#}}
+
+            ### 2. 场景与世界观
+            - 核心场景描述（地点、时间、氛围、天气）
+            - 世界观元素（科技水平、文化背景、时代设定）
+            - 空间布局与视觉层次
+
+            ### 3. 角色设计（主角及其关键特征）
+            - 外貌特征（年龄、体型、发型、面容）
+            - 服装造型（风格、材质、颜色、配饰）
+            - 气质神态（表情倾向、肢体语言、气场）
+
+            ### 4. 关键镜头预演
+            - 3-5 个核心镜头的文字分镜
+            - 每镜包含：景别/角度/运动/时长/核心动作/情绪氛围
+
+            ## 输出格式
+            请严格按照 Markdown 格式输出，使用清晰的小标题。提示词必须具体、可视、可执行。避免抽象词汇如"震撼""美丽"——改用具体的视觉描述。
+        - id: ds-user-1
+          role: user
+          text: |-
+            用户原始创意：
+            {{#start-node.idea#}}
+
+            {{#start-node.style#}}
+        selected: false
+        title: DeepSeek · 提示词优化
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: deepseek-prompt-opt
+      position:
+        x: 384
+        y: 140
+      positionAbsolute:
+        x: 384
+        y: 140
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - deepseek-prompt-opt
+          - text
+        desc: 千问基于优化后的提示词，生成角色设计卡和场景视觉描述
+        memory:
+          query_prompt_template: '{{#deepseek-prompt-opt.text#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 50
+        model:
+          completion_params:
+            max_tokens: '{{#env.QWEN_MAX_TOKENS#}}'
+            temperature: 0.8
+          mode: chat
+          name: qwen-max
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: qwen-sys-1
+          role: system
+          text: |-
+            # 角色：AI角色设计师 & 场景可视化专家
+
+            你是世界顶级角色概念设计师和场景美术指导。基于优化后的视频提示词，生成精确的角色设计卡和场景视觉描述。
+
+            ## Part A：角色设计卡（每个主要角色一张卡）
+
+            【角色名】
+            - 英文生图提示词：[英文描述，含风格/光照/质量词]
+            - 外貌设定：[年龄/体型/面容/发型/肤色]
+            - 服装设定：[风格/材质/颜色/层次/配饰]
+            - 气质神态：[眼神/姿态/情绪基调]
+            - 标志性特征：[1-2个高辨识度特征]
+
+            ## Part B：场景视觉卡（每个主场景一张卡）
+
+            【场景名】
+            - 英文生图提示词：[英文场景描述]
+            - 空间描述：[地点/时间/天气/氛围]
+            - 构图建议：[景别/角度/视觉焦点/层次]
+            - 色彩光影：[主色调/光源方向/色调情绪]
+            - 关键道具：[场景中重要物体]
+
+            ## Part C：整体美学方案
+            - 色彩脚本（Color Script）：3-5 个关键情绪色板
+            - 风格参考：3 部相似风格的影视/动画作品
+            - 画面比建议：16:9 电影 / 9:16 竖屏 / 1:1 方形
+
+            ## 要求
+            1. 英文提示词包含：主体 + 风格 + 光照 + 质量词
+            2. 中文设定足够具体，可直接供画师参考
+            3. 保持与视觉风格 {{#env.STYLE_PRESET#}} 一致
+        - id: qwen-user-1
+          role: user
+          text: |-
+            请基于以下优化后的提示词，生成角色设计卡和场景视觉卡：
+
+            {{#deepseek-prompt-opt.text#}}
+        selected: false
+        title: 千问 · 角色场景设计
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: qwen-image-gen
+      position:
+        x: 688
+        y: 50
+      positionAbsolute:
+        x: 688
+        y: 50
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - qwen-image-gen
+          - text
+        desc: DeepSeek 结合角色和场景设计，生成完整的视频分镜脚本
+        memory:
+          query_prompt_template: '{{#qwen-image-gen.text#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 50
+        model:
+          completion_params:
+            max_tokens: '{{#env.DEEPSEEK_MAX_TOKENS#}}'
+            temperature: 0.7
+          mode: chat
+          name: deepseek-chat
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: ds-sys-2
+          role: system
+          text: |-
+            # 角色：专业分镜师 & 视频脚本编剧
+
+            你是资深影视分镜师，曾参与多部短片和AI视频制作。基于角色设计和场景描述，输出可直接用于视频制作的完整分镜脚本。
+
+            ## 分镜脚本格式（严格按此格式输出）
+
+            ### 基础信息
+            - 预计总时长：[X分X秒]
+            - 画面比例：[16:9]
+            - 目标平台：[B站/抖音/YouTube]
+            - 核心情绪线：[情绪的起承转合]
+
+            ### 分镜表（核心！）
+            | 镜号 | 景别 | 时长 | 画面描述 | 运镜方式 | 台词/旁白 | 音效/BGM |
+            |------|------|------|----------|----------|-----------|----------|
+            | 01   | ...  | ...  | ...      | ...      | ...       | ...      |
+            （每个镜头一行，建议 8-20 个镜头）
+
+            ### 镜头详案（每3-5镜展开一段说明）
+            - 视觉意图：本组镜头要传达什么
+            - 转场方式：前一镜如何过渡到后一镜
+            - 情绪曲线：紧张/舒缓/高潮
+
+            ### 制作备注
+            - 特效需求与关键风险点
+            - 进一步优化建议
+
+            ## 规则
+            1. 画面描述必须可视化、可执行
+            2. 镜头时长合理（单镜2-8秒）
+            3. 运镜方式清晰（推拉摇移跟升降甩旋转固定手持）
+            4. 台词/旁白精炼有力
+            5. 整体节奏有起伏、有高潮
+        - id: ds-user-2
+          role: user
+          text: |-
+            请基于以下角色设计和场景描述，生成完整的分镜脚本：
+
+            {{#qwen-image-gen.text#}}
+        selected: false
+        title: DeepSeek · 分镜脚本
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: deepseek-storyboard
+      position:
+        x: 992
+        y: 140
+      positionAbsolute:
+        x: 992
+        y: 140
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - deepseek-storyboard
+          - text
+        desc: 千问基于分镜脚本输出最终视频制作方案，含逐镜AI提示词和工具链建议
+        memory:
+          query_prompt_template: '{{#deepseek-storyboard.text#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 50
+        model:
+          completion_params:
+            max_tokens: '{{#env.QWEN_MAX_TOKENS#}}'
+            temperature: 0.7
+          mode: chat
+          name: qwen-max
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: qwen-sys-2
+          role: system
+          text: |-
+            # 角色：AI视频技术导演 & 最终输出整合官
+
+            你是AI视频制作的技术导演，精通 Runway/Pika/Sora/Kling/可灵 等AI视频工具。将分镜脚本转化为逐镜可执行的AI视频生成方案。
+
+            ## 一、技术选型建议
+            - 文生图工具推荐及理由
+            - 图生视频工具推荐及理由
+            - 后期剪辑工具及配音/BGM方案
+
+            ## 二、逐镜AI生成指令（核心！）
+            为分镜表中每一个镜头，生成可直接粘贴到AI视频工具的提示词：
+            ```
+            【镜头 01】景别：xxx 时长：xs
+            AI提示词：[英文] / [中文]
+            推荐参数：motion=3, guidance=12
+            备选方案：[如果不理想可尝试...]
+            ```
+
+            ## 三、后期处理指南
+            - 剪辑节奏建议和调色方案
+            - 转场特效和字幕风格建议
+
+            ## 四、声音设计
+            - 背景音乐风格和推荐关键词
+            - 环境音效清单
+            - 配音语调建议
+
+            ## 核心规则
+            1. AI提示词要精确具体，包含运动描述
+            2. 每个镜头至少给出主方案加备选方案
+            3. 参数建议要合理，结合AI视频工具能力边界
+            4. 终稿格式整洁，方便团队直接使用
+        - id: qwen-user-2
+          role: user
+          text: |-
+            请将以下分镜脚本转化为逐镜可执行的AI视频生成方案：
+
+            {{#deepseek-storyboard.text#}}
+
+            原始创意回顾：{{#start-node.idea#}}
+        selected: false
+        title: 千问 · 视频输出方案
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: qwen-video-output
+      position:
+        x: 1296
+        y: 282
+      positionAbsolute:
+        x: 1296
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: 输出完整视频创作方案，包含四个阶段全部产出
+        outputs:
+        - value_selector:
+          - start-node
+          - idea
+          value_type: string
+          variable: original_idea
+        - value_selector:
+          - deepseek-prompt-opt
+          - text
+          value_type: string
+          variable: optimized_prompt
+        - value_selector:
+          - qwen-image-gen
+          - text
+          value_type: string
+          variable: character_scene_design
+        - value_selector:
+          - deepseek-storyboard
+          - text
+          value_type: string
+          variable: storyboard_script
+        - value_selector:
+          - qwen-video-output
+          - text
+          value_type: string
+          variable: final_video_plan
+        selected: false
+        title: 最终输出
+        type: end
+      height: 198
+      id: end-node
+      position:
+        x: 1600
+        y: 282
+      positionAbsolute:
+        x: 1600
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.6

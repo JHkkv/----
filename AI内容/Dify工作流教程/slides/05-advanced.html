@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dify 工作流教程 — 进阶篇</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg-card: rgba(13, 20, 40, 0.75);
+  --grid-color: rgba(0, 240, 255, 0.04);
+  --cyan: #00f0ff;
+  --cyan-dim: rgba(0, 240, 255, 0.15);
+  --cyan-glow: 0 0 20px rgba(0, 240, 255, 0.3), 0 0 60px rgba(0, 240, 255, 0.1);
+  --magenta: #ff00e5;
+  --magenta-dim: rgba(255, 0, 229, 0.15);
+  --magenta-glow: 0 0 20px rgba(255, 0, 229, 0.3), 0 0 60px rgba(255, 0, 229, 0.08);
+  --text: #e0e6f0;
+  --text-dim: #8892a4;
+  --text-bright: #ffffff;
+  --code-bg: #0d1117;
+  --code-border: rgba(0, 240, 255, 0.25);
+  --duration: 0.6s;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Slide ── */
+.slide {
+  width: 100vw;
+  height: 100vh;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: clamp(32px, 5vh, 64px) clamp(24px, 6vw, 80px);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.slide-inner {
+  width: 100%;
+  max-width: clamp(640px, 80vw, 1100px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.5vh, 20px);
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity var(--duration) var(--ease), transform var(--duration) var(--ease);
+}
+
+.slide.visible .slide-inner { opacity: 1; transform: translateY(0); }
+
+/* ── Typography ── */
+h1 {
+  font-size: clamp(28px, 4.5vw, 52px);
+  font-weight: 900;
+  line-height: 1.15;
+  color: var(--text-bright);
+}
+
+h2 {
+  font-size: clamp(22px, 3.5vw, 38px);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--cyan);
+  text-shadow: 0 0 30px rgba(0, 240, 255, 0.25);
+}
+
+h3 {
+  font-size: clamp(18px, 2.5vw, 26px);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-bright);
+}
+
+h4 {
+  font-size: clamp(15px, 1.8vw, 20px);
+  font-weight: 600;
+  color: var(--cyan);
+}
+
+p, li { font-size: clamp(13px, 1.4vw, 16px); line-height: 1.65; color: var(--text); }
+
+.text-dim { color: var(--text-dim); font-size: clamp(12px, 1.2vw, 14px); }
+
+/* ── Accent tags ── */
+.tag {
+  display: inline-block;
+  padding: clamp(4px, 0.6vh, 8px) clamp(12px, 1.5vw, 20px);
+  border-radius: 20px;
+  font-size: clamp(11px, 1.1vw, 13px);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.tag-cyan { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(0,240,255,0.3); }
+.tag-magenta { background: var(--magenta-dim); color: var(--magenta); border: 1px solid rgba(255,0,229,0.3); }
+
+/* ── Cards ── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  border-radius: clamp(8px, 1.2vw, 14px);
+  padding: clamp(12px, 2vh, 24px) clamp(14px, 2vw, 28px);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.card:hover { border-color: rgba(0, 240, 255, 0.4); box-shadow: var(--cyan-glow); }
+
+.card-grid {
+  display: grid;
+  gap: clamp(10px, 1.5vh, 18px);
+}
+
+.card-grid.col2 { grid-template-columns: repeat(2, 1fr); }
+.card-grid.col3 { grid-template-columns: repeat(3, 1fr); }
+.card-grid.col5 { grid-template-columns: repeat(5, 1fr); }
+
+/* ── Code blocks ── */
+.code-block {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: clamp(6px, 0.8vw, 10px);
+  padding: clamp(10px, 1.5vh, 20px) clamp(12px, 1.8vw, 24px);
+  font-family: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
+  font-size: clamp(11px, 1.1vw, 13px);
+  line-height: 1.6;
+  color: #c9d1d9;
+  overflow: hidden;
+  white-space: pre-wrap;
+}
+
+/* Syntax colors */
+.kw { color: #ff7b72; }
+.str { color: #a5d6ff; }
+.num { color: #79c0ff; }
+.cmt { color: #8b949e; font-style: italic; }
+.fn { color: #d2a8ff; }
+.op { color: #ff7b72; }
+.type { color: #7ee787; }
+.var { color: #ffa657; }
+
+/* ── Tables ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: clamp(11px, 1.1vw, 13px);
+}
+th {
+  background: rgba(0, 240, 255, 0.08);
+  color: var(--cyan);
+  padding: clamp(6px, 1vh, 12px) clamp(8px, 1.2vw, 16px);
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid rgba(0, 240, 255, 0.3);
+}
+td {
+  padding: clamp(6px, 1vh, 10px) clamp(8px, 1.2vw, 16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text);
+}
+tr:hover td { background: rgba(0, 240, 255, 0.03); }
+
+/* ── Flow diagram ── */
+.flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(4px, 0.8vw, 10px);
+}
+.flow-node {
+  padding: clamp(6px, 0.8vh, 10px) clamp(10px, 1.2vw, 16px);
+  border-radius: clamp(6px, 0.8vw, 10px);
+  font-size: clamp(10px, 1vw, 12px);
+  font-weight: 600;
+  text-align: center;
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
+.flow-n-start { border: 1px solid var(--cyan); color: var(--cyan); background: var(--cyan-dim); }
+.flow-n-llm { border: 1px solid var(--magenta); color: var(--magenta); background: var(--magenta-dim); }
+.flow-n-human { border: 1px solid #f0c040; color: #f0c040; background: rgba(240,192,64,0.12); }
+.flow-n-if { border: 1px solid #7ee787; color: #7ee787; background: rgba(126,231,135,0.1); }
+.flow-n-end { border: 1px solid #ff7b72; color: #ff7b72; background: rgba(255,123,114,0.1); }
+.flow-n-agent { border: 1px solid #d2a8ff; color: #d2a8ff; background: rgba(210,168,255,0.1); }
+.flow-n-iter { border: 1px solid #79c0ff; color: #79c0ff; background: rgba(121,192,255,0.1); }
+.flow-n-http { border: 1px solid #ffa657; color: #ffa657; background: rgba(255,166,87,0.1); }
+.flow-n-code { border: 1px solid #56d364; color: #56d364; background: rgba(86,211,100,0.1); }
+.flow-arrow { color: var(--text-dim); font-size: clamp(14px, 1.5vw, 20px); }
+
+/* ── Decorative elements ── */
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Navigation ── */
+#nav-dots {
+  position: fixed;
+  right: clamp(12px, 2vw, 20px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1vh, 10px);
+  z-index: 100;
+}
+.nav-dot {
+  width: clamp(8px, 0.8vw, 10px);
+  height: clamp(8px, 0.8vw, 10px);
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.nav-dot.active { background: var(--cyan); box-shadow: 0 0 8px rgba(0,240,255,0.6); }
+
+#slide-counter {
+  position: fixed;
+  bottom: clamp(14px, 2.5vh, 24px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(11px, 1vw, 13px);
+  color: var(--text-dim);
+  z-index: 100;
+  background: var(--bg-card);
+  padding: clamp(4px, 0.6vh, 8px) clamp(10px, 1.5vw, 18px);
+  border-radius: 16px;
+  border: 1px solid rgba(0,240,255,0.12);
+  backdrop-filter: blur(8px);
+}
+
+/* ── Two column layout ── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(12px, 2vw, 28px);
+  align-items: start;
+}
+
+/* ── Icon prefix ── */
+.icon-label { display: flex; align-items: center; gap: 6px; }
+.icon-label .ico { font-size: clamp(14px, 1.6vw, 18px); }
+
+/* ── Section number ── */
+.section-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(11px, 1.1vw, 13px);
+  color: var(--magenta);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-snap-type: none; }
+  .slide-inner { opacity: 1; transform: none; transition: none; }
+}
+
+/* ── Responsive breakpoints ── */
+@media (max-width: 700px) {
+  .card-grid.col3, .card-grid.col5 { grid-template-columns: repeat(2, 1fr); }
+  .two-col { grid-template-columns: 1fr; }
+  #nav-dots { right: 6px; }
+}
+
+@media (max-width: 500px) {
+  .card-grid.col2, .card-grid.col3, .card-grid.col5 { grid-template-columns: 1fr; }
+  .two-col { grid-template-columns: 1fr; }
+  h1 { font-size: 24px; }
+  h2 { font-size: 20px; }
+  .flow { flex-direction: column; }
+  .flow-arrow { transform: rotate(90deg); }
+}
+</style>
+</head>
+<body>
+
+<!-- grid overlay handled by body::before -->
+
+<!-- Navigation dots -->
+<div id="nav-dots"></div>
+
+<!-- Slide counter -->
+<div id="slide-counter">1 / 34</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 1: TITLE -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="glow-orb" style="top:-120px;left:-80px;width:300px;height:300px;background:var(--cyan);"></div>
+  <div class="glow-orb" style="bottom:-100px;right:-60px;width:250px;height:250px;background:var(--magenta);"></div>
+  <div class="slide-inner" style="align-items:center;text-align:center;">
+    <div class="section-num" style="margin-bottom:4px;">DIFFY WORKFLOW TUTORIAL</div>
+    <h1 style="background:linear-gradient(135deg,var(--cyan),var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+      工作流搭建完全教程
+    </h1>
+    <h2 style="text-shadow:none;color:var(--text-bright);font-size:clamp(20px,3vw,36px);">
+      第五篇：进阶篇
+    </h2>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:8px;">
+      <span class="tag tag-cyan">触发器</span>
+      <span class="tag tag-cyan">HITL</span>
+      <span class="tag tag-cyan">迭代/循环</span>
+      <span class="tag tag-magenta">错误处理</span>
+      <span class="tag tag-magenta">Agent 节点</span>
+    </div>
+    <p class="text-dim" style="margin-top:12px;">触发器 / HumanInput 人工介入 / 循环 / 错误处理 / Agent 深度解析</p>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 2: 本篇概览 (5 topic cards) -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">OVERVIEW</div>
+    <h2>本篇概览 — 五大高级特性</h2>
+    <div class="card-grid col5" style="margin-top:6px;">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:clamp(28px,3vw,42px);margin-bottom:8px;">&#x1F514;</div>
+        <h4>触发器</h4>
+        <p class="text-dim">Webhook / 定时 / 插件<br>让工作流自动运行</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:clamp(28px,3vw,42px);margin-bottom:8px;">&#x1F464;</div>
+        <h4>HumanInput</h4>
+        <p class="text-dim">人工介入决策<br>HITL 暂停/恢复</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:clamp(28px,3vw,42px);margin-bottom:8px;">&#x1F504;</div>
+        <h4>迭代与循环</h4>
+        <p class="text-dim">并行迭代 + 条件循环<br>批量处理利器</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:clamp(28px,3vw,42px);margin-bottom:8px;">&#x1F6E1;</div>
+        <h4>错误处理</h4>
+        <p class="text-dim">3 种策略 + 重试<br>生产级容错</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:clamp(28px,3vw,42px);margin-bottom:8px;">&#x1F916;</div>
+        <h4>Agent 节点</h4>
+        <p class="text-dim">v2 架构深度<br>工具链与追踪</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 3: 触发器总览 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="glow-orb" style="top:-60px;right:-60px;width:180px;height:180px;background:var(--cyan);"></div>
+  <div class="slide-inner">
+    <div class="section-num">TRIGGERS — 01</div>
+    <h2>触发器总览 — 3 种类型 + DataSource</h2>
+    <p>触发器让工作流无需手动或 API 调用即可自动启动。Dify 支持以下触发方式：</p>
+    <div class="code-block"><span class="cmt"># api/core/trigger/constants.py</span>
+<span class="var">TRIGGER_WEBHOOK_NODE_TYPE</span>  <span class="op">=</span> <span class="str">"trigger-webhook"</span>   <span class="cmt"># 配置在 api/core/workflow/nodes/trigger_webhook/</span>
+<span class="var">TRIGGER_SCHEDULE_NODE_TYPE</span> <span class="op">=</span> <span class="str">"trigger-schedule"</span>  <span class="cmt"># 配置在 api/core/workflow/nodes/trigger_schedule/</span>
+<span class="var">TRIGGER_PLUGIN_NODE_TYPE</span>   <span class="op">=</span> <span class="str">"trigger-plugin"</span>    <span class="cmt"># 配置在 api/core/workflow/nodes/trigger_plugin/</span></div>
+    <div class="card-grid col2" style="margin-top:4px;">
+      <div class="card">
+        <div class="icon-label"><span class="ico">&#x1F310;</span><h4>Webhook 触发器</h4></div>
+        <p class="text-dim">外部系统通过 HTTP 请求触发工作流</p>
+      </div>
+      <div class="card">
+        <div class="icon-label"><span class="ico">&#x23F0;</span><h4>定时触发器</h4></div>
+        <p class="text-dim">按 Cron 表达式定时自动触发</p>
+      </div>
+    </div>
+    <div class="card-grid col2">
+      <div class="card">
+        <div class="icon-label"><span class="ico">&#x1F50C;</span><h4>插件触发器</h4></div>
+        <p class="text-dim">第三方插件事件触发（GitHub/邮件/DB）</p>
+      </div>
+      <div class="card" style="border-color:rgba(255,0,229,0.2);">
+        <div class="icon-label"><span class="ico">&#x1F4E1;</span><h4 style="color:var(--magenta);">DataSource</h4></div>
+        <p class="text-dim">API 调用时主动拉取外部数据作为输入（非独立触发器类型，但属触发生态）</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 4: Webhook 触发器 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">TRIGGERS — 02</div>
+    <h2>Webhook 触发器</h2>
+    <p>向 Dify 生成的 Webhook URL 发送 HTTP 请求即可触发工作流执行。</p>
+    <div class="two-col">
+      <div>
+        <div class="card" style="margin-bottom:10px;">
+          <h4 style="margin-bottom:6px;">3 步配置流程</h4>
+          <p style="margin-bottom:0;">1. 在工作流开头添加"Webhook 触发器"节点</p>
+          <p style="margin-bottom:0;">2. Dify 自动生成唯一 Webhook URL</p>
+          <p style="margin-bottom:0;">3. 外部系统向该 URL 发送 POST 请求</p>
+        </div>
+        <div class="card">
+          <h4 style="margin-bottom:6px;">Payload 访问</h4>
+          <div class="code-block" style="margin-top:6px;"><span class="cmt"># POST JSON body 发送后，工作流中引用：</span>
+<span class="var">{{</span>trigger_webhook<span class="op">.</span>event<span class="var">}}</span>
+<span class="var">{{</span>trigger_webhook<span class="op">.</span>data<span class="op">.</span>order_id<span class="var">}}</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h4 style="margin-bottom:6px;">请求 YAML 示例</h4>
+          <div class="code-block" style="margin-top:6px;"><span class="cmt"># POST /webhook/xxx 发送的 JSON body</span>
+<span class="kw">{</span>
+  <span class="str">"event"</span>: <span class="str">"order_created"</span>,
+  <span class="str">"data"</span>: <span class="kw">{</span>
+    <span class="str">"order_id"</span>: <span class="str">"12345"</span>,
+    <span class="str">"amount"</span>: <span class="num">299.00</span>
+  <span class="kw">}</span>
+<span class="kw">}</span></div>
+        </div>
+        <div class="card" style="margin-top:10px;border-color:rgba(255,0,229,0.2);">
+          <h4 style="color:var(--magenta);margin-bottom:6px;">安全建议</h4>
+          <p style="margin-bottom:3px;">URL 中带随机 token：<span style="color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:12px;">/webhook/xxx?token=random123</span></p>
+          <p style="margin-bottom:3px;">在 HTTP 请求节点中验证请求签名</p>
+          <p style="margin-bottom:0;">在 Dify 部署层配置 IP 白名单</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 5: 定时触发器 Schedule -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">TRIGGERS — 03</div>
+    <h2>定时触发器 Schedule — Cron 表达式</h2>
+    <p>按 Cron 5 字段语法定时触发：<span style="color:var(--cyan);font-family:'JetBrains Mono',monospace;">分钟 小时 日 月 星期</span></p>
+    <table style="margin-top:6px;">
+      <thead><tr><th>Cron 表达式</th><th>含义</th><th>使用场景</th></tr></thead>
+      <tbody>
+        <tr><td style="font-family:'JetBrains Mono',monospace;color:var(--cyan);">0 9 * * *</td><td>每天 9:00</td><td>日报生成</td></tr>
+        <tr><td style="font-family:'JetBrains Mono',monospace;color:var(--cyan);">0 */2 * * *</td><td>每 2 小时</td><td>轮询检查</td></tr>
+        <tr><td style="font-family:'JetBrains Mono',monospace;color:var(--cyan);">30 8 * * 1-5</td><td>工作日 8:30</td><td>工作日早报</td></tr>
+        <tr><td style="font-family:'JetBrains Mono',monospace;color:var(--cyan);">0 0 1 * *</td><td>每月 1 号</td><td>月度报表</td></tr>
+        <tr><td style="font-family:'JetBrains Mono',monospace;color:var(--cyan);">0 9 * * 1</td><td>每周一 9:00</td><td>周报汇总</td></tr>
+      </tbody>
+    </table>
+    <div class="card" style="margin-top:6px;">
+      <h4 style="margin-bottom:4px;">前端面板配置结构</h4>
+      <div class="code-block" style="background:rgba(13,17,23,0.6);"><span class="cmt">// web/app/components/workflow/nodes/trigger-schedule/</span>
+<span class="type">├──</span> <span class="fn">default.ts</span>          <span class="cmt">// 默认配置</span>
+<span class="type">├──</span> <span class="fn">panel.tsx</span>           <span class="cmt">// 配置面板</span>
+<span class="type">└──</span> components<span class="type">/</span>
+    <span class="type">└──</span> <span class="fn">next-execution-times.tsx</span>  <span class="cmt">// 下次执行时间预览</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 6: 插件触发器 + DataSource -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">TRIGGERS — 04</div>
+    <h2>插件触发器 + DataSource</h2>
+    <div class="two-col">
+      <div>
+        <div class="card" style="margin-bottom:10px;">
+          <h4 style="margin-bottom:6px;">插件触发器示例</h4>
+          <p style="margin-bottom:3px;">GitHub 有新 Issue 时触发工作流</p>
+          <p style="margin-bottom:3px;">邮件收到新消息时触发处理</p>
+          <p style="margin-bottom:0;">数据库有新记录时触发同步</p>
+        </div>
+        <div class="card" style="border-color:rgba(255,0,229,0.2);">
+          <h4 style="color:var(--magenta);margin-bottom:6px;">DataSource 说明</h4>
+          <p style="margin-bottom:0;color:var(--text-dim);">不同于被动接收触发，DataSource 在 API 调用时主动拉取外部数据：
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);">api/core/workflow/nodes/datasource/</span></p>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:8px;">Start vs DataSource vs Trigger 对比</h4>
+        <table>
+          <thead><tr><th>特性</th><th>Start</th><th>DataSource</th><th>Trigger</th></tr></thead>
+          <tbody>
+            <tr><td>启动方式</td><td>API/手动</td><td>API 调用时拉取</td><td>事件/定时</td></tr>
+            <tr><td>数据来源</td><td>调用方传入</td><td>外部主动拉取</td><td>触发器 Payload</td></tr>
+            <tr><td>适用场景</td><td>普通工作流</td><td>需外部数据源</td><td>自动化场景</td></tr>
+            <tr><td>典型例子</td><td>ChatBot</td><td>CRM 数据加载</td><td>定时报/Webhook</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 7: HITL 概念 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="glow-orb" style="bottom:-60px;left:-60px;width:200px;height:200px;background:var(--magenta);"></div>
+  <div class="slide-inner">
+    <div class="section-num">HITL — 01</div>
+    <h2>HumanInput — 人工介入 (HITL)</h2>
+    <p style="font-size:clamp(15px,1.6vw,18px);color:var(--text-bright);">Human-In-The-Loop：工作流运行到某个节点时<span style="color:var(--cyan);font-weight:700;">暂停</span>，等待人类做出决策后再继续。</p>
+    <div class="card" style="margin-top:8px;">
+      <h4 style="margin-bottom:8px;">源码架构</h4>
+      <div class="code-block" style="background:rgba(13,17,23,0.6);"><span class="cmt"># api/core/workflow/nodes/human_input/</span>
+<span class="type">├──</span> <span class="fn">entities.py</span>      <span class="cmt"># HumanInputNodeData — 表单定义、触发条件</span>
+<span class="type">├──</span> <span class="fn">boundary.py</span>      <span class="cmt"># 工作流暂停 / 恢复边界逻辑</span>
+<span class="type">└──</span> <span class="fn">callback.py</span>      <span class="cmt"># DifyHITLCallback — 回调处理</span></div>
+    </div>
+    <div class="card-grid col2" style="margin-top:6px;">
+      <div class="card" style="text-align:center;">
+        <h4>暂停</h4>
+        <p class="text-dim">保存状态 → 通知人工 → 等待响应</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <h4>恢复</h4>
+        <p class="text-dim">加载状态 → 注入数据 → 继续执行</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 8: HITL 配置4步骤 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">HITL — 02</div>
+    <h2>HITL 配置 4 步骤</h2>
+    <div class="card-grid col2">
+      <div class="card">
+        <div style="font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:clamp(18px,2vw,28px);font-weight:700;">Step 1</div>
+        <h4>添加 HumanInput 节点</h4>
+        <p class="text-dim">在需要人工决策的位置插入"人工输入"节点</p>
+      </div>
+      <div class="card">
+        <div style="font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:clamp(18px,2vw,28px);font-weight:700;">Step 2</div>
+        <h4>设计表单</h4>
+        <table style="margin-top:4px;">
+          <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>审批意见</td><td>下拉</td><td>通过/拒绝/需修改</td></tr>
+            <tr><td>修改建议</td><td>段落</td><td>具体修改内容</td></tr>
+            <tr><td>优先级</td><td>下拉</td><td>高/中/低</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div style="font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:clamp(18px,2vw,28px);font-weight:700;">Step 3</div>
+        <h4>配置通知方式</h4>
+        <p class="text-dim" style="margin-bottom:2px;">站内通知 — Dify 工作区内待处理</p>
+        <p class="text-dim" style="margin-bottom:2px;">邮件通知 — SMTP 发送到邮箱</p>
+        <p class="text-dim">API 回调 — 向外部系统发 Webhook</p>
+      </div>
+      <div class="card">
+        <div style="font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:clamp(18px,2vw,28px);font-weight:700;">Step 4</div>
+        <h4>下游节点引用</h4>
+        <div class="code-block" style="margin-top:4px;"><span class="var">{{</span>human_input_node<span class="op">.</span>审批意见<span class="var">}}</span>
+<span class="var">{{</span>human_input_node<span class="op">.</span>修改建议<span class="var">}}</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 9: HITL 完整示例：内容审核 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">HITL — 03</div>
+    <h2>完整 HITL 示例：内容审核工作流</h2>
+    <div class="card" style="margin-bottom:8px;">
+      <div class="flow" style="flex-wrap:wrap;justify-content:center;">
+        <div class="flow-node flow-n-start">Start<br>提交文章</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-llm">LLM<br>AI 初审</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-human">HumanInput<br>人工复审</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-if">IF<br>审核决定</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-end">通过 &#x2192; 发布</div>
+      </div>
+      <div style="text-align:center;margin-top:6px;">
+        <span class="flow-arrow">&#x2198;</span>
+        <span style="margin-left:8px;"></span>
+        <span class="flow-node flow-n-end" style="display:inline-block;">拒绝 &#x2192; 返回修改意见</span>
+      </div>
+    </div>
+    <div class="card-grid col3">
+      <div class="card" style="text-align:center;">
+        <h4>AI 初审</h4>
+        <p class="text-dim">LLM 检查敏感内容/合规性/虚假信息/隐私侵犯，输出 risk_level + issues</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <h4>HumanInput 表单</h4>
+        <p class="text-dim">显示 AI 发现的问题；人工选择：通过 / 拒绝 / 修改后重审，并填写审核意见</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <h4>条件路由</h4>
+        <p class="text-dim">通过 &#x2192; 发布; 拒绝 &#x2192; 返回原因; 修改后重审 &#x2192; 回到 Start</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 10: HITL 审核 — LLM初审 Prompt -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">HITL — 04</div>
+    <h2>HITL 审核工作流 — LLM 初审 Prompt</h2>
+    <div class="card" style="padding:0;overflow:hidden;border-color:rgba(255,0,229,0.25);">
+      <div class="code-block" style="border:none;border-radius:0;"><span class="cmt"># System Prompt — 内容审核助手</span>
+
+你是内容审核助手。检查以下文章是否存在：
+<span class="num">1.</span> 政治敏感内容
+<span class="num">2.</span> 色情暴力内容
+<span class="num">3.</span> 虚假信息
+<span class="num">4.</span> 侵犯隐私内容
+
+文章内容：
+<span class="var">{{</span>sys<span class="op">.</span>query<span class="var">}}</span>
+
+输出 JSON（严格按此格式）：
+<span class="kw">{</span>
+  <span class="str">"risk_level"</span>: <span class="str">"low"</span> | <span class="str">"medium"</span> | <span class="str">"high"</span>,
+  <span class="str">"issues"</span>: [<span class="str">"具体问题1"</span>, <span class="str">"具体问题2"</span>],
+  <span class="str">"recommendation"</span>: <span class="str">"建议通过"</span> | <span class="str">"建议人工复审"</span> | <span class="str">"建议拒绝"</span>,
+  <span class="str">"reasoning"</span>: <span class="str">"判断依据简述"</span>
+<span class="kw">}</span></div>
+    </div>
+    <div class="card-grid col2" style="margin-top:6px;">
+      <div class="card">
+        <h4 style="margin-bottom:4px;">关键设计要点</h4>
+        <p style="margin-bottom:3px;">明确 4 个风险维度检查清单</p>
+        <p style="margin-bottom:3px;">要求 JSON 格式输出，便于条件路由</p>
+        <p style="margin-bottom:0;">recommendation 给 3 档判断而非二元</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:4px;">HumanInput 表单对接</h4>
+        <p style="margin-bottom:3px;">显示：<span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);">{{llm初审.issues}}</span></p>
+        <p style="margin-bottom:3px;">字段1：审核决定（通过/拒绝/修改后重审）</p>
+        <p style="margin-bottom:0;">字段2：审核意见（段落，人工补充理由）</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 11: HITL 暂停/恢复机制 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">HITL — 05</div>
+    <h2>HITL 暂停 / 恢复机制</h2>
+    <div class="two-col">
+      <div class="card" style="border-color:rgba(255,0,229,0.25);">
+        <h4 style="color:var(--magenta);margin-bottom:8px;">暂停流程</h4>
+        <div class="code-block" style="background:rgba(13,17,23,0.6);"><span class="cmt"># HumanInput 节点执行时</span>
+<span class="kw">def</span> <span class="fn">pause_workflow</span>(state):
+    <span class="cmt"># 1. 保存当前 GraphRuntimeState</span>
+    runtime_state <span class="op">=</span> save_state(
+        variables,           <span class="cmt"># 变量池</span>
+        execution_position,  <span class="cmt"># 执行位置</span>
+        node_states          <span class="cmt"># 各节点状态</span>
+    )
+
+    <span class="cmt"># 2. 创建 PauseState 持久化记录</span>
+    pause <span class="op">=</span> create_pause_record(
+        state<span class="op">=</span>runtime_state,
+        form_schema<span class="op">=</span>human_input_form
+    )
+
+    <span class="cmt"># 3. 发出暂停事件 → 引擎停止</span>
+    emit_pause_event(pause)</div>
+      </div>
+      <div class="card" style="border-color:rgba(0,240,255,0.25);">
+        <h4 style="color:var(--cyan);margin-bottom:8px;">恢复流程</h4>
+        <div class="code-block" style="background:rgba(13,17,23,0.6);"><span class="cmt"># 人工操作完成后</span>
+<span class="kw">def</span> <span class="fn">resume_workflow</span>(pause_id, form_data):
+    <span class="cmt"># 1. 加载 PauseState</span>
+    pause <span class="op">=</span> load_pause_record(pause_id)
+
+    <span class="cmt"># 2. 将填写的表单数据注入变量池</span>
+    inject_variables(
+        pause<span class="op">.</span>runtime_state,
+        form_data  <span class="cmt"># 人工填写的数据</span>
+    )
+
+    <span class="cmt"># 3. 从暂停点恢复引擎执行</span>
+    engine<span class="op">.</span>resume_from(pause<span class="op">.</span>execution_position)</div>
+      </div>
+    </div>
+    <p class="text-dim" style="text-align:center;margin-top:6px;">核心文件：<span style="font-family:'JetBrains Mono',monospace;color:var(--cyan);">api/core/workflow/nodes/human_input/boundary.py</span></p>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 12: HITL 避坑3条 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">HITL — 06</div>
+    <h2>HITL 避坑 3 条</h2>
+    <div class="card-grid" style="grid-template-columns:1fr;gap:12px;">
+      <div class="card" style="border-color:rgba(255,123,114,0.3);border-left:4px solid #ff7b72;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="color:#ff7b72;font-size:clamp(22px,2.5vw,32px);">&#x274C;</span>
+          <div>
+            <h4 style="color:#ff7b72;">超时设置太短</h4>
+            <p style="color:var(--text);">人工操作可能需要几小时甚至几天（如跨时区审批）。设置过短的超时会导致任务过早失败。建议至少 24 小时，重要审批可设 7 天。</p>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(255,123,114,0.3);border-left:4px solid #ff7b72;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="color:#ff7b72;font-size:clamp(22px,2.5vw,32px);">&#x274C;</span>
+          <div>
+            <h4 style="color:#ff7b72;">没有设计超时后的默认行为</h4>
+            <p style="color:var(--text);">超时后自动通过？自动拒绝？还是回退到上级审批？必须提前配置超时策略，否则工作流会一直卡在等待状态，无法正常终结。</p>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(255,123,114,0.3);border-left:4px solid #ff7b72;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="color:#ff7b72;font-size:clamp(22px,2.5vw,32px);">&#x274C;</span>
+          <div>
+            <h4 style="color:#ff7b72;">表单字段太多</h4>
+            <p style="color:var(--text);">控制在 <span style="color:var(--cyan);font-weight:700;">5 个以内</span>。字段越多，人工填写意愿越低，处理时间越长。只收集决策必需的信息，其他可通过上游 LLM 自动提取。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 13: 迭代 Iteration -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="glow-orb" style="top:-60px;right:-80px;width:200px;height:200px;background:var(--cyan);"></div>
+  <div class="slide-inner">
+    <div class="section-num">ITERATION — 01</div>
+    <h2>迭代 Iteration — 并行处理数组</h2>
+    <p>适用场景：对数组的每个元素做同样的处理。</p>
+    <div class="card" style="margin-bottom:8px;">
+      <div class="flow" style="flex-wrap:wrap;">
+        <div class="flow-node flow-n-start">Start<br>文章列表</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-iter">Iteration<br>对每篇文章</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node" style="border:1px solid #79c0ff;color:#79c0ff;background:rgba(121,192,255,0.08);">聚合器</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-llm">LLM<br>生成综述</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-end">End</div>
+      </div>
+    </div>
+    <div class="card-grid col3">
+      <div class="card">
+        <h4 style="margin-bottom:4px;">输入变量</h4>
+        <p class="text-dim">选择数组类型变量，如：
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);">{{http_请求.body.items}}</span></p>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:4px;">并行度</h4>
+        <p class="text-dim">同时处理的元素数量。最大并行度受平台配置限制，高并行可提速但需注意 API 并发限制。</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:4px;">输出变量</h4>
+        <p class="text-dim">迭代完成后输出结果数组，可用于下游聚合或进一步处理。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 14: 迭代内部变量 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">ITERATION — 02</div>
+    <h2>迭代内部变量</h2>
+    <p>在迭代节点内部，以下变量可以直接引用：</p>
+    <div class="card-grid col3">
+      <div class="card" style="text-align:center;">
+        <div class="code-block" style="margin-bottom:8px;"><span class="var">{{</span>iteration<span class="op">.</span>item<span class="var">}}</span></div>
+        <h4>当前元素</h4>
+        <p class="text-dim">本轮迭代正在处理的数组元素</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="code-block" style="margin-bottom:8px;"><span class="var">{{</span>iteration<span class="op">.</span>index<span class="var">}}</span></div>
+        <h4>当前索引</h4>
+        <p class="text-dim">从 0 开始的当前迭代序号</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="code-block" style="margin-bottom:8px;"><span class="var">{{</span>iteration<span class="op">.</span>output<span class="var">}}</span></div>
+        <h4>所有输出数组</h4>
+        <p class="text-dim">所有迭代的输出汇总（仅迭代完成后可访问）</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:8px;">
+      <h4 style="margin-bottom:4px;">前端源码路径</h4>
+      <div class="code-block" style="background:rgba(13,17,23,0.6);"><span class="cmt">// web/app/components/workflow/nodes/iteration/</span>
+<span class="type">├──</span> <span class="fn">default.ts</span>     <span class="cmt">// 默认配置</span>
+<span class="type">├──</span> <span class="fn">types.ts</span>      <span class="cmt">// 迭代参数类型定义</span>
+<span class="type">└──</span> <span class="fn">add-block.tsx</span>  <span class="cmt">// 在迭代内部添加子节点</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 15: 循环 Loop -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">LOOP — 01</div>
+    <h2>循环 Loop — 条件循环</h2>
+    <p>适用场景：根据条件重复执行，直到满足退出条件。</p>
+    <div class="card" style="margin-bottom:8px;">
+      <div class="flow" style="flex-wrap:wrap;">
+        <div class="flow-node flow-n-start">Start</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-iter">LoopStart</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-llm">LLM<br>处理一次</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-code">Code<br>检查条件</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-iter">LoopEnd</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node" style="border:1px solid #79c0ff;color:#79c0ff;background:rgba(121,192,255,0.08);">聚合</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-end">End</div>
+      </div>
+    </div>
+    <div class="card-grid col3">
+      <div class="card">
+        <h4 style="margin-bottom:4px;">循环条件</h4>
+        <p class="text-dim">定义何时退出循环（如结果长度 &gt;= 指定值，或某个标志为 true）</p>
+      </div>
+      <div class="card" style="border-color:rgba(255,123,114,0.25);">
+        <h4 style="color:#ff7b72;margin-bottom:4px;">最大循环次数</h4>
+        <p class="text-dim">防止无限循环的硬限制，必设！超出后强制终止</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:4px;">循环变量</h4>
+        <p class="text-dim"><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);">{{loop.index}}</span> / <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);">{{loop.item}}</span> / <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);">{{loop.output}}</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 16: 迭代 vs 循环 对比 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">ITERATION vs LOOP</div>
+    <h2>迭代 vs 循环 — 如何选择</h2>
+    <table style="margin-top:8px;">
+      <thead><tr><th>特性</th><th style="color:var(--cyan);">迭代 (Iteration)</th><th style="color:var(--magenta);">循环 (Loop)</th></tr></thead>
+      <tbody>
+        <tr><td>输入</td><td>数组</td><td>任意条件</td></tr>
+        <tr><td>并行执行</td><td style="color:#7ee787;">支持</td><td style="color:#ff7b72;">不支持（串行）</td></tr>
+        <tr><td>退出方式</td><td>数组遍历完自动退出</td><td>条件满足时退出</td></tr>
+        <tr><td>适用模式</td><td>"对每个 X 做 Y"</td><td>"重复做直到 Z"</td></tr>
+        <tr><td>顺序保证</td><td>不保证（并行模式下）</td><td>严格按序执行</td></tr>
+        <tr><td>适用场景</td><td>批量翻译/总结/审核</td><td>递归搜索/迭代优化/多轮对话</td></tr>
+      </tbody>
+    </table>
+    <div class="card" style="margin-top:8px;text-align:center;border-color:rgba(0,240,255,0.3);">
+      <h4 style="margin-bottom:4px;">选择规则</h4>
+      <p style="font-size:clamp(14px,1.5vw,17px);">你知道有多少次（有数组）&#x2192; <span style="color:var(--cyan);font-weight:700;">迭代</span>&nbsp;&nbsp;&nbsp;&nbsp;你不知道多少次（有条件）&#x2192; <span style="color:var(--magenta);font-weight:700;">循环</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 17: 迭代/循环避坑4条 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">ITERATION/LOOP — PITFALLS</div>
+    <h2>迭代 / 循环 — 避坑 4 条</h2>
+    <div class="card-grid" style="grid-template-columns:1fr;gap:10px;">
+      <div class="card" style="border-left:4px solid #ff7b72;">
+        <h4 style="color:#ff7b72;">变量作用域隔离</h4>
+        <p>迭代/循环内部定义的变量，外部看不到。如果需要把内部结果传递出去，必须通过迭代/循环的输出变量（output）来传递。</p>
+      </div>
+      <div class="card" style="border-left:4px solid #ff7b72;">
+        <h4 style="color:#ff7b72;">循环必须设置最大次数</h4>
+        <p>没有最大次数限制的循环是死循环炸弹。建议根据业务场景设置合理上限，如 10 / 50 / 100，超出后走错误处理分支。</p>
+      </div>
+      <div class="card" style="border-left:4px solid #ff7b72;">
+        <h4 style="color:#ff7b72;">迭代并行度过大导致限流</h4>
+        <p>并行度设太高会超出 LLM API 的并发限制（通常是 RPM/TPM）。建议先确认 API 的并发上限，然后设置并行度为上限的 50%-70%。</p>
+      </div>
+      <div class="card" style="border-left:4px solid #ff7b72;">
+        <h4 style="color:#ff7b72;">迭代内昂贵 LLM 调用 x N = 成本爆炸</h4>
+        <p>如果数组有 100 个元素，每个都调用一次 GPT-4o，成本会非常高。考虑先用便宜模型筛选，或合并请求减少调用次数。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 18: 迭代实战示例 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">ITERATION — 03</div>
+    <h2>迭代实战：10 篇文章批量摘要</h2>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="margin-bottom:6px;">工作流结构</h4>
+        <div class="flow" style="flex-direction:column;align-items:flex-start;gap:6px;">
+          <div class="flow-node flow-n-start">Start: 文章列表 [10篇]</div>
+          <div style="font-size:clamp(10px,1vw,12px);color:var(--text-dim);padding-left:24px;">&#x2198;</div>
+          <div class="flow-node flow-n-iter">Iteration: 遍历每篇</div>
+          <div style="font-size:clamp(10px,1vw,12px);color:var(--text-dim);padding-left:24px;">&#x2198; 内部</div>
+          <div class="flow-node flow-n-llm">LLM: 提取摘要 + 关键词</div>
+          <div style="font-size:clamp(10px,1vw,12px);color:var(--text-dim);padding-left:24px;">&#x2198;</div>
+          <div class="flow-node flow-n-code">聚合: 合并所有摘要</div>
+          <div style="font-size:clamp(10px,1vw,12px);color:var(--text-dim);padding-left:24px;">&#x2198;</div>
+          <div class="flow-node flow-n-end">End: 输出综述</div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:10px;">
+          <h4 style="margin-bottom:4px;">LLM 节点 Prompt（迭代内）</h4>
+          <div class="code-block" style="font-size:11px;">为以下文章生成摘要：
+<span class="var">{{</span>iteration<span class="op">.</span>item<span class="op">.</span>content<span class="var">}}</span>
+
+输出 JSON：
+<span class="kw">{</span>
+  <span class="str">"title"</span>: <span class="str">"..."</span>,
+  <span class="str">"summary"</span>: <span class="str">"一句话摘要"</span>,
+  <span class="str">"keywords"</span>: [<span class="str">"kw1"</span>, <span class="str">"kw2"</span>]
+<span class="kw">}</span></div>
+        </div>
+        <div class="card">
+          <h4 style="margin-bottom:4px;">配置参数</h4>
+          <table>
+            <tr><td>输入变量</td><td style="color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:12px;">{{http.body.articles}}</td></tr>
+            <tr><td>并行度</td><td style="color:var(--cyan);">5</td></tr>
+            <tr><td>模型</td><td>GPT-4o-mini (10篇总成本极低)</td></tr>
+            <tr><td>输出变量</td><td style="color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:12px;">summaries[]</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 19: 三种错误处理模式 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="glow-orb" style="bottom:-80px;right:-80px;width:200px;height:200px;background:var(--magenta);"></div>
+  <div class="slide-inner">
+    <div class="section-num">ERROR HANDLING — 01</div>
+    <h2>三种错误处理模式</h2>
+    <p>Dify 提供 3 种错误处理策略，定义在 <span style="font-family:'JetBrains Mono',monospace;color:var(--cyan);">ErrorHandleMode</span>：</p>
+    <div class="code-block" style="margin-bottom:6px;"><span class="cmt">// web/app/components/workflow/types.ts</span>
+<span class="kw">enum</span> <span class="type">ErrorHandleMode</span> <span class="kw">{</span>
+  <span class="var">Terminated</span>            <span class="op">=</span> <span class="str">'terminated'</span>,                <span class="cmt">// 终止工作流（默认）</span>
+  <span class="var">ContinueOnError</span>      <span class="op">=</span> <span class="str">'continue-on-error'</span>,      <span class="cmt">// 失败时继续</span>
+  <span class="var">RemoveAbnormalOutput</span> <span class="op">=</span> <span class="str">'remove-abnormal-output'</span>  <span class="cmt">// 移除异常输出后继续</span>
+<span class="kw">}</span></div>
+    <div class="card-grid col3">
+      <div class="card" style="border-color:#ff7b72;text-align:center;">
+        <h4 style="color:#ff7b72;">Terminated（终止）</h4>
+        <p class="text-dim" style="margin-bottom:0;">默认策略；节点失败立即终止。适合关键节点：数据验证、安全检查。</p>
+      </div>
+      <div class="card" style="border-color:#f0c040;text-align:center;">
+        <h4 style="color:#f0c040;">ContinueOnError（跳过）</h4>
+        <p class="text-dim" style="margin-bottom:0;">失败后跳过该节点继续执行。下游引用失败节点输出得到空值。适合外部 API、可选增强。</p>
+      </div>
+      <div class="card" style="border-color:#79c0ff;text-align:center;">
+        <h4 style="color:#79c0ff;">RemoveAbnormalOutput（移除异常）</h4>
+        <p class="text-dim" style="margin-bottom:0;">移除失败输出继续执行。适合并行分支中单个分支失败不影响整体。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 20: 错误处理最佳实践 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">ERROR HANDLING — 02</div>
+    <h2>错误处理最佳实践表</h2>
+    <table style="margin-top:8px;">
+      <thead><tr><th>节点类型</th><th>推荐策略</th><th>原因</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700;color:var(--text-bright);">LLM</td>
+          <td style="color:#ff7b72;font-weight:600;">Terminated</td>
+          <td>核心推理环节，失败意味着输出不可用</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--text-bright);">HTTP</td>
+          <td style="color:#f0c040;font-weight:600;">ContinueOnError</td>
+          <td>外部服务不稳定，失败不应中断主流程</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--text-bright);">Tool</td>
+          <td style="color:#f0c040;font-weight:600;">ContinueOnError</td>
+          <td>第三方工具可能出错，需容错</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--text-bright);">Code</td>
+          <td style="color:#ff7b72;font-weight:600;">Terminated</td>
+          <td>代码逻辑错误应暴露而非静默跳过</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;color:var(--text-bright);">Agent</td>
+          <td style="color:#f0c040;font-weight:600;">ContinueOnError</td>
+          <td>Agent 多步执行，单步失败不应终止整个 Agent</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="text-dim" style="margin-top:8px;text-align:center;">这是生产环境推荐配置，具体可根据业务关键性调整。</p>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 21: 重试机制 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">ERROR HANDLING — 03</div>
+    <h2>重试机制</h2>
+    <p>除错误处理模式外，Dify 还支持节点级别的重试配置。</p>
+    <div class="two-col">
+      <div>
+        <div class="card" style="margin-bottom:10px;">
+          <h4 style="margin-bottom:4px;">前端组件</h4>
+          <div class="code-block" style="background:rgba(13,17,23,0.6);"><span class="cmt">// web/app/components/workflow/nodes/_base/components/retry/</span>
+<span class="type">├──</span> <span class="fn">retry-on-node.tsx</span>  <span class="cmt">// 节点上的重试按钮</span>
+<span class="type">└──</span> <span class="fn">retry-on-panel.tsx</span> <span class="cmt">// 面板中的重试配置</span></div>
+        </div>
+        <div class="card">
+          <h4 style="margin-bottom:6px;">可配置项</h4>
+          <table>
+            <tr><td>最大重试次数</td><td style="color:var(--cyan);">1-10 次</td></tr>
+            <tr><td>重试间隔</td><td style="color:var(--cyan);">1s / 5s / 10s / 30s</td></tr>
+            <tr><td>策略</td><td style="color:var(--cyan);">固定间隔 / 指数退避</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(0,240,255,0.25);">
+        <h4 style="margin-bottom:8px;">指数退避示例</h4>
+        <div class="code-block"><span class="cmt"># 指数退避重试策略</span>
+<span class="kw">def</span> <span class="fn">retry_with_backoff</span>(max_retries<span class="op">=</span><span class="num">3</span>):
+    delays <span class="op">=</span> [<span class="num">2</span>, <span class="num">4</span>, <span class="num">8</span>]  <span class="cmt"># 2^1, 2^2, 2^3</span>
+    <span class="kw">for</span> attempt, delay <span class="kw">in</span> enumerate(delays):
+        <span class="kw">try</span>:
+            result <span class="op">=</span> execute_node()
+            <span class="kw">return</span> result
+        <span class="kw">except</span> NodeError <span class="kw">as</span> e:
+            <span class="kw">if</span> attempt <span class="op">==</span> max_retries <span class="op">-</span> <span class="num">1</span>:
+                <span class="kw">raise</span>  <span class="cmt"># 全部失败，抛出</span>
+            sleep(delay)  <span class="cmt"># 等待后重试</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 22: IF-ELSE 错误兜底 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">ERROR HANDLING — 04</div>
+    <h2>IF-ELSE 错误兜底</h2>
+    <p>在关键节点后加 IF-ELSE 判断结果，构建降级路径。</p>
+    <div class="card" style="margin-bottom:8px;">
+      <div class="flow" style="flex-wrap:wrap;">
+        <div class="flow-node flow-n-http">HTTP<br>调用外部 API</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-if">IF<br>status_code == 200</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#7ee787;font-weight:700;font-size:12px;">Yes &#x2192;</span>
+            <span class="flow-node flow-n-end">正常处理</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#ff7b72;font-weight:700;font-size:12px;">No &#x2192;</span>
+            <span class="flow-node flow-n-code">从缓存读取</span>
+            <span style="color:var(--text-dim);font-size:12px;">或</span>
+            <span class="flow-node flow-n-llm">LLM 生成兜底回复</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h4 style="margin-bottom:4px;">IF-ELSE 条件判断示例</h4>
+      <div class="code-block"><span class="cmt"># 在 IF 节点中设置条件</span>
+<span class="var">{{</span>http_node<span class="op">.</span>status_code<span class="var">}}</span> <span class="op">==</span> <span class="num">200</span>
+
+<span class="cmt"># 更复杂的条件</span>
+<span class="var">{{</span>http_node<span class="op">.</span>status_code<span class="var">}}</span> <span class="op">==</span> <span class="num">200</span> <span class="op">AND</span> <span class="var">{{</span>http_node<span class="op">.</span>body<span class="op">.</span>error<span class="var">}}</span> <span class="op">is</span> <span class="kw">None</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 23: 错误处理完整策略总结 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">ERROR HANDLING — 05</div>
+    <h2>错误处理完整策略 Checklist</h2>
+    <div class="card-grid col2">
+      <div class="card">
+        <h4 style="margin-bottom:8px;">策略选择</h4>
+        <p style="margin-bottom:3px;">LLM/Code 节点 &#x2192; Terminated</p>
+        <p style="margin-bottom:3px;">HTTP/Tool/Agent 节点 &#x2192; ContinueOnError</p>
+        <p style="margin-bottom:3px;">并行分支非关键路径 &#x2192; RemoveAbnormalOutput</p>
+        <p style="margin-bottom:0;">IF-ELSE + 重试 + 兜底构建多层防护</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:8px;">重试配置</h4>
+        <p style="margin-bottom:3px;">HTTP 节点：重试 3 次，指数退避</p>
+        <p style="margin-bottom:3px;">Agent 节点：重试 2 次，固定间隔</p>
+        <p style="margin-bottom:0;">LLM 节点：不重试（或 1 次，考虑成本）</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:8px;">兜底机制</h4>
+        <p style="margin-bottom:3px;">外部 API 失败 &#x2192; 读取缓存</p>
+        <p style="margin-bottom:3px;">LLM 超时 &#x2192; 返回预设回复</p>
+        <p style="margin-bottom:0;">Agent 失败 &#x2192; 直接返回错误信息给用户</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:8px;">监控告警</h4>
+        <p style="margin-bottom:3px;">关键节点 Terminated 时发送告警</p>
+        <p style="margin-bottom:3px;">错误率超过阈值时通知运维</p>
+        <p style="margin-bottom:0;">HumanInput 超时时升级到上级审批</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 24: Agent v2 架构 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="glow-orb" style="top:-60px;right:-60px;width:180px;height:180px;background:var(--magenta);"></div>
+  <div class="slide-inner">
+    <div class="section-num">AGENT — 01</div>
+    <h2>Agent v2 架构 — 7 个核心文件</h2>
+    <p>Agent v2 是当前 Dify 的主力 Agent 实现：</p>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div class="code-block" style="border:none;border-radius:0;background:rgba(13,17,23,0.8);"><span class="cmt"># api/core/workflow/nodes/agent_v2/</span>
+<span class="type">├──</span> <span class="fn">agent_node.py</span>              <span class="cmt">&#x2190; DifyAgentNode 主体实现</span>
+<span class="type">├──</span> <span class="fn">entities.py</span>               <span class="cmt">&#x2190; DifyAgentNodeData 节点配置数据模型</span>
+<span class="type">├──</span> <span class="fn">dify_tools_builder.py</span>     <span class="cmt">&#x2190; 工具构建器（核心插件/工具注册）</span>
+<span class="type">├──</span> <span class="fn">runtime_request_builder.py</span> <span class="cmt">&#x2190; Agent 运行时请求构建</span>
+<span class="type">├──</span> <span class="fn">output_adapter.py</span>         <span class="cmt">&#x2190; Agent 输出格式适配</span>
+<span class="type">├──</span> <span class="fn">validators.py</span>             <span class="cmt">&#x2190; 发布前输入校验</span>
+<span class="type">└──</span> <span class="fn">ask_human_hitl.py</span>         <span class="cmt">&#x2190; Agent 内嵌 HumanInput 支持</span></div>
+    </div>
+    <div class="card-grid col2" style="margin-top:6px;">
+      <div class="card"><h4 style="margin-bottom:2px;">agent_node.py</h4><p class="text-dim">Agent 节点的主入口，负责工具调用循环、上下文管理、结果生成</p></div>
+      <div class="card"><h4 style="margin-bottom:2px;">dify_tools_builder.py</h4><p class="text-dim">将插件工具、内置工具、工作流工具统一构建为 Agent 可调用的工具列表</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 25: Agent 工具绑定 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">AGENT — 02</div>
+    <h2>Agent 工具绑定 — 3 种类型</h2>
+    <div class="card-grid" style="grid-template-columns:1fr;gap:12px;">
+      <div class="card" style="border-color:rgba(0,240,255,0.3);">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:clamp(20px,2.5vw,32px);font-weight:700;">A</div>
+          <div>
+            <h4>插件工具 — DifyPluginToolsLayerConfig</h4>
+            <p class="text-dim" style="margin-bottom:0;">已安装的社区/官方插件：Google Search、DALL-E、代码解释器、GitHub 等，通过统一接口注册</p>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(0,240,255,0.3);">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:clamp(20px,2.5vw,32px);font-weight:700;">B</div>
+          <div>
+            <h4>内置工具 — DifyCoreToolsLayerConfig</h4>
+            <p class="text-dim" style="margin-bottom:0;">Dify 内置能力：知识库检索（内嵌在 Agent 中）、数据集操作、变量操作等核心功能</p>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(255,0,229,0.3);">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="font-family:'JetBrains Mono',monospace;color:var(--magenta);font-size:clamp(20px,2.5vw,32px);font-weight:700;">C</div>
+          <div>
+            <h4 style="color:var(--magenta);">工作流作为工具 — WorkflowToolProviderController</h4>
+            <p class="text-dim" style="margin-bottom:0;">将已有的子工作流注册为 Agent 可调用的工具，实现模块化复用。一个工作流 = 一个工具。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 26: Agent System Prompt 模板 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">AGENT — 03</div>
+    <h2>Agent System Prompt 模板</h2>
+    <div class="card" style="padding:0;overflow:hidden;border-color:rgba(255,0,229,0.25);">
+      <div class="code-block" style="border:none;border-radius:0;font-size:clamp(10px,1vw,12px);"><span class="cmt"># System Prompt — Agent 行为定义模板</span>
+
+你是 <span class="str">[角色：如"客户支持 Agent"]</span>。你可以使用以下工具来完成用户的任务。
+
+<span class="cmt"># 可用工具</span>
+<span class="num">1.</span> search_knowledge_base    — 在知识库中搜索产品和政策信息
+<span class="num">2.</span> lookup_customer_by_email — 根据邮箱查找客户信息和订单
+<span class="num">3.</span> create_support_ticket    — 创建支持工单并分配给人工客服
+<span class="num">4.</span> check_order_status       — 查询订单实时状态
+
+<span class="cmt"># 行为规则</span>
+<span class="num">1.</span> 用户询问产品问题 &#x2192; 先用 search_knowledge_base 查找
+<span class="num">2.</span> 用户询问订单 &#x2192; 先用 lookup_customer_by_email 确认身份
+<span class="num">3.</span> 无法解决的问题 &#x2192; 使用 create_support_ticket 转人工
+<span class="num">4.</span> 所有工具都不适用 &#x2192; 基于已有知识直接回答
+
+<span class="cmt"># 输出格式</span>
+- 工具调用：返回工具名称和参数 JSON
+- 最终回复：用 markdown 格式，友好专业</div>
+    </div>
+    <p class="text-dim" style="margin-top:6px;text-align:center;">核心公式：<span style="color:var(--cyan);">角色定义</span> + <span style="color:var(--magenta);">工具列表</span> + <span style="color:#f0c040;">行为规则</span> + <span style="color:#7ee787;">输出规范</span></p>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 27: 工具选择最佳实践 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">AGENT — 04</div>
+    <h2>工具选择最佳实践 4 条</h2>
+    <div class="card-grid" style="grid-template-columns:1fr;gap:10px;">
+      <div class="card" style="border-left:4px solid #7ee787;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <span style="color:#7ee787;font-weight:700;font-size:clamp(16px,1.8vw,20px);">1</span>
+          <div>
+            <h4>清晰的场景描述</h4>
+            <p style="margin-bottom:2px;"><span style="color:#7ee787;">&#x2705;</span> "当用户询问最近订单时，使用该工具查询最近 30 天内的订单"</p>
+            <p style="margin-bottom:0;"><span style="color:#ff7b72;">&#x274C;</span> "用于查询订单"</p>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="border-left:4px solid #7ee787;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <span style="color:#7ee787;font-weight:700;font-size:clamp(16px,1.8vw,20px);">2</span>
+          <div>
+            <h4>工具数量控制在 3-8 个</h4>
+            <p style="margin-bottom:0;">工具太少 Agent 能力不足，太多则 Agent 选错工具概率大增。3-8 个是经过验证的最佳区间。</p>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="border-left:4px solid #7ee787;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <span style="color:#7ee787;font-weight:700;font-size:clamp(16px,1.8vw,20px);">3</span>
+          <div>
+            <h4>描述性命名</h4>
+            <p style="margin-bottom:2px;"><span style="color:#7ee787;">&#x2705;</span> <span style="font-family:'JetBrains Mono',monospace;color:var(--cyan);">search_customer_by_email</span></p>
+            <p style="margin-bottom:0;"><span style="color:#ff7b72;">&#x274C;</span> <span style="font-family:'JetBrains Mono',monospace;color:#ff7b72;">tool_1</span> / <span style="font-family:'JetBrains Mono',monospace;color:#ff7b72;">func_a</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="border-left:4px solid #7ee787;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <span style="color:#7ee787;font-weight:700;font-size:clamp(16px,1.8vw,20px);">4</span>
+          <div>
+            <h4>精确的参数描述</h4>
+            <p style="margin-bottom:2px;"><span style="color:#7ee787;">&#x2705;</span> "customer email address (e.g. user@company.com)"</p>
+            <p style="margin-bottom:0;"><span style="color:#ff7b72;">&#x274C;</span> "input" / "query"</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 28: Agent 执行追踪 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">AGENT — 05</div>
+    <h2>Agent 执行追踪</h2>
+    <p>Agent 节点的执行日志包含详细的工具调用树状信息。</p>
+    <div class="two-col">
+      <div class="card" style="overflow:hidden;padding:0;">
+        <div class="code-block" style="border:none;border-radius:0;font-size:clamp(10px,1vw,12px);"><span class="cmt">// web/types/workflow.ts — NodeTracing</span>
+<span class="kw">type</span> <span class="type">NodeTracing</span> <span class="op">=</span> <span class="kw">{</span>
+  <span class="var">execution_metadata</span>?: <span class="kw">{</span>
+    <span class="var">agent_log</span>?: <span class="type">AgentLogItem</span>[]  <span class="cmt">// 工具调用的树状日志</span>
+    <span class="var">tool_info</span>?: <span class="kw">{</span>             <span class="cmt">// 工具调用元信息</span>
+      <span class="var">agent_strategy</span>?: <span class="kw">string</span>
+      <span class="var">icon</span>?: <span class="kw">string</span>
+    <span class="kw">}</span>
+    <span class="var">total_tokens</span>?: <span class="kw">number</span>       <span class="cmt">// 总 token 消耗</span>
+    <span class="var">total_steps</span>?: <span class="kw">number</span>        <span class="cmt">// 工具调用总步数</span>
+  <span class="kw">}</span>
+<span class="kw">}</span>
+
+<span class="cmt">// agent_log 每个元素包含：</span>
+<span class="cmt">// - tool_name:     被调用的工具名</span>
+<span class="cmt">// - tool_input:    工具参数</span>
+<span class="cmt">// - tool_output:   工具返回值</span>
+<span class="cmt">// - elapsed_time:  单步耗时</span>
+<span class="cmt">// - children:      嵌套工具调用（子级）</span></div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:10px;">
+          <h4 style="margin-bottom:4px;">前端日志面板路径</h4>
+          <div class="code-block" style="background:rgba(13,17,23,0.6);"><span class="cmt">// web/app/components/workflow/run/agent-log/</span>
+<span class="type">├──</span> <span class="fn">agent-log-trigger.tsx</span>  <span class="cmt">// 展开/折叠 Agent 日志</span>
+<span class="type">└──</span> <span class="fn">agent-log-item.tsx</span>     <span class="cmt">// 单条工具调用详情</span></div>
+        </div>
+        <div class="card" style="border-color:rgba(0,240,255,0.2);">
+          <h4 style="margin-bottom:4px;">追踪可观测信息</h4>
+          <p style="margin-bottom:2px;">Agent 每一步思考过程（Thought）</p>
+          <p style="margin-bottom:2px;">每个工具调用耗时和结果</p>
+          <p style="margin-bottom:2px;">总 Token 消耗和步数</p>
+          <p style="margin-bottom:0;">Agent 最终回复的生成依据</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 29: 链式 Agent 模式 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">AGENT — 06</div>
+    <h2>链式 Agent 模式</h2>
+    <p>将多个 Agent v2 节点串联，每个 Agent 负责不同阶段，输出传递给下一个。</p>
+    <div class="card" style="margin-bottom:8px;">
+      <div class="flow" style="flex-wrap:wrap;">
+        <div class="flow-node flow-n-agent">Agent A<br>&#x1F50D; 研究助手</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-agent">Agent B<br>&#x1F4CA; 分析助手</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-agent">Agent C<br>&#x270D; 写作助手</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-end">End<br>格式化输出</div>
+      </div>
+    </div>
+    <div class="card-grid col3">
+      <div class="card" style="text-align:center;">
+        <h4>Agent A：研究</h4>
+        <p class="text-dim" style="margin-bottom:0;">搜索 + 收集信息<br>工具：Google Search, 知识库检索<br>输出：原始资料集合</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <h4>Agent B：分析</h4>
+        <p class="text-dim" style="margin-bottom:0;">分析 + 发现洞察<br>工具：数据处理、统计计算<br>输出：分析报告</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <h4>Agent C：写作</h4>
+        <p class="text-dim" style="margin-bottom:0;">撰写 + 格式化<br>工具：模板渲染、语法检查<br>输出：终稿文档</p>
+      </div>
+    </div>
+    <p class="text-dim" style="text-align:center;margin-top:6px;">每个 Agent 是独立的 Agent v2 节点，文本输出传给下一个 Agent 作为上下文输入。</p>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 30: 知识库多路召回 + RRF融合 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="glow-orb" style="bottom:-80px;left:-80px;width:200px;height:200px;background:var(--cyan);"></div>
+  <div class="slide-inner">
+    <div class="section-num">ADVANCED PATTERNS — 01</div>
+    <h2>知识库多路召回 + RRF 融合</h2>
+    <div class="card" style="margin-bottom:6px;">
+      <div class="flow" style="flex-wrap:wrap;">
+        <div class="flow-node flow-n-start">Start<br>用户问题</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div class="flow-node flow-n-iter">检索A：语义检索</div>
+          <div class="flow-node flow-n-iter">检索B：全文检索</div>
+          <div class="flow-node flow-n-iter">检索C：混合检索</div>
+        </div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-code">Code<br>RRF 融合</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-llm">LLM</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-end">End</div>
+      </div>
+    </div>
+    <div class="card" style="overflow:hidden;padding:0;">
+      <div class="code-block" style="border:none;border-radius:0;font-size:clamp(9px,0.9vw,11px);"><span class="cmt"># RRF (Reciprocal Rank Fusion) 核心算法 — Code 节点</span>
+<span class="kw">def</span> <span class="fn">main</span>(args):
+    results_a, results_b, results_c <span class="op">=</span> args.get(<span class="str">'retrieval_a_result'</span>,[]), args.get(<span class="str">'retrieval_b_result'</span>,[]), args.get(<span class="str">'retrieval_c_result'</span>,[])
+    scores, k <span class="op">=</span> <span class="kw">{}</span>, <span class="num">60</span>  <span class="cmt"># k=60 是 RRF 经典常数</span>
+    <span class="kw">for</span> results <span class="kw">in</span> [results_a, results_b, results_c]:
+        <span class="kw">for</span> rank, doc <span class="kw">in</span> <span class="kw">enumerate</span>(results):
+            doc_id <span class="op">=</span> doc.get(<span class="str">'metadata'</span>,<span class="kw">{}</span>).get(<span class="str">'document_id'</span>,<span class="str">''</span>)
+            scores[doc_id] <span class="op">=</span> scores.get(doc_id, <span class="num">0</span>) <span class="op">+</span> <span class="num">1</span> <span class="op">/</span> (k <span class="op">+</span> rank <span class="op">+</span> <span class="num">1</span>)
+
+    all_docs <span class="op">=</span> <span class="kw">{</span>doc[<span class="str">'metadata'</span>][<span class="str">'document_id'</span>]:doc <span class="kw">for</span> r <span class="kw">in</span> [results_a,results_b,results_c] <span class="kw">for</span> doc <span class="kw">in</span> r<span class="kw">}</span>
+    merged <span class="op">=</span> <span class="kw">sorted</span>(all_docs.values(), key<span class="op">=</span><span class="kw">lambda</span> d: scores.get(d[<span class="str">'metadata'</span>][<span class="str">'document_id'</span>],<span class="num">0</span>), reverse<span class="op">=</span><span class="kw">True</span>)[:<span class="num">10</span>]
+    <span class="kw">return</span> <span class="kw">{</span><span class="str">'merged_results'</span>: merged<span class="kw">}</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 31: 条件发布管道 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">ADVANCED PATTERNS — 02</div>
+    <h2>条件发布管道</h2>
+    <p>AI 生成内容后，按质量分数走不同处理路径。</p>
+    <div class="card" style="margin-bottom:8px;">
+      <div class="flow" style="flex-wrap:wrap;">
+        <div class="flow-node flow-n-llm">LLM<br>生成内容</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div class="flow-node flow-n-if">IF<br>质量检查</div>
+        <div class="flow-arrow">&#x2192;</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#7ee787;font-weight:700;font-size:12px;">score &gt; 0.8 &#x2192;</span>
+            <span class="flow-node flow-n-end" style="border-color:#7ee787;color:#7ee787;">直接发布</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#f0c040;font-weight:700;font-size:12px;">score &gt; 0.5 &#x2192;</span>
+            <span class="flow-node flow-n-llm">LLM 优化</span>
+            <span class="flow-arrow">&#x2192;</span>
+            <span class="flow-node flow-n-end">发布</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#ff7b72;font-weight:700;font-size:12px;">score &lt; 0.5 &#x2192;</span>
+            <span class="flow-node flow-n-human">HumanInput<br>人工改写</span>
+            <span class="flow-arrow">&#x2192;</span>
+            <span class="flow-node flow-n-end">发布</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-grid col3">
+      <div class="card" style="text-align:center;">
+        <h4 style="color:#7ee787;">score &gt; 0.8</h4>
+        <p class="text-dim">高质量内容，无需人工审核，直接自动发布。适合对时效性要求高的场景。</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <h4 style="color:#f0c040;">score 0.5-0.8</h4>
+        <p class="text-dim">中等质量，交给 LLM 优化后自动发布。节省人工但保证一定质量。</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <h4 style="color:#ff7b72;">score &lt; 0.5</h4>
+        <p class="text-dim">低质量，触发 HumanInput 人工介入。确保关键内容有人类把关。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 32: 性能调优清单 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="slide-inner">
+    <div class="section-num">ADVANCED PATTERNS — 03</div>
+    <h2>性能调优 Checklist</h2>
+    <div class="card-grid col3">
+      <div class="card" style="border-color:rgba(255,0,229,0.2);">
+        <h4 style="color:var(--magenta);margin-bottom:8px;">LLM 成本控制</h4>
+        <p style="margin-bottom:3px;">问题分类器用便宜模型（Haiku / GPT-4o-mini）</p>
+        <p style="margin-bottom:3px;">只在"主 LLM"用贵的模型（Opus / GPT-4o）</p>
+        <p style="margin-bottom:3px;">设置 max_tokens 限制输出长度</p>
+        <p style="margin-bottom:0;">知识库检索 TopK 减小到 3-5</p>
+      </div>
+      <div class="card" style="border-color:rgba(0,240,255,0.2);">
+        <h4 style="color:var(--cyan);margin-bottom:8px;">工作流结构</h4>
+        <p style="margin-bottom:3px;">并行分支避免最长路径成瓶颈</p>
+        <p style="margin-bottom:3px;">迭代内部避免深度嵌套（迭代套迭代套 LLM）</p>
+        <p style="margin-bottom:0;">大文件处理放在独立分支中异步进行</p>
+      </div>
+      <div class="card" style="border-color:rgba(240,192,64,0.2);">
+        <h4 style="color:#f0c040;margin-bottom:8px;">错误恢复</h4>
+        <p style="margin-bottom:3px;">HTTP/Tool 节点启用重试</p>
+        <p style="margin-bottom:3px;">Agent 节点启用 ContinueOnError</p>
+        <p style="margin-bottom:3px;">关键路径有兜底逻辑</p>
+        <p style="margin-bottom:0;">HumanInput 设置合理超时（≥24h）</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 33: 全系列总结 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="glow-orb" style="top:-80px;left:-80px;width:250px;height:250px;background:var(--cyan);"></div>
+  <div class="glow-orb" style="bottom:-80px;right:-80px;width:250px;height:250px;background:var(--magenta);"></div>
+  <div class="slide-inner" style="align-items:center;text-align:center;">
+    <div class="section-num">SERIES CONCLUSION</div>
+    <h2>恭喜！Dify 工作流搭建完全教程</h2>
+    <p style="font-size:clamp(14px,1.5vw,18px);margin-bottom:8px;">五篇内容已全部完成</p>
+    <div class="card-grid col2" style="margin-bottom:8px;text-align:left;">
+      <div class="card">
+        <h4 style="margin-bottom:2px;">第一篇：概念篇</h4>
+        <p class="text-dim">架构概览、核心概念、系统变量体系</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:2px;">第二篇：节点篇</h4>
+        <p class="text-dim">28 种节点完整详解</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:2px;">第三篇：变量篇</h4>
+        <p class="text-dim">变量系统与数据传递机制</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:2px;">第四篇：实战篇</h4>
+        <p class="text-dim">5 个真实生产级场景</p>
+      </div>
+      <div class="card" style="border-color:rgba(255,0,229,0.35);grid-column:1/-1;text-align:center;">
+        <h4 style="color:var(--magenta);margin-bottom:2px;">第五篇：进阶篇 &#x2B05; 本篇</h4>
+        <p class="text-dim">触发器 / HITL / 循环 / 错误处理 / Agent</p>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;">
+      <span class="tag tag-cyan">28 种节点</span>
+      <span class="tag tag-cyan">9 个系统变量</span>
+      <span class="tag tag-magenta">5 种错误策略</span>
+      <span class="tag tag-magenta">3 种触发器</span>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SLIDE 34: 结束页 -->
+<!-- ================================================================ -->
+<div class="slide">
+  <div class="glow-orb" style="top:50%;left:50%;transform:translate(-50%,-50%);width:400px;height:400px;background:var(--cyan);opacity:0.08;"></div>
+  <div class="slide-inner" style="align-items:center;text-align:center;">
+    <h1 style="background:linear-gradient(135deg,var(--cyan),var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:clamp(32px,5vw,56px);">
+      教程完整结束
+    </h1>
+    <p style="font-size:clamp(16px,2vw,22px);color:var(--text-bright);margin-top:8px;">
+      开始搭建你的第一个 Dify 工作流吧！
+    </p>
+    <div style="width:clamp(40px,5vw,60px);height:3px;background:linear-gradient(90deg,var(--cyan),var(--magenta));border-radius:2px;margin:12px 0;"></div>
+    <p class="text-dim">Dify Workflow Tutorial — Complete</p>
+    <p class="text-dim" style="font-size:clamp(11px,1vw,13px);margin-top:6px;">触发器 / HumanInput / 迭代与循环 / 错误处理 / Agent v2 / 高级数据流模式 / 性能调优</p>
+  </div>
+</div>
+
+
+<!-- ==================== JavaScript ==================== -->
+<script>
+(function() {
+  const slides = document.querySelectorAll('.slide');
+  const navDots = document.getElementById('nav-dots');
+  const counter = document.getElementById('slide-counter');
+  const totalSlides = slides.length;
+
+  // Create navigation dots
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot';
+    dot.title = 'Slide ' + (i + 1);
+    dot.addEventListener('click', () => {
+      slides[i].scrollIntoView({ behavior: 'smooth' });
+    });
+    navDots.appendChild(dot);
+  }
+
+  // Intersection Observer for fade-up animation
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  slides.forEach(slide => {
+    observer.observe(slide);
+  });
+
+  // Update active dot and counter
+  const dotObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const index = Array.from(slides).indexOf(entry.target);
+        document.querySelectorAll('.nav-dot').forEach((d, i) => {
+          d.classList.toggle('active', i === index);
+        });
+        counter.textContent = (index + 1) + ' / ' + totalSlides;
+      }
+    });
+  }, { threshold: 0.5 });
+
+  slides.forEach(slide => {
+    dotObserver.observe(slide);
+  });
+
+  // Touch swipe support
+  let touchStartY = 0;
+  document.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    const deltaY = touchStartY - e.changedTouches[0].clientY;
+    if (Math.abs(deltaY) > 50) {
+      const currentSlide = Math.round(window.scrollY / window.innerHeight);
+      if (deltaY > 0 && currentSlide < totalSlides - 1) {
+        slides[currentSlide + 1].scrollIntoView({ behavior: 'smooth' });
+      } else if (deltaY < 0 && currentSlide > 0) {
+        slides[currentSlide - 1].scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    const currentSlide = Math.round(window.scrollY / window.innerHeight);
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'PageDown') {
+      e.preventDefault();
+      if (currentSlide < totalSlides - 1) {
+        slides[currentSlide + 1].scrollIntoView({ behavior: 'smooth' });
+      }
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault();
+      if (currentSlide > 0) {
+        slides[currentSlide - 1].scrollIntoView({ behavior: 'smooth' });
+      }
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      slides[0].scrollIntoView({ behavior: 'smooth' });
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      slides[totalSlides - 1].scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+
+  // Make first slide visible immediately
+  setTimeout(() => {
+    slides[0].classList.add('visible');
+    document.querySelectorAll('.nav-dot')[0]?.classList.add('active');
+  }, 100);
+})();
+</script>
+
+</body>
+</html>
