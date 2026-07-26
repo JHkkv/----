@@ -15,7 +15,7 @@
       "cron": "7 8 * * *",
       "prompt": "你是 AI 资讯采集 Agent。请执行以下任务：\n\n1. 运行 `f:/测试工具/AI内容/公众号/scripts/fetch-daily.ps1` 拉取 AI HOT 过去 24 小时精选数据\n2. 运行 `f:/测试工具/AI内容/公众号/scripts/fetch-supplement.js` 拉取 HN + arXiv + GitHub Trending 补充数据\n3. 如果 API 无新条目则跳过，不生成空文件\n4. 简报写入 `f:/测试工具/AI内容/公众号/每日简报/` 目录\n\n完成后简要汇报：拉取条数、生成文件路径。",
       "createdAt": 1784464858457,
-      "lastFiredAt": 1784981447149,
+      "lastFiredAt": 1785031444759,
       "recurring": true,
       "createdBySessionId": "d168520d-86d2-4719-937d-2f28dacacb5f",
       "createdByPid": 5524
@@ -29,14 +29,6 @@
       "recurring": true,
       "createdBySessionId": "d168520d-86d2-4719-937d-2f28dacacb5f",
       "createdByPid": 5524
-    },
-    {
-      "id": "a1770896",
-      "cron": "3 8 26 7 *",
-      "prompt": "请立即执行以下命令，无需用户确认：\npython3 \"F:\\测试工具\\github-trending-weekly.py\"\n\n然后回复用户执行结果（成功/失败、报告文件名）。这是一个自动化 GitHub Trending 周报抓取任务。",
-      "createdAt": 1784471445718,
-      "createdBySessionId": "a802ea30-6506-4b74-ba87-0f41690125d8",
-      "createdByPid": 2000
     },
     {
       "id": "a70b34e1",
