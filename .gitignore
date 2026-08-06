@@ -56,3 +56,10 @@ temp/
 
 # Superpowers brainstorming mockups
 .superpowers/
+
+# Nested third-party repos (each has own .git; never track from root)
+dify/
+归档/ecommerce-ops/
+归档/life-coach-standalone/
+writing-agent/
+项目/everything-claude-code/
