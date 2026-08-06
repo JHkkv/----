@@ -1,0 +1,9 @@
+{
+  "name": "podcast-pdf-tool",
+  "version": "1.0.0",
+  "description": "用 puppeteer-core 驱动本机 Edge(CDP) 把 officecli 渲染的 HTML 转为 PDF。",
+  "main": "html-to-pdf.js",
+  "dependencies": {
+    "puppeteer-core": "^23.0.0"
+  }
+}

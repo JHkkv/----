@@ -63,3 +63,6 @@ dify/
 归档/life-coach-standalone/
 writing-agent/
 项目/everything-claude-code/
+
+# 隐私备份(含历史敏感数据, 绝不推送)
+.backup-history/

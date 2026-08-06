@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文案作品集 · 内容创作与优化</title>
+<style>
+  :root {
+    --paper: #faf7f2;
+    --paper-deep: #f1ebe2;
+    --ink: #22201d;
+    --ink-soft: #55524d;
+    --ink-faint: #8a867f;
+    --line: #e3dcd2;
+    --gzh: #0f4c81;
+    --gzh-soft: #eef3f8;
+    --xhs: #b76e79;
+    --xhs-soft: #f9eef0;
+    --dy: #a93226;
+    --dy-soft: #f7ecea;
+    --ease: cubic-bezier(.16, 1, .3, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 40px; }
+
+  /* ============ HERO ============ */
+  header.hero {
+    padding: 96px 0 64px;
+    position: relative;
+  }
+  .hero .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    letter-spacing: .28em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero .kicker::before {
+    content: "";
+    width: 44px; height: 1px;
+    background: var(--ink);
+  }
+  .hero h1 {
+    font-size: clamp(2.6rem, 6vw, 4.4rem);
+    line-height: 1.12;
+    letter-spacing: .01em;
+    font-weight: 700;
+    max-width: 15em;
+  }
+  .hero h1 .accent {
+    color: var(--gzh);
+    position: relative;
+  }
+  .hero .lead {
+    margin-top: 28px;
+    max-width: 42em;
+    font-size: 1.06rem;
+    color: var(--ink-soft);
+  }
+  .hero .lead strong { color: var(--ink); }
+
+  .stats {
+    margin-top: 44px;
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+  .stat .num {
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat .lbl { font-size: 13px; color: var(--ink-faint); margin-top: 6px; letter-spacing: .06em; }
+  .stat.g .num { color: var(--gzh); }
+  .stat.x .num { color: var(--xhs); }
+  .stat.d .num { color: var(--dy); }
+
+  /* ============ NAV ============ */
+  nav.anchors {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(250, 247, 242, .92);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  nav.anchors .wrap {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    height: 60px;
+  }
+  nav.anchors a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: color .25s var(--ease);
+  }
+  nav.anchors a:hover { color: var(--ink); }
+  nav.anchors a .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--ink-faint);
+  }
+  nav.anchors a:nth-child(2) .dot { background: var(--gzh); }
+  nav.anchors a:nth-child(3) .dot { background: var(--xhs); }
+  nav.anchors a:nth-child(4) .dot { background: var(--dy); }
+  nav.anchors .cnt { font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+
+  /* ============ SECTION ============ */
+  section.plat { padding: 72px 0; }
+  section.plat + section.plat { border-top: 1px solid var(--line); }
+
+  .plat-head { margin-bottom: 40px; }
+  .plat-head .tag {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: .2em;
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  section#gzh .tag { background: var(--gzh-soft); color: var(--gzh); }
+  section#xhs  .tag { background: var(--xhs-soft); color: var(--xhs); }
+  section#dy   .tag { background: var(--dy-soft); color: var(--dy); }
+  .plat-head h2 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+  }
+  .plat-head .desc { color: var(--ink-soft); font-size: .98rem; margin-top: 8px; max-width: 44em; }
+
+  /* ============ WORKS GRID ============ */
+  .works {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  .work {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: #fffdfa;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 26px 26px 22px;
+    position: relative;
+    overflow: hidden;
+    transition: transform .4s var(--ease), box-shadow .4s var(--ease), border-color .4s var(--ease);
+  }
+  .work::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--line);
+    transition: background .4s var(--ease);
+  }
+  .work:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px -18px rgba(34, 32, 29, .22);
+  }
+  .work .idx {
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: .1em;
+    font-variant-numeric: tabular-nums;
+  }
+  .work h3 {
+    font-size: 1.18rem;
+    line-height: 1.4;
+    font-weight: 700;
+    margin: 10px 0 8px;
+    letter-spacing: .01em;
+  }
+  .work .sum {
+    font-size: .9rem;
+    color: var(--ink-soft);
+    line-height: 1.65;
+    min-height: 3.3em;
+  }
+  .work .meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--line);
+  }
+  .work .tags {
+    font-size: 12px;
+    color: var(--ink-faint);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .work .go {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .work .go::after { content: "→"; transition: transform .3s var(--ease); }
+  .work:hover .go::after { transform: translateX(4px); }
+
+  section#gzh .work:hover { border-color: var(--gzh); }
+  section#gzh .work:hover::after { background: var(--gzh); }
+  section#gzh .work:hover .go { color: var(--gzh); }
+  section#xhs  .work:hover { border-color: var(--xhs); }
+  section#xhs  .work:hover::after { background: var(--xhs); }
+  section#xhs  .work:hover .go { color: var(--xhs); }
+  section#dy   .work:hover { border-color: var(--dy); }
+  section#dy   .work:hover::after { background: var(--dy); }
+  section#dy   .work:hover .go { color: var(--dy); }
+
+  /* ============ FOOTER ============ */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 56px 0 72px;
+    text-align: center;
+    color: var(--ink-faint);
+    font-size: 14px;
+  }
+  footer .tline { color: var(--ink-soft); margin-bottom: 10px; font-size: 15px; }
+  footer .tline em { font-style: normal; color: var(--ink); font-weight: 600; }
+
+  @media (max-width: 640px) {
+    .wrap { padding: 0 22px; }
+    header.hero { padding: 64px 0 44px; }
+    nav.anchors .wrap { gap: 18px; }
+    nav.anchors a { font-size: 13px; }
+    .stats { gap: 28px; }
+    .works { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Copywriting · Portfolio</div>
+    <h1>写给<em class="accent">「屏幕前的人」</em><br>的文字作品集</h1>
+    <p class="lead">
+      这些作品，是我用文字做过的事情：把每天 30+ 条 AI 资讯整理成一篇可读的行业观察；
+      把一篇简历改出 3 个面试邀约；把一次求职挫折写成 9 分钟能被 10 万人看完的口播台本。
+      <strong>我不追求"文采飞扬"，我追求——把话说进人心坎里，然后让人行动。</strong>
+    </p>
+    <div class="stats">
+      <div class="stat g"><div class="num">04</div><div class="lbl">公众号长文</div></div>
+      <div class="stat x"><div class="num">06</div><div class="lbl">小红书笔记</div></div>
+      <div class="stat d"><div class="num">03</div><div class="lbl">抖音口播台本</div></div>
+      <div class="stat"><div class="num">13</div><div class="lbl">总作品数</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= NAV ================= -->
+<nav class="anchors">
+  <div class="wrap">
+    <a href="#gzh"><span class="dot"></span>公众号 <span class="cnt">04</span></a>
+    <a href="#xhs"><span class="dot"></span>小红书 <span class="cnt">06</span></a>
+    <a href="#dy"><span class="dot"></span>抖音 <span class="cnt">03</span></a>
+  </div>
+</nav>
+
+<!-- ================= 公众号 ================= -->
+<section class="plat" id="gzh">
+  <div class="wrap">
+    <div class="plat-head">
+      <span class="tag">微信公众平台</span>
+      <h2>公众号 · 长图文</h2>
+      <p class="desc">把复杂话题拆成"人话"，用数据和故事建立信任。适合深度阅读、私域传播、行业观点输出。</p>
+    </div>
+    <div class="works">
+      <a class="work" href="works/公众号/001-我用ClaudeCode做了AI公众号自动化系统.html">
+        <div class="idx">WECHAT · 001</div>
+        <h3>我用 Claude Code 做了一个 AI 公众号自动化系统，这是全过程</h3>
+        <p class="sum">一个 AI 新手，如何从"零技术背景"到搭起一套每天自动采集、筛选、成稿的内容管道。从采集到成文到审校的完整工作流拆解。</p>
+        <div class="meta"><span class="tags">#AI写作 #公众号运营 #工作流</span><span class="go">阅读</span></div>
+      </a>
+      <a class="work" href="works/公众号/002-黄仁勋喊出4万亿GitHub正在崩塌.html">
+        <div class="idx">WECHAT · 002</div>
+        <h3>黄仁勋喊出 4 万亿，GitHub 正在崩塌，而我们还在讨论 AI 会不会取代你</h3>
+        <p class="sum">三条同一天的 AI 大新闻，指向同一个方向：行业跑得太快了。用"钱、竞争、崩塌"三条线织出 AI 时代的真实张力。</p>
+        <div class="meta"><span class="tags">#AI行业 #深度观察 #资讯综述</span><span class="go">阅读</span></div>
+      </a>
+      <a class="work" href="works/公众号/003-北京智能体新政到底说了什么.html">
+        <div class="idx">WECHAT · 003</div>
+        <h3>北京发了份"智能体新政"，第一次把"一人公司"写进红头文件</h3>
+        <p class="sum">三个陌生名词——驾驭层工程、Token 经济、一人公司，如何被翻译成每个人都能听懂的职业机会。</p>
+        <div class="meta"><span class="tags">#政策解读 #AI职场 #个体创业</span><span class="go">阅读</span></div>
+      </a>
+      <a class="work" href="works/公众号/004-硅谷在抢电我们在存钱.html">
+        <div class="idx">WECHAT · 004</div>
+        <h3>硅谷在抢电，我们在存钱：一组数据看懂 AI 时代的"冰火两重天"</h3>
+        <p class="sum">同一周，资本疯狂扩张、普通人拼命储蓄。用两组反差数据，讲清 AI 浪潮里"夹在中间的人"该怎么自处。</p>
+        <div class="meta"><span class="tags">#数据写作 #经济观察 #AI与个体</span><span class="go">阅读</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 小红书 ================= -->
+<section class="plat" id="xhs">
+  <div class="wrap">
+    <div class="plat-head">
+      <span class="tag">小红书 · RED</span>
+      <h2>小红书 · 种草笔记</h2>
+      <p class="desc">数字开头、场景共鸣、方法可抄。擅长把工具教程写成"读起来像人话"的干货，追求收藏率与互动感。</p>
+    </div>
+    <div class="works">
+      <a class="work" href="works/小红书/01-投了100份没回音简历里缺了数据.html">
+        <div class="idx">RED · 01</div>
+        <h3>投了 100 份没回音？因为你简历里缺了数据</h3>
+        <p class="sum">"我知道要写数据，但我做的事没数据啊"——用三步提示词，把大白话"剥"出可量化的数据。</p>
+        <div class="meta"><span class="tags">#简历优化 #AI求职 #数据化简历</span><span class="go">查看</span></div>
+      </a>
+      <a class="work" href="works/小红书/02-转行简历总被拒AI经历翻译官.html">
+        <div class="idx">RED · 02</div>
+        <h3>转行简历总被拒？用 AI 把老经历翻译成新 JD 话术</h3>
+        <p class="sum">"选品上架调价一条龙"怎么翻译成"内容策划"？三步法让 HR 看得懂、关键词命中。</p>
+        <div class="meta"><span class="tags">#转行 #AI求职 #简历怎么写</span><span class="go">查看</span></div>
+      </a>
+      <a class="work" href="works/小红书/03-简历投了100份没回音JD镜子法.html">
+        <div class="idx">RED · 03</div>
+        <h3>简历投了 100 份没回音？把 JD 和简历同时发给 AI</h3>
+        <p class="sum">"JD 镜子法"：让 AI 从 HR 视角输出 6 维诊断报告，一次看清你的简历差在哪。</p>
+        <div class="meta"><span class="tags">#简历诊断 #AI求职 #面试技巧</span><span class="go">查看</span></div>
+      </a>
+      <a class="work" href="works/小红书/04-让AI面试我之后终于知道发什么了.html">
+        <div class="idx">RED · 04</div>
+        <h3>让 AI 面试我之后，终于知道发什么了</h3>
+        <p class="sum">自媒体起步第一问不是"发什么"，是"我是谁"。让 AI 先认识你，再帮你定方向、找语气。</p>
+        <div class="meta"><span class="tags">#自媒体新手 #AI写作 #个人IP</span><span class="go">查看</span></div>
+      </a>
+      <a class="work" href="works/小红书/05-AI认识我之后终于能帮我拨开迷雾.html">
+        <div class="idx">RED · 05</div>
+        <h3>AI 认识我之后，终于能帮我拨开迷雾了</h3>
+        <p class="sum">迷茫不是缺一条确定的路，是缺一盏照亮脚下三米的灯。一段关于"让 AI 懂你"的安静叙事。</p>
+        <div class="meta"><span class="tags">#AI自媒体 #活人感 #陪伴感写作</span><span class="go">查看</span></div>
+      </a>
+      <a class="work" href="works/小红书/06-手机备忘录278条碎片一条都没变成行动.html">
+        <div class="idx">RED · 06</div>
+        <h3>手机备忘录 278 条碎片，一条都没变成行动</h3>
+        <p class="sum">用具体数字开场，把"信息焦虑"讲成每个打工人都有过的体验，再给出一个 AI 任务收件箱的解法。</p>
+        <div class="meta"><span class="tags">#AI提效 #打工人效率 #碎片管理</span><span class="go">查看</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 抖音 ================= -->
+<section class="plat" id="dy">
+  <div class="wrap">
+    <div class="plat-head">
+      <span class="tag">抖音 · Douyin</span>
+      <h2>抖音 · 口播台本</h2>
+      <p class="desc">3–9 分钟双人口播台本：开场钩子、情绪起伏、金句大字卡、合规自查。为"竖屏听感"而写，字字能读出声。</p>
+    </div>
+    <div class="works">
+      <a class="work" href="works/抖音/01-经济阵痛期普通人怎么明哲保身.html">
+        <div class="idx">DOUYIN · 01</div>
+        <h3>经济阵痛期，普通人怎么明哲保身？</h3>
+        <p class="sum">4 分钟双人口播：饭碗、现金流、负债、心态四关，用"14.6万亿 vs 4417亿"一组反差数据开场。</p>
+        <div class="meta"><span class="tags">#口播台本 #经济话题 #打工人</span><span class="go">阅读</span></div>
+      </a>
+      <a class="work" href="works/抖音/02-今年找工作到底难在哪.html">
+        <div class="idx">DOUYIN · 02</div>
+        <h3>今年找工作，到底难在哪？</h3>
+        <p class="sum">9 分钟双人口播：简历、行业、心态、Offer 四板块。12 条可截图金句，从共鸣焦虑走到给出力量。</p>
+        <div class="meta"><span class="tags">#口播台本 #求职 #面试技巧</span><span class="go">阅读</span></div>
+      </a>
+      <a class="work" href="works/抖音/03-面试官只问了一句最近学了什么.html">
+        <div class="idx">DOUYIN · 03</div>
+        <h3>面试官只问了一句"最近学了什么"，我当场答不上来</h3>
+        <p class="sum">60 秒单人口播：一个具体场景，一句"他在问你的未来"，把求职焦虑转成行动信号。</p>
+        <div class="meta"><span class="tags">#口播文案 #求职 #成长</span><span class="go">阅读</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <p class="tline">文案不是堆砌词藻，是 <em>替读者说出他还没说出口的话</em>。</p>
+    <p>Copywriting Portfolio · 内容创作 · 文案优化 · 多平台适配</p>
+  </div>
+</footer>
+
+</body>
+</html>

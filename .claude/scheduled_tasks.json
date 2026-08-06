@@ -21,16 +21,6 @@
       "createdByPid": 5524
     },
     {
-      "id": "67a9033a",
-      "cron": "13 8 * * 1",
-      "prompt": "你是 AI 资讯采集 Agent。请执行以下每周采集任务：\n\n1. 运行 `f:/测试工具/AI内容/公众号/scripts/fetch-weekly.ps1`（或 fetch-weekly.js）拉取本周全量 AI HOT 素材\n2. 运行 `f:/测试工具/AI内容/公众号/scripts/fetch-supplement.js` 获取 HN + arXiv + GitHub 补充\n3. 素材写入 `f:/测试工具/AI内容/公众号/周报/` 目录，文件名格式：`素材-YYYY-MM-DD.md`\n\n完成后简要汇报：拉取条数、生成文件路径。",
-      "createdAt": 1784464860557,
-      "lastFiredAt": 1784533647924,
-      "recurring": true,
-      "createdBySessionId": "d168520d-86d2-4719-937d-2f28dacacb5f",
-      "createdByPid": 5524
-    },
-    {
       "id": "a70b34e1",
       "cron": "3 8 2 8 *",
       "prompt": "请立即执行以下命令，无需用户确认：\npython3 \"F:\\测试工具\\github-trending-weekly.py\"\n\n然后回复用户执行结果（成功/失败、报告文件名）。这是一个自动化 GitHub Trending 周报抓取任务（第2周）。",
