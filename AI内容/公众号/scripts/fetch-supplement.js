@@ -4,7 +4,7 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const OUTPUT_DIR = process.argv[2] || 'f:/测试工具/AI公众号/每日简报';
+const OUTPUT_DIR = process.argv[2] || 'f:/测试工具/AI内容/公众号/每日简报';
 const CURL = 'curl -s --connect-timeout 15 --max-time 20';
 
 const now = new Date();

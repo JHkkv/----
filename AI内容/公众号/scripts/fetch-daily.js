@@ -5,7 +5,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const OUTPUT_DIR = process.argv[2] || 'f:/测试工具/AI公众号/每日简报';
+const OUTPUT_DIR = process.argv[2] || 'f:/测试工具/AI内容/公众号/每日简报';
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 aihot-skill/0.2.0';
 
 // 北京时间日期

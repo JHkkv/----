@@ -1,6 +1,6 @@
 # fetch-daily.ps1 — 拉取AI HOT过去24小时精选，存为每日简报
 param(
-    [string]$OutputDir = "f:\测试工具\AI公众号\每日简报"
+    [string]$OutputDir = "f:\测试工具\AI内容\公众号\每日简报"
 )
 
 $ErrorActionPreference = 'Stop'

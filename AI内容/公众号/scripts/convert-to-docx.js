@@ -6,7 +6,7 @@ const {
   ShadingType, PageNumber, ExternalHyperlink, PageBreak
 } = require('docx');
 
-const INPUT = process.argv[2] || 'f:/测试工具/AI公众号/发布队列/001-AI时代的写作革命-从零到一的实战复盘.md';
+const INPUT = process.argv[2] || 'f:/测试工具/AI内容/公众号/发布队列/001-AI时代的写作革命-从零到一的实战复盘.md';
 const OUTPUT = process.argv[3] || INPUT.replace(/\.md$/, '.docx');
 
 const md = fs.readFileSync(INPUT, 'utf-8');

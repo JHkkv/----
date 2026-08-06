@@ -2,7 +2,7 @@
 const { execSync } = require('child_process');
 
 const TASK_NAME = 'AI-Weekly-Fetch';
-const BAT_PATH = 'f:\\测试工具\\AI公众号\\scripts\\fetch-weekly.bat';
+const BAT_PATH = 'f:\\测试工具\\AI内容\\公众号\\scripts\\fetch-weekly.bat';
 
 const cmd = `schtasks /create /tn "${TASK_NAME}" /tr "cmd /c \\"${BAT_PATH}\\"" /sc weekly /d MON /st 08:30 /f`;
 

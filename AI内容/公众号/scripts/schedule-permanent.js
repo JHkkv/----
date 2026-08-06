@@ -3,8 +3,8 @@ const { execSync } = require('child_process');
 const path = require('path');
 
 const TASK_NAME = 'AI-Daily-Fetch';
-const SCRIPT_PATH = 'f:\\测试工具\\AI公众号\\scripts\\fetch-daily.js';
-const BAT_PATH = 'f:\\测试工具\\AI公众号\\scripts\\fetch-daily.bat';
+const SCRIPT_PATH = 'f:\\测试工具\\AI内容\\公众号\\scripts\\fetch-daily.js';
+const BAT_PATH = 'f:\\测试工具\\AI内容\\公众号\\scripts\\fetch-daily.bat';
 
 // 使用 schtasks 创建永久每日任务
 const cmd = `schtasks /create /tn "${TASK_NAME}" /tr "cmd /c \\"${BAT_PATH}\\"" /sc daily /st 08:15 /f`;
