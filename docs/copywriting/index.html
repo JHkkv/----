@@ -243,6 +243,24 @@
   }
   footer .tline { color: var(--ink-soft); margin-bottom: 10px; font-size: 15px; }
   footer .tline em { font-style: normal; color: var(--ink); font-weight: 600; }
+  footer .ppt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all .3s var(--ease);
+  }
+  footer .ppt-btn:hover {
+    background: var(--ink);
+    color: var(--paper);
+    transform: translateY(-2px);
+  }
 
   @media (max-width: 640px) {
     .wrap { padding: 0 22px; }
@@ -405,7 +423,8 @@
 <footer>
   <div class="wrap">
     <p class="tline">文案不是堆砌词藻，是 <em>替读者说出他还没说出口的话</em>。</p>
-    <p>Copywriting Portfolio · 内容创作 · 文案优化 · 多平台适配</p>
+    <p style="margin-bottom: 26px;">Copywriting Portfolio · 内容创作 · 文案优化 · 多平台适配</p>
+    <a class="ppt-btn" href="ppt/文案作品集.pptx" download>⬇ 下载演示文稿 PPT（12页精选）</a>
   </div>
 </footer>
 
