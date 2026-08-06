@@ -70,3 +70,6 @@ writing-agent/
 # 私密文件(简历/复盘/面试) — 仅存放于私人仓库, 永不推送到公开仓库
 求职/
 知识库/复盘/
+
+# ecommerce-optimizer 归档仓库(独立git, 不入公开)
+.claude/skills/ecommerce-optimizer/archive/
